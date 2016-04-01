@@ -81,6 +81,287 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/04/01/HTTP Session 攻击与防护/" title="HTTP Session 攻击与防护" itemprop="url">HTTP Session 攻击与防护</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="HTTP-Session-攻击与防护"><a href="#HTTP-Session-攻击与防护" class="headerlink" title="HTTP Session 攻击与防护"></a>HTTP Session 攻击与防护</h1><h2 id="Cookie的基本概念"><a href="#Cookie的基本概念" class="headerlink" title="Cookie的基本概念"></a>Cookie的基本概念</h2><hr>
+<p>Cookie 是网站在浏览器中存放的資料，內容包括使用者在网站上的偏好設定、或者是登入的 Session ID。网站利用 Session ID 來辨认访客的身份。</p>
+<p>当用户访问某一站点时，浏览器会根据用户访问的站点自动搜索可用的cookie，如果有可用的就随着请求一起发送到了服务端。每次接收到服务端的响应时又会更新本地的cookie信息。</p>
+<p>客户端和服务端的这种联系必然是需要有时间的规定的，所以需要定期清除session。这个问题就需要在两方面考虑了，一个是清除服务端session文件，一个是清除客户端的cookie信息，因为两者都各保存着一半的信息。</p>
+<p>Cookie 既然存放在 Client 端，那就有被窃取的風險。例如透過 <a href="https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29" target="_blank" rel="external">Cross-Site Scripting（跨站腳本共计，又稱 XSS）</a>，攻击者可以輕易窃取受害者的 Cookie。如果 Cookie 被偷走了，你的身份就被窃取了。</p>
+<p>Session 共计手法有三種：</p>
+<ul>
+<li>猜测 Session ID (Session Prediction)</li>
+<li>窃取 Session ID (Session Hijacking)</li>
+<li>固定 Session ID (Session Fixation)</li>
+</ul>
+<h2 id="Session-Prediction-猜测-Session-ID"><a href="#Session-Prediction-猜测-Session-ID" class="headerlink" title="Session Prediction (猜测 Session ID)"></a>Session Prediction (猜测 Session ID)</h2><p>Session ID 如同我們前面所說的，就如同是會員卡的编号。只要知道 Session ID，就可以成為這個使用者。如果 Session ID 的长度、复杂度、杂乱度不夠，就能夠被攻击者猜测。攻击者只要寫程序不斷暴力計算 Session ID，就有機會得到有效的 Session ID 而窃取使用者帳號。</p>
+<p>分析 Session ID 的工具可以用以下幾種</p>
+<p><a href="https://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" target="_blank" rel="external">OWASP WebScarab</a><br><a href="http://lcamtuf.coredump.cx/soft/stompy.tgz" target="_blank" rel="external">Stompy</a><br><a href="http://portswigger.net/burp/" target="_blank" rel="external">Burp Suite</a></p>
+<p>观察 Session ID 的亂數分布，可以了解是否能夠推出規律、猜测有效的 Session ID。</p>
+<h3 id="防护措施"><a href="#防护措施" class="headerlink" title="防护措施"></a>防护措施</h3><p>使用 Session ID 分析程序進行分析，評估是否无法被預測。如果沒有 100% 的把握自己撰寫的 Session ID 產生機制是安全的，不妨使用內建的 Session ID 產生 function，通常都有一定程度的安全。</p>
+<h2 id="Session-Hijacking-窃取-Session-ID"><a href="#Session-Hijacking-窃取-Session-ID" class="headerlink" title="Session Hijacking (窃取 Session ID)"></a>Session Hijacking (窃取 Session ID)</h2><p>窃取 Session ID 是最常見的共计手法。攻击者可以利用多種方式窃取 Cookie 獲取 Session ID：</p>
+<ul>
+<li>跨站腳本攻击 (Cross-Site Scripting (XSS))：利用 XSS 漏洞窃取使用者 Cookie</li>
+<li>网路窃听：使用 ARP Spoofing 等手法窃听网路封包獲取 Cookie<br>透過 Referer 取得：若网站允許 Session ID 使用 URL 传输，便可能從 Referer 取得 Session ID</li>
+</ul>
+<p>窃取利用的方式如下圖：</p>
+<p>受害者已經登入网站伺服器，並且取得 Session ID，在連線過程中攻击者用窃听的方式獲取受害者 Session ID。攻击者直接使用窃取到的 Session ID 送至伺服器，偽造受害者身分。若伺服器沒有檢查 Session ID 的使用者身分，則可以让攻击者得逞。<br><img src="https://lh3.googleusercontent.com/-glmPtR_Erp0/U3VCmo0w9yI/AAAAAAAAAZk/4rP1hOOC5W8/w600-no/2014-05-16-http-session-protection-01-session-id-sniffing.png" alt="enter image description here"></p>
+<p><img src="https://lh3.googleusercontent.com/--Si53ercaV0/U3VCmfP_ZKI/AAAAAAAAAZg/-Dirb4AYKGk/w600/2014-05-16-http-session-protection-02-session-id-spoofing.png" alt="enter image description here"></p>
+<h3 id="防护措施-1"><a href="#防护措施-1" class="headerlink" title="防护措施"></a>防护措施</h3><ul>
+<li>禁止將 Session ID 使用 URL (GET) 方式來传输</li>
+<li>設定加強安全性的 Cookie 属性：HttpOnly (无法被 JavaScript 存取)</li>
+<li>設定加強安全性的 Cookie 属性：Secure (只在 HTTPS 传输，若网站无 HTTPS 請勿設定)<br>在需要權限的頁面請使用者重新輸入密碼</li>
+</ul>
+<h2 id="Session-Fixation-固定-Session-ID"><a href="#Session-Fixation-固定-Session-ID" class="headerlink" title="Session Fixation (固定 Session ID)"></a>Session Fixation (固定 Session ID)</h2><p>攻击者诱使受害者使用特定的 Session ID 登入网站，而攻击者就能取得受害者的身分。</p>
+<ol>
+<li>攻击者從网站取得有效 Session ID</li>
+<li>使用社交工程等手法诱使受害者點選連結，使用該 Session ID 登入网站</li>
+<li>受害者輸入帳號密碼成功登入网站</li>
+<li>攻击者使用該 Session ID，操作受害者的帳號</li>
+</ol>
+<p><img src="https://lh5.googleusercontent.com/-qAizYyaOoRo/U3Vaaw6lqsI/AAAAAAAAAZ4/GNO7z3T6Mjg/s2400/2014-05-16-http-session-protection-04-session-id-fixation.png" alt="enter image description here"></p>
+<h2 id="防护措施-2"><a href="#防护措施-2" class="headerlink" title="防护措施"></a>防护措施</h2><p>在使用者登入成功後，立即更換 Session ID，防止攻击者操控 Session ID 給予受害者。<br>禁止將 Session ID 使用 URL (GET) 方式來传输</p>
+<h2 id="Session-防护"><a href="#Session-防护" class="headerlink" title="Session 防护"></a>Session 防护</h2><p>每個使用者在登入网站的時候，我們可以用每個人特有的識別資訊來確認身分：</p>
+<ul>
+<li>來源 IP 位址</li>
+<li>瀏覽器 User-Agent</li>
+</ul>
+<p>如果在同一個 Session 中，使用者的 IP 或者 User-Agent 改變了，最安全的作法就是把這個 Session 清除，請使用者重新登入。雖然使用者可能因為 IP 更換、Proxy 等因素導致被強制登出，但為了安全性，便利性必須要與之取捨。</p>
+<p>除了檢查個人識別資訊來確認是否盜用之外，也可以增加前述的 Session ID 的防护方式：</p>
+<ul>
+<li>Cookie 設定 Secure Flag (HTTPS)</li>
+<li>Cookie 設定 HTTP Only Flag</li>
+<li>成功登入後立即變更 Session ID</li>
+<li>Session 的清除機制也非常重要。當伺服器偵測到可疑的使用者 Session 行為時，例如攻击者惡意嘗試偽造 Session ID、使用者 Session 可能遭窃、或者逾時等情況，都應該立刻清除該 Session ID 以免被攻击者利用。</li>
+</ul>
+<h3 id="Session-清除机制时机："><a href="#Session-清除机制时机：" class="headerlink" title="Session 清除机制时机："></a>Session 清除机制时机：</h3><ul>
+<li>侦测到恶意尝试 Session ID</li>
+<li>识别咨询无效时</li>
+<li>超时</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
+<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
+<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
+<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
+<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
+<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
+<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
+<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
+<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
+<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
+<p>参考：</p>
+<ul>
+<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
+<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/01/Session原理、安全以及最基本的Express和Redis实现/" title="Session原理、安全以及最基本的Express和Redis实现" itemprop="url">Session原理、安全以及最基本的Express和Redis实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Session原理、安全以及最基本的Express和Redis实现"><a href="#Session原理、安全以及最基本的Express和Redis实现" class="headerlink" title="Session原理、安全以及最基本的Express和Redis实现"></a>Session原理、安全以及最基本的Express和Redis实现</h1><h2 id="Session基础概念"><a href="#Session基础概念" class="headerlink" title="Session基础概念"></a>Session基础概念</h2><hr>
+<p>Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。</p>
+<p>HTTP协议在设计的时候是无状态的。这是一个很关键的概念，意味着服务器在处理请求的时候，并不关注这个请求是谁发来的。这对于以提供内容为核心的Web1.0，例如门户网站，非常适合。然而对于以应用服务为核心的Web 2.0而言，服务器端必须有能力从请求中提取出请求者的身份信息，以在请求者不用反复输入身份的情况下，提供连续的服务。</p>
+<p>实现请求身份验证的方式很多，其中一种广泛接受的方式是使用服务器端产生的Session ID结合浏览器的Cookie实现对Session的管理，一般来说包括以下4个步骤：</p>
+<ol>
+<li>服务器端的产生Session ID</li>
+<li>服务器端和客户端存储Session ID</li>
+<li>从HTTP Header中提取Session ID</li>
+<li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
+</ol>
+<p><img src="https://segmentfault.com/img/bVlcpM" alt="enter image description here"></p>
+<p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
+<p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
+<h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
+<p>Redis是一个非常适合用于Session管理的数据库。第一，它的结构简单，key-value的形式非常符合SessionID-UserID的存储；第二，读写速度非常快；第三，自身支持数据自动过期和清除；第四，语法、部署非常简单。基于以上原因，很多Session管理都是基于Redis实现的。</p>
+<h2 id="Session的安全问题"><a href="#Session的安全问题" class="headerlink" title="Session的安全问题"></a>Session的安全问题</h2><hr>
+<p>SessionId就如同请求者的身份证，一旦被攻击者恶意获得，攻击者便可以伪装成请求者对服务器发起请求，也就是我们经常听到的会话劫持(Session/Cookie Hijack)<br>关于会话劫持的原理推荐大家去看<a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">这篇文章</a></p>
+<p>基于上述实现方法的Session管理，我认为基本上可以排除</p>
+<ul>
+<li>暴力破解SessionId</li>
+<li>恶意植入固定SessionId</li>
+</ul>
+<p>两种可能，因为uid的库基本上可以保证SessionId的随机性；而传递SessionId则依赖HTTP请求头中的Cookie信息而非URL，同时在用户登录立刻更换SessionId。</p>
+<p>唯一的可能性来源于Session的监听，而对于这种攻击有效的两种防止办法是：</p>
+<ul>
+<li>Https<br>很多网站仅仅在Login的阶段使用Https防止用户的用户名、密码信息被监听者获取，但是随后的SessionId同样有可能被监听者获取而伪造登录者的身份信息。因此更加推荐的方式是所有的信息传递全部使用Https实现，这样即使监听着截获了信息也无法破解其中的内容。关于如何使用NodeJS建立一个HTTPS的server可以参考《HTTPS的原理和NodeJS的实现》 这篇文章</li>
+<li>httpOnly<br>Express在options中提供了httpOnly的属性，此属性默认值为true，这个属性保证了Cookie的信息不能够通过JavaScript脚本获取。</li>
+</ul>
+<p>参考:</p>
+<ol>
+<li><a href="https://segmentfault.com/a/1190000002630691" target="_blank" rel="external">https://segmentfault.com/a/1190000002630691</a></li>
+<li><a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">http://devco.re/blog/2014/06/03/http-session-protection/</a></li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
   </h1>
   <p class="article-author">By
@@ -256,6 +537,10 @@
 			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
 		  
 		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>3</sup></a></li>
+		  
+		
 		</ul>
 </div>
 
@@ -264,6 +549,18 @@
 <div class="tagslist">
 	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
 		
 			
 				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
