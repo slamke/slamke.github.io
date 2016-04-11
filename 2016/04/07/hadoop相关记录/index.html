@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Java中一个线程可以多次start吗? | 雁渡寒潭 风吹疏竹</title>
+    <title>hadoop相关记录 | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="通过Thread实例的start()，一个Thread的实例只能产生一个线程。">
+    <meta name="description" content="使用FUSE-DFS mount HDFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java中一个线程可以多次start吗?">
-<meta property="og:url" content="slamke.github.io/2016/03/23/java-multi-thread-start/index.html">
+<meta property="og:title" content="hadoop相关记录">
+<meta property="og:url" content="slamke.github.io/2016/04/07/hadoop相关记录/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="通过Thread实例的start()，一个Thread的实例只能产生一个线程。">
-<meta property="og:updated_time" content="2016-03-23T06:14:25.092Z">
+<meta property="og:description" content="使用FUSE-DFS mount HDFS">
+<meta property="og:updated_time" content="2016-04-11T11:40:03.156Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java中一个线程可以多次start吗?">
-<meta name="twitter:description" content="通过Thread实例的start()，一个Thread的实例只能产生一个线程。">
+<meta name="twitter:title" content="hadoop相关记录">
+<meta name="twitter:description" content="使用FUSE-DFS mount HDFS">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -80,14 +80,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
+      <a href="/2016/04/07/hadoop相关记录/" title="hadoop相关记录" itemprop="url">hadoop相关记录</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> 发表于 2016-03-23</time>
+    <time datetime="2016-04-07T01:28:09.000Z" itemprop="datePublished"> 发表于 2016-04-07</time>
     
   </p>
 </header>
@@ -96,11 +96,11 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java中一个线程可以多次start吗"><span class="toc-number">1.</span> <span class="toc-text">Java中一个线程可以多次start吗?</span></a></li></ol>
+			
 		
 		</div>
 		
-		<h1 id="Java中一个线程可以多次start吗"><a href="#Java中一个线程可以多次start吗" class="headerlink" title="Java中一个线程可以多次start吗?"></a>Java中一个线程可以多次start吗?</h1><p><strong>不可以</strong><br>通过Thread实例的start()，一个Thread的实例只能产生一个线程。一个Thread的实例一旦调用start()方法，这个实例的started标记就标记为true，事实中不管这个线程后来有没有执行到底，只要调用了一次start()就再也没有机会运行了。<br>一个线程对象只能调用一次start方法.从new到等待运行是单行道,所以如果你对一个已经启动的线程对象再调用一次start方法的话,会产生:IllegalThreadStateException异常. 可以被重复调用的是run()方法。<br>Thread类中run()和start()方法的区别如下:<br>run()方法: 在本线程内调用该Runnable对象的run()方法，可以重复多次调用；<br>start()方法: 启动一个线程，调用该Runnable对象的run()方法，不能多次启动一个线程</p>
+		<p><a href="http://jiangbo.me/blog/2012/10/23/mount-hdfs-with-fuse-dfs/" target="_blank" rel="external">使用FUSE-DFS mount HDFS</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -108,13 +108,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
+  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/多线程/">多线程</a>
+  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/Hdfs/">Hdfs</a>
   </div>
 
 </div>
@@ -123,7 +123,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2016/03/23/java-multi-thread-start/" data-title="Java中一个线程可以多次start吗? | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/04/07/hadoop相关记录/" data-title="hadoop相关记录 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -137,13 +137,21 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/03/23/java-io/" title="Java IO">
+ <a href="/2016/04/07/Spring实现数据库读写分离/" title="Spring实现数据库读写分离">
   <strong>上一篇：</strong><br/>
   <span>
-  Java IO</span>
+  Spring实现数据库读写分离</span>
 </a>
 </div>
 
+
+<div class="next">
+<a href="/2016/04/05/Http-Servlet汇总/"  title="Http Servlet汇总">
+ <strong>下一篇：</strong><br/> 
+ <span>Http Servlet汇总
+</span>
+</a>
+</div>
 
 </nav>
 
@@ -155,7 +163,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java中一个线程可以多次start吗"><span class="toc-number">1.</span> <span class="toc-text">Java中一个线程可以多次start吗?</span></a></li></ol>
+ 
  
   </div>
 
