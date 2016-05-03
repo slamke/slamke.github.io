@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,528 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/04/03/https是如何确保安全的/" title="https是如何确保安全的" itemprop="url">https是如何确保安全的</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="https是如何确保安全的"><a href="#https是如何确保安全的" class="headerlink" title="https是如何确保安全的"></a>https是如何确保安全的</h1><h2 id="什么是Https"><a href="#什么是Https" class="headerlink" title="什么是Https"></a>什么是Https</h2><p>HTTPS（全称：Hypertext Transfer Protocol over Secure Socket Layer），是以安全为目标的HTTP通道，简单讲是HTTP的安全版。即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL</p>
+<h2 id="Https的作用"><a href="#Https的作用" class="headerlink" title="Https的作用"></a>Https的作用</h2><p>内容加密 建立一个信息安全通道，来保证数据传输的安全；<br>身份认证 确认网站的真实性<br>数据完整性 防止内容被第三方冒充或者篡改</p>
+<h2 id="Https的劣势"><a href="#Https的劣势" class="headerlink" title="Https的劣势"></a>Https的劣势</h2><p>对数据进行加解密决定了它比http慢<br>需要进行非对称的加解密，且需要三次握手。首次连接比较慢点，当然现在也有很多的优化。</p>
+<p>出于安全考虑，浏览器不会在本地保存HTTPS缓存。实际上，只要在HTTP头中使用特定命令，HTTPS是可以缓存的。Firefox默认只在内存中缓存HTTPS。但是，只要头命令中有Cache-Control: Public，缓存就会被写到硬盘上。 IE只要http头允许就可以缓存https内容，缓存策略与是否使用HTTPS协议无关。</p>
+<h2 id="HTTPS和HTTP的区别"><a href="#HTTPS和HTTP的区别" class="headerlink" title="HTTPS和HTTP的区别"></a>HTTPS和HTTP的区别</h2><p>https协议需要到CA申请证书。<br>http是超文本传输协议，信息是明文传输；https 则是具有安全性的ssl加密传输协议。<br>http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。<br>http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
+<h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><ul>
+<li>为什么要有数字证书？</li>
+</ul>
+<p>对于请求方来说，它怎么能确定它所得到的公钥一定是从目标主机那里发布的，而且没有被篡改过呢？亦或者请求的目标主机本本身就从事窃取用户信息的不正当行为呢？这时候，我们需要有一个权威的值得信赖的第三方机构(一般是由政府审核并授权的机构)来统一对外发放主机机构的公钥，只要请求方这种机构获取公钥，就避免了上述问题的发生。</p>
+<h2 id="SSL、TLS的握手过程"><a href="#SSL、TLS的握手过程" class="headerlink" title="SSL、TLS的握手过程"></a>SSL、TLS的握手过程</h2><p>SSL与TLS握手整个过程如下图所示，下面会详细介绍每一步的具体内容：<br><img src="https://segmentfault.com/image?src=http://sean-images.qiniudn.com/tls-ssl.svg&amp;objectId=1190000002554673&amp;token=ec9df05ae1ad4ca98daa795a168ea462" alt="握手"></p>
+<p>现在的https基本都使用TLS了，因为更加安全.</p>
+<p>SSL协议在握手阶段使用的是非对称加密，在传输阶段使用的是对称加密，也就是说在SSL上传送的数据是使用对称密钥加密的！因为非对称加密的速度缓慢，耗费资源。其实当客户端和主机使用非对称加密方式建立连接后，客户端和主机已经决定好了在传输过程使用的对称加密算法和关键的对称加密密钥，由于这个过程本身是安全可靠的，也即对称加密密钥是不可能被窃取盗用的，因此，保证了在传输过程中对数据进行对称加密也是安全可靠的，因为除了客户端和主机之外，不可能有第三方窃取并解密出对称加密密钥！如果有人窃听通信，他可以知道双方选择的加密方法，以及三个随机数中的两个。整个通话的安全，只取决于第三个随机数（Premaster secret）能不能被破解。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>https实际就是在TCP层与http层之间加入了SSL/TLS来为上层的安全保驾护航，主要用到对称加密、非对称加密、证书，等技术进行客户端与服务器的数据加密传输，最终达到保证整个通信的安全性。</p>
+<p>流程:<br>前提：CA证书<br>握手阶段: 生成随机数 + 数据摘要 + 数字签名 + 非对称加密算法 ==&gt; 对称机密的密钥<br>数据传输阶段： 基于对称加密密钥的交流</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Https/">Https</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/03/如何定位消耗CPU最多的线程/" title="如何定位消耗CPU最多的线程" itemprop="url">如何定位消耗CPU最多的线程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-03T11:24:27.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>#如何定位消耗CPU最多的线程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">                        <span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                        <span class="keyword">try</span>&#123;</span><br><span class="line">                                                Thread.sleep(<span class="number">100000</span>);</span><br><span class="line">                                        &#125;<span class="keyword">catch</span>(Exception e)&#123;&#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;.start();</span><br><span class="line">                &#125;</span><br><span class="line">                Thread t=<span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                <span class="keyword">int</span> i=<span class="number">0</span>;</span><br><span class="line">                                <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                                        i=(i++)/<span class="number">100</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;;</span><br><span class="line">                t.setName(<span class="string">"Busiest Thread"</span>);</span><br><span class="line">                t.start();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个例子里新创建了11个线程，其中10个线程没干什么事，主要是sleep，另外有一个线程在循环里一直跑着，可以想象这个线程是这个进程里最耗cpu的线程了，那怎么把这个线程给抓出来呢？</p>
+<p>首先我们可以通过<figure class="highlight plain"><figcaption><span>-Hp <pid>```来看这个进程里所有线程的cpu消耗情况，得到类似下面的数据</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ top -Hp 18207</span><br><span class="line">top - 19:11:43 up 573 days,  2:43,  2 users,  load average: 3.03, 3.03, 3.02</span><br><span class="line">Tasks:  44 total,   1 running,  43 sleeping,   0 stopped,   0 zombie</span><br><span class="line">Cpu(s): 18.8%us,  0.0%sy,  0.0%ni, 81.1%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st</span><br><span class="line">Mem:  99191752k total, 98683576k used,   508176k free,   128248k buffers</span><br><span class="line">Swap:  1999864k total,   191064k used,  1808800k free, 17413760k cached</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br><span class="line">18207 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18208 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.09 java Test</span><br><span class="line">18209 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18210 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18211 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18212 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18213 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18214 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18215 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18216 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18217 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18218 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18219 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18220 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18221 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18222 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18223 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18224 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18225 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18226 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18227 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br></pre></td></tr></table></figure></p>
+<p>拿到这个结果之后，我们可以看到cpu最高的线程是pid为18250的线程，占了99.8%：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br></pre></td></tr></table></figure></p>
+<p>接着我们可以通过<figure class="highlight plain"><figcaption><span><pid>```的输出来看各个线程栈:</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ jstack 18207</span><br><span class="line">2016-03-30 19:12:23</span><br><span class="line">Full thread dump OpenJDK 64-Bit Server VM (25.66-b60 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;Attach Listener&quot; #30 daemon prio=9 os_prio=0 tid=0x00007fb90be13000 nid=0x47d7 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;DestroyJavaVM&quot; #29 prio=5 os_prio=0 tid=0x00007fb96245b800 nid=0x4720 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br><span class="line"></span><br><span class="line">&quot;Thread-9&quot; #27 prio=5 os_prio=0 tid=0x00007fb91498c800 nid=0x4749 waiting on condition [0x00007fb906bfe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-8&quot; #26 prio=5 os_prio=0 tid=0x00007fb91498b800 nid=0x4748 waiting on condition [0x00007fb906ffe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-7&quot; #25 prio=5 os_prio=0 tid=0x00007fb91498b000 nid=0x4747 waiting on condition [0x00007fb9073fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-6&quot; #24 prio=5 os_prio=0 tid=0x00007fb91498a000 nid=0x4746 waiting on condition [0x00007fb9077fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>上面的线程栈我们注意到nid的值其实就是线程ID，它是十六进制的，我们将消耗cpu最高的线程18250，转成十六进制0X47A，然后从上面的线程栈里找到nid=0X47A的线程，其栈为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br></pre></td></tr></table></figure></p>
+<p>即将最耗cpu的线程找出来了，是Businest Thread</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/多线程/">多线程</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
+<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
+<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
+<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
+<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
+<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
+<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
+<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
+<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
+<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
+<p>参考：</p>
+<ul>
+<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
+<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/01/Session原理、安全以及最基本的Express和Redis实现/" title="Session原理、安全以及最基本的Express和Redis实现" itemprop="url">Session原理、安全以及最基本的Express和Redis实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Session原理、安全以及最基本的Express和Redis实现"><a href="#Session原理、安全以及最基本的Express和Redis实现" class="headerlink" title="Session原理、安全以及最基本的Express和Redis实现"></a>Session原理、安全以及最基本的Express和Redis实现</h1><h2 id="Session基础概念"><a href="#Session基础概念" class="headerlink" title="Session基础概念"></a>Session基础概念</h2><hr>
+<p>Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。</p>
+<p>HTTP协议在设计的时候是无状态的。这是一个很关键的概念，意味着服务器在处理请求的时候，并不关注这个请求是谁发来的。这对于以提供内容为核心的Web1.0，例如门户网站，非常适合。然而对于以应用服务为核心的Web 2.0而言，服务器端必须有能力从请求中提取出请求者的身份信息，以在请求者不用反复输入身份的情况下，提供连续的服务。</p>
+<p>实现请求身份验证的方式很多，其中一种广泛接受的方式是使用服务器端产生的Session ID结合浏览器的Cookie实现对Session的管理，一般来说包括以下4个步骤：</p>
+<ol>
+<li>服务器端的产生Session ID</li>
+<li>服务器端和客户端存储Session ID</li>
+<li>从HTTP Header中提取Session ID</li>
+<li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
+</ol>
+<p><img src="https://segmentfault.com/img/bVlcpM" alt="enter image description here"></p>
+<p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
+<p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
+<h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
+<p>Redis是一个非常适合用于Session管理的数据库。第一，它的结构简单，key-value的形式非常符合SessionID-UserID的存储；第二，读写速度非常快；第三，自身支持数据自动过期和清除；第四，语法、部署非常简单。基于以上原因，很多Session管理都是基于Redis实现的。</p>
+<h2 id="Session的安全问题"><a href="#Session的安全问题" class="headerlink" title="Session的安全问题"></a>Session的安全问题</h2><hr>
+<p>SessionId就如同请求者的身份证，一旦被攻击者恶意获得，攻击者便可以伪装成请求者对服务器发起请求，也就是我们经常听到的会话劫持(Session/Cookie Hijack)<br>关于会话劫持的原理推荐大家去看<a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">这篇文章</a></p>
+<p>基于上述实现方法的Session管理，我认为基本上可以排除</p>
+<ul>
+<li>暴力破解SessionId</li>
+<li>恶意植入固定SessionId</li>
+</ul>
+<p>两种可能，因为uid的库基本上可以保证SessionId的随机性；而传递SessionId则依赖HTTP请求头中的Cookie信息而非URL，同时在用户登录立刻更换SessionId。</p>
+<p>唯一的可能性来源于Session的监听，而对于这种攻击有效的两种防止办法是：</p>
+<ul>
+<li>Https<br>很多网站仅仅在Login的阶段使用Https防止用户的用户名、密码信息被监听者获取，但是随后的SessionId同样有可能被监听者获取而伪造登录者的身份信息。因此更加推荐的方式是所有的信息传递全部使用Https实现，这样即使监听着截获了信息也无法破解其中的内容。关于如何使用NodeJS建立一个HTTPS的server可以参考《HTTPS的原理和NodeJS的实现》 这篇文章</li>
+<li>httpOnly<br>Express在options中提供了httpOnly的属性，此属性默认值为true，这个属性保证了Cookie的信息不能够通过JavaScript脚本获取。</li>
+</ul>
+<p>参考:</p>
+<ol>
+<li><a href="https://segmentfault.com/a/1190000002630691" target="_blank" rel="external">https://segmentfault.com/a/1190000002630691</a></li>
+<li><a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">http://devco.re/blog/2014/06/03/http-session-protection/</a></li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/01/HTTP Session 攻击与防护/" title="HTTP Session 攻击与防护" itemprop="url">HTTP Session 攻击与防护</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="HTTP-Session-攻击与防护"><a href="#HTTP-Session-攻击与防护" class="headerlink" title="HTTP Session 攻击与防护"></a>HTTP Session 攻击与防护</h1><h2 id="Cookie的基本概念"><a href="#Cookie的基本概念" class="headerlink" title="Cookie的基本概念"></a>Cookie的基本概念</h2><hr>
+<p>Cookie 是网站在浏览器中存放的資料，內容包括使用者在网站上的偏好設定、或者是登入的 Session ID。网站利用 Session ID 來辨认访客的身份。</p>
+<p>当用户访问某一站点时，浏览器会根据用户访问的站点自动搜索可用的cookie，如果有可用的就随着请求一起发送到了服务端。每次接收到服务端的响应时又会更新本地的cookie信息。</p>
+<p>客户端和服务端的这种联系必然是需要有时间的规定的，所以需要定期清除session。这个问题就需要在两方面考虑了，一个是清除服务端session文件，一个是清除客户端的cookie信息，因为两者都各保存着一半的信息。</p>
+<p>Cookie 既然存放在 Client 端，那就有被窃取的風險。例如透過 <a href="https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29" target="_blank" rel="external">Cross-Site Scripting（跨站腳本共计，又稱 XSS）</a>，攻击者可以輕易窃取受害者的 Cookie。如果 Cookie 被偷走了，你的身份就被窃取了。</p>
+<p>Session 共计手法有三種：</p>
+<ul>
+<li>猜测 Session ID (Session Prediction)</li>
+<li>窃取 Session ID (Session Hijacking)</li>
+<li>固定 Session ID (Session Fixation)</li>
+</ul>
+<h2 id="Session-Prediction-猜测-Session-ID"><a href="#Session-Prediction-猜测-Session-ID" class="headerlink" title="Session Prediction (猜测 Session ID)"></a>Session Prediction (猜测 Session ID)</h2><p>Session ID 如同我們前面所說的，就如同是會員卡的编号。只要知道 Session ID，就可以成為這個使用者。如果 Session ID 的长度、复杂度、杂乱度不夠，就能夠被攻击者猜测。攻击者只要寫程序不斷暴力計算 Session ID，就有機會得到有效的 Session ID 而窃取使用者帳號。</p>
+<p>分析 Session ID 的工具可以用以下幾種</p>
+<p><a href="https://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" target="_blank" rel="external">OWASP WebScarab</a><br><a href="http://lcamtuf.coredump.cx/soft/stompy.tgz" target="_blank" rel="external">Stompy</a><br><a href="http://portswigger.net/burp/" target="_blank" rel="external">Burp Suite</a></p>
+<p>观察 Session ID 的亂數分布，可以了解是否能夠推出規律、猜测有效的 Session ID。</p>
+<h3 id="防护措施"><a href="#防护措施" class="headerlink" title="防护措施"></a>防护措施</h3><p>使用 Session ID 分析程序進行分析，評估是否无法被預測。如果沒有 100% 的把握自己撰寫的 Session ID 產生機制是安全的，不妨使用內建的 Session ID 產生 function，通常都有一定程度的安全。</p>
+<h2 id="Session-Hijacking-窃取-Session-ID"><a href="#Session-Hijacking-窃取-Session-ID" class="headerlink" title="Session Hijacking (窃取 Session ID)"></a>Session Hijacking (窃取 Session ID)</h2><p>窃取 Session ID 是最常見的共计手法。攻击者可以利用多種方式窃取 Cookie 獲取 Session ID：</p>
+<ul>
+<li>跨站腳本攻击 (Cross-Site Scripting (XSS))：利用 XSS 漏洞窃取使用者 Cookie</li>
+<li>网路窃听：使用 ARP Spoofing 等手法窃听网路封包獲取 Cookie<br>透過 Referer 取得：若网站允許 Session ID 使用 URL 传输，便可能從 Referer 取得 Session ID</li>
+</ul>
+<p>窃取利用的方式如下圖：</p>
+<p>受害者已經登入网站伺服器，並且取得 Session ID，在連線過程中攻击者用窃听的方式獲取受害者 Session ID。攻击者直接使用窃取到的 Session ID 送至伺服器，偽造受害者身分。若伺服器沒有檢查 Session ID 的使用者身分，則可以让攻击者得逞。<br><img src="https://lh3.googleusercontent.com/-glmPtR_Erp0/U3VCmo0w9yI/AAAAAAAAAZk/4rP1hOOC5W8/w600-no/2014-05-16-http-session-protection-01-session-id-sniffing.png" alt="enter image description here"></p>
+<p><img src="https://lh3.googleusercontent.com/--Si53ercaV0/U3VCmfP_ZKI/AAAAAAAAAZg/-Dirb4AYKGk/w600/2014-05-16-http-session-protection-02-session-id-spoofing.png" alt="enter image description here"></p>
+<h3 id="防护措施-1"><a href="#防护措施-1" class="headerlink" title="防护措施"></a>防护措施</h3><ul>
+<li>禁止將 Session ID 使用 URL (GET) 方式來传输</li>
+<li>設定加強安全性的 Cookie 属性：HttpOnly (无法被 JavaScript 存取)</li>
+<li>設定加強安全性的 Cookie 属性：Secure (只在 HTTPS 传输，若网站无 HTTPS 請勿設定)<br>在需要權限的頁面請使用者重新輸入密碼</li>
+</ul>
+<h2 id="Session-Fixation-固定-Session-ID"><a href="#Session-Fixation-固定-Session-ID" class="headerlink" title="Session Fixation (固定 Session ID)"></a>Session Fixation (固定 Session ID)</h2><p>攻击者诱使受害者使用特定的 Session ID 登入网站，而攻击者就能取得受害者的身分。</p>
+<ol>
+<li>攻击者從网站取得有效 Session ID</li>
+<li>使用社交工程等手法诱使受害者點選連結，使用該 Session ID 登入网站</li>
+<li>受害者輸入帳號密碼成功登入网站</li>
+<li>攻击者使用該 Session ID，操作受害者的帳號</li>
+</ol>
+<p><img src="https://lh5.googleusercontent.com/-qAizYyaOoRo/U3Vaaw6lqsI/AAAAAAAAAZ4/GNO7z3T6Mjg/s2400/2014-05-16-http-session-protection-04-session-id-fixation.png" alt="enter image description here"></p>
+<h2 id="防护措施-2"><a href="#防护措施-2" class="headerlink" title="防护措施"></a>防护措施</h2><p>在使用者登入成功後，立即更換 Session ID，防止攻击者操控 Session ID 給予受害者。<br>禁止將 Session ID 使用 URL (GET) 方式來传输</p>
+<h2 id="Session-防护"><a href="#Session-防护" class="headerlink" title="Session 防护"></a>Session 防护</h2><p>每個使用者在登入网站的時候，我們可以用每個人特有的識別資訊來確認身分：</p>
+<ul>
+<li>來源 IP 位址</li>
+<li>瀏覽器 User-Agent</li>
+</ul>
+<p>如果在同一個 Session 中，使用者的 IP 或者 User-Agent 改變了，最安全的作法就是把這個 Session 清除，請使用者重新登入。雖然使用者可能因為 IP 更換、Proxy 等因素導致被強制登出，但為了安全性，便利性必須要與之取捨。</p>
+<p>除了檢查個人識別資訊來確認是否盜用之外，也可以增加前述的 Session ID 的防护方式：</p>
+<ul>
+<li>Cookie 設定 Secure Flag (HTTPS)</li>
+<li>Cookie 設定 HTTP Only Flag</li>
+<li>成功登入後立即變更 Session ID</li>
+<li>Session 的清除機制也非常重要。當伺服器偵測到可疑的使用者 Session 行為時，例如攻击者惡意嘗試偽造 Session ID、使用者 Session 可能遭窃、或者逾時等情況，都應該立刻清除該 Session ID 以免被攻击者利用。</li>
+</ul>
+<h3 id="Session-清除机制时机："><a href="#Session-清除机制时机：" class="headerlink" title="Session 清除机制时机："></a>Session 清除机制时机：</h3><ul>
+<li>侦测到恶意尝试 Session ID</li>
+<li>识别咨询无效时</li>
+<li>超时</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Java-IO"><a href="#Java-IO" class="headerlink" title="Java IO"></a>Java IO</h1><h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><p>Java IO流是既可以从中读取，也可以写入到其中的数据流。正如这个系列教程之前提到过的，流通常会与数据源、数据流向目的地相关联，比如文件、网络等等。</p>
+<p>流和数组不一样，不能通过索引读写数据。在流中，你也不能像数组那样前后移动读取数据，除非使用RandomAccessFile 处理文件。流仅仅只是一个连续的数据流。</p>
+<p>某些类似PushbackInputStream 流的实现允许你将数据重新推回到流中，以便重新读取。然而你只能把有限的数据推回流中，并且你不能像操作数组那样随意读取数据。流中的数据只能够顺序访问。</p>
+<p>Java IO流通常是基于字节或者基于字符的。字节流通常以“stream”命名，比如InputStream和OutputStream。除了DataInputStream 和DataOutputStream 还能够读写int, long, float和double类型的值以外，其他流在一个操作时间内只能读取或者写入一个原始字节。</p>
+<p>字符流通常以“Reader”或者“Writer”命名。字符流能够读写字符(比如Latin1或者Unicode字符)。可以浏览Java Readers and Writers获取更多关于字符流输入输出的信息。</p>
+<ul>
+<li>InputStream</li>
+</ul>
+<p>java.io.InputStream类是所有Java IO输入流的基类。如果你正在开发一个从流中读取数据的组件，请尝试用InputStream替代任何它的子类(比如FileInputStream)进行开发。这么做能够让你的代码兼容任何类型而非某种确定类型的输入流。</p>
+<p>然而仅仅依靠InputStream并不总是可行。如果你需要将读过的数据推回到流中，你必须使用PushbackInputStream，这意味着你的流变量只能是这个类型，否则在代码中就不能调用PushbackInputStream的unread()方法。</p>
+<p>通常使用输入流中的read()方法读取数据。read()方法返回一个整数，代表了读取到的字节的内容(译者注：0 ~ 255)。当达到流末尾没有更多数据可以读取的时候，read()方法返回-1。</p>
+<ul>
+<li>OutputStream</li>
+</ul>
+<p>java.io.OutputStream是Java IO中所有输出流的基类。如果你正在开发一个能够将数据写入流中的组件，请尝试使用OutputStream替代它的所有子类。<br>-组合流</p>
+<p>你可以将流整合起来以便实现更高级的输入和输出操作。比如，一次读取一个字节是很慢的，所以可以从磁盘中一次读取一大块数据，然后从读到的数据块中获取字节。为了实现缓冲，可以把InputStream包装到BufferedInputStream中。</p>
+<h2 id="字节和字符数组"><a href="#字节和字符数组" class="headerlink" title="字节和字符数组"></a>字节和字符数组</h2><p>Java中的字节和字符数组，经常被用于临时存储应用程序内部的数据，所以数组也是常见的数据来源以及数据流目的地。如果你在程序执行过程中需要频繁访问文件的内容，你可能会愿意将文件加载到数组中去。当然你可以通过索引直接访问这些数组。但是如果你有一个组件的设计初衷是从InputStream或者Reader而非数组中读取某些数据呢？</p>
+<ul>
+<li>通过InputStream或者Reader读取数组</li>
+</ul>
+<p>为了让你的组件能够从数组中读取数据，你需要把字节或者字符数组包装到一个ByteArrayInputStream或者CharArrayReader中。这种方式允许通过包装好的stream或者reader读取数组中的字节或者字符数据。</p>
+<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>]; </span><br><span class="line"><span class="comment">//write data into byte array...  </span></span><br><span class="line">InputStream input = <span class="keyword">new</span> ByteArrayInputStream(bytes);  </span><br><span class="line"><span class="comment">//read first byte </span></span><br><span class="line"><span class="keyword">int</span> data = input.read(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(data != -<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">//do something with data</span></span><br><span class="line">    <span class="comment">//read next byte      </span></span><br><span class="line">    data = input.read(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>通过InputStream或者Reader写入数组</li>
+</ul>
+<p>同样可以将数据写入到ByteArrayOutputStream或者CharArrayWriter中。你所需要做的是创建一个ByteArrayOutputStream或者CharArrayWriter，然后写入数据，就像你操作其他类型的stream或者writer一样。当所有的数据都写入完毕，只需调用toByteArray()或者toCharArray()，即可得到写入数据的数组形式。</p>
+<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">output.write(<span class="string">"This text is converted to bytes"</span>.toBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line"><span class="keyword">byte</span>[] bytes = output.toByteArray();</span><br></pre></td></tr></table></figure></p>
+<p>操作一个字符数组的代码也与本例类似，只需要将字符数组包装到CharArrayWriter中。</p>
+<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>Java IO中的管道为运行在同一个JVM中的两个线程提供了通信的能力。所以管道也可以作为数据源以及目标媒介。</p>
+<p>你不能利用管道与不同的JVM中的线程通信(不同的进程)。在概念上，Java的管道不同于Unix/Linux系统中的管道。在Unix/Linux中，运行在不同地址空间的两个进程可以通过管道通信。在Java中，通信的双方应该是运行在同一进程中的不同线程。</p>
+<ul>
+<li>通过Java IO创建管道</li>
+</ul>
+<p>可以通过Java IO中的PipedOutputStream和PipedInputStream创建管道。一个PipedInputStream流应该和一个PipedOutputStream流相关联。一个线程通过PipedOutputStream写入的数据可以被另一个线程通过相关联的PipedInputStream读取出来。<br>你也可以使用两个管道共有的connect()方法使之相关联。PipedInputStream和PipedOutputStream都拥有一个可以互相关联的connect()方法。</p>
+<ul>
+<li>管道和线程</li>
+</ul>
+<p>请记得，当使用两个相关联的管道流时，务必将它们分配给不同的线程。read()方法和write()方法调用时会导致流阻塞，这意味着如果你尝试在一个线程中同时进行读和写，可能会导致线程死锁。</p>
+<ul>
+<li>管道的替代</li>
+</ul>
+<p>除了管道之外，一个JVM中不同线程之间还有许多通信的方式。实际上，线程在大多数情况下会传递完整的对象信息而非原始的字节数据。但是，如果你需要在线程之间传递字节数据，Java IO的管道是一个不错的选择。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/IO/">IO</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +610,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> 发表于 2016-03-23</time>
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
     
   </p>
 </header>
@@ -141,15 +663,15 @@
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="https://github.com/slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -159,7 +681,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -167,11 +689,23 @@
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>3</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>1</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>1</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>2</sup></a></li>
 		  
 		
 		  
@@ -188,11 +722,15 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">标签</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Web/" title="Web">Web<sup>5</sup></a></li>
+				<li><a href="/tags/Web/" title="Web">Web<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>4</sup></a></li>
 			
 		
 			
@@ -212,11 +750,19 @@
 			
 		
 			
-				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
 			
 		
 			
@@ -224,11 +770,19 @@
 			
 		
 			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>1</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
 			
 		
 			
@@ -236,7 +790,7 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -244,7 +798,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情链接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -260,11 +814,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -416,7 +970,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
