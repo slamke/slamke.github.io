@@ -12,7 +12,7 @@
 
     
     <meta name="description" content="UDTF
-HIVE中UDTF编写和使用
+Hive中UDTF编写和使用
 
 UDAF
 Hive udaf开发入门和运行过程详解
@@ -25,7 +25,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 <meta property="og:url" content="slamke.github.io/2016/05/03/hive的Transform和MR/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="UDTF
-HIVE中UDTF编写和使用
+Hive中UDTF编写和使用
 
 UDAF
 Hive udaf开发入门和运行过程详解
@@ -33,11 +33,11 @@ Hive通用型自定义聚合函数（UDAF）
 
 Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/archives/4052
 首先来看一下数据：12345hive&amp;gt; select * from test;OK1       32">
-<meta property="og:updated_time" content="2016-05-03T14:20:32.807Z">
+<meta property="og:updated_time" content="2016-05-04T13:01:07.807Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hive的Transform和UDF">
 <meta name="twitter:description" content="UDTF
-HIVE中UDTF编写和使用
+Hive中UDTF编写和使用
 
 UDAF
 Hive udaf开发入门和运行过程详解
@@ -120,12 +120,12 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#UDTF"><span class="toc-number">1.</span> <span class="toc-text">UDTF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDAF"><span class="toc-number">2.</span> <span class="toc-text">UDAF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce"><span class="toc-number">3.</span> <span class="toc-text">Hive中的TRANSFORM：使用脚本完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><span class="toc-number">4.</span> <span class="toc-text">Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#UDTF"><span class="toc-number">1.</span> <span class="toc-text">UDTF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDAF"><span class="toc-number">2.</span> <span class="toc-text">UDAF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce"><span class="toc-number">3.</span> <span class="toc-text">Hive中的TRANSFORM：使用脚本完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><span class="toc-number">4.</span> <span class="toc-text">Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-Python-Streaming的原理及写法"><span class="toc-number">5.</span> <span class="toc-text">Hive Python Streaming的原理及写法</span></a></li></ol>
 		
 		</div>
 		
 		<h2 id="UDTF"><a href="#UDTF" class="headerlink" title="UDTF"></a>UDTF</h2><ul>
-<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888819.html" target="_blank" rel="external">HIVE中UDTF编写和使用</a></li>
+<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888819.html" target="_blank" rel="external">Hive中UDTF编写和使用</a></li>
 </ul>
 <h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><ul>
 <li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html" target="_blank" rel="external">Hive udaf开发入门和运行过程详解</a></li>
@@ -160,6 +160,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 <p>使用样例:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExecuteMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String FULL_PATH_CLASS = <span class="string">"com.***.dpop.ods.mr.impl."</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Mapper&gt; mappers = <span class="keyword">new</span> HashMap&lt;String, Mapper&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Process class must be given"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> GenericMR().map(System.in, System.out,</span><br><span class="line">                getMapper(args[<span class="number">0</span>], Arrays.copyOfRange(args, <span class="number">1</span>, args.length)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Mapper <span class="title">getMapper</span><span class="params">(String parserClass, String[] args)</span></span><br><span class="line">            <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mappers.containsKey(parserClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> mappers.get(parserClass);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class[] classes = <span class="keyword">new</span> Class[args.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; classes.length; ++i) &#123;</span><br><span class="line">            classes[i] = String.class;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Mapper mapper = (Mapper) Class.forName(FULL_PATH_CLASS + parserClass).getConstructor(classes).newInstance(args);</span><br><span class="line">            mappers.put(parserClass, mapper);</span><br><span class="line">            <span class="keyword">return</span> mapper;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"Unknown MapperClass:"</span> + parserClass, e);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span>  ClassNotFoundException(<span class="string">"Error Constructing processor"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MR_USING=" USING 'java -Xmx512m -Xms512m -cp ods-mr-1.0.jar:hive-contrib-2.3.33.jar com.***.dpop.ods.mr.api.ExecuteMap "</span><br><span class="line"></span><br><span class="line">COMMAND="FROM dw_rtb.event_fact_adx_auction "</span><br><span class="line">COMMAND="$&#123;COMMAND&#125; INSERT overwrite TABLE dw_rtb.event_fact_mid_adx_auction_ad PARTITION(yymmdd=$&#123;CURRENT_DATE&#125;) SELECT transform(search_id, print_time, pthread_id, ad_s) $&#123;MR_USING&#125; EventFactMidAdxAuctionAdMapper' as search_id, print_time, pthread_id, ad_s, ssp_id WHERE $INSERT_PARTITION and original = 'exinternal' "</span><br></pre></td></tr></table></figure>
+<h2 id="Hive-Python-Streaming的原理及写法"><a href="#Hive-Python-Streaming的原理及写法" class="headerlink" title="Hive Python Streaming的原理及写法"></a>Hive Python Streaming的原理及写法</h2><p><a href="http://www.tuicool.com/articles/vmumUjA" target="_blank" rel="external">http://www.tuicool.com/articles/vmumUjA</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -195,6 +196,14 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2016/05/04/SpringTest整合JUnit4使用总结/" title="SpringTest整合JUnit4使用总结">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SpringTest整合JUnit4使用总结</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2016/05/02/REST-API-设计最佳实践/"  title="REST API 设计最佳实践">
@@ -214,7 +223,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#UDTF"><span class="toc-number">1.</span> <span class="toc-text">UDTF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDAF"><span class="toc-number">2.</span> <span class="toc-text">UDAF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce"><span class="toc-number">3.</span> <span class="toc-text">Hive中的TRANSFORM：使用脚本完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><span class="toc-number">4.</span> <span class="toc-text">Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#UDTF"><span class="toc-number">1.</span> <span class="toc-text">UDTF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDAF"><span class="toc-number">2.</span> <span class="toc-text">UDAF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce"><span class="toc-number">3.</span> <span class="toc-text">Hive中的TRANSFORM：使用脚本完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><span class="toc-number">4.</span> <span class="toc-text">Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive-Python-Streaming的原理及写法"><span class="toc-number">5.</span> <span class="toc-text">Hive Python Streaming的原理及写法</span></a></li></ol>
  
   </div>
 
@@ -254,11 +263,11 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>2</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>2</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>3</sup></a></li>
 		  
 		
 		  
@@ -266,7 +275,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 		  
 		
 		  
-			<li><a href="/categories/Web/" title="Web">Web<sup>4</sup></a></li>
+			<li><a href="/categories/Web/" title="Web">Web<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -279,7 +288,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Web/" title="Web">Web<sup>6</sup></a></li>
+				<li><a href="/tags/Web/" title="Web">Web<sup>7</sup></a></li>
 			
 		
 			
@@ -287,15 +296,15 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 			
 		
 			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>3</sup></a></li>
 			
 		
 			
@@ -303,15 +312,11 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>2</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -319,7 +324,15 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 			
 		
 			
-				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
 			
 		
 			
@@ -343,7 +356,7 @@ Hive中的TRANSFORM：使用脚本完成Map/Reduce转自: http://www.coder4.com/
 			
 		
 			
-				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
 			
 		
 		</ul>

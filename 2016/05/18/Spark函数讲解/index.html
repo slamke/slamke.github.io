@@ -1,0 +1,604 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spark函数讲解 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="cogroup将多个RDD中同一个Key对应的Value组合到一起。123456789101112131415161718192021def cogroup[W1, W2, W3](other1: RDD[(K, W1)],       other2: RDD[(K, W2)], other3: RDD[(K, W3)], partitioner: Partitioner) :       RDD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark函数讲解">
+<meta property="og:url" content="slamke.github.io/2016/05/18/Spark函数讲解/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="cogroup将多个RDD中同一个Key对应的Value组合到一起。123456789101112131415161718192021def cogroup[W1, W2, W3](other1: RDD[(K, W1)],       other2: RDD[(K, W2)], other3: RDD[(K, W3)], partitioner: Partitioner) :       RDD">
+<meta property="og:updated_time" content="2016-05-18T05:49:24.727Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark函数讲解">
+<meta name="twitter:description" content="cogroup将多个RDD中同一个Key对应的Value组合到一起。123456789101112131415161718192021def cogroup[W1, W2, W3](other1: RDD[(K, W1)],       other2: RDD[(K, W2)], other3: RDD[(K, W3)], partitioner: Partitioner) :       RDD">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/18/Spark函数讲解/" title="Spark函数讲解" itemprop="url">Spark函数讲解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> Published 2016-05-18</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#cogroup"><span class="toc-number">1.</span> <span class="toc-text">cogroup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#combineByKey"><span class="toc-number">2.</span> <span class="toc-text">combineByKey</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数原型"><span class="toc-number">2.1.</span> <span class="toc-text">函数原型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#coalesce"><span class="toc-number">3.</span> <span class="toc-text">coalesce</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数原型-1"><span class="toc-number">3.1.</span> <span class="toc-text">函数原型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#checkpoint"><span class="toc-number">4.</span> <span class="toc-text">checkpoint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cartesian"><span class="toc-number">5.</span> <span class="toc-text">cartesian</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cache"><span class="toc-number">6.</span> <span class="toc-text">cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aggregate"><span class="toc-number">7.</span> <span class="toc-text">aggregate</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aggregateByKey"><span class="toc-number">8.</span> <span class="toc-text">aggregateByKey</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sortBy和sortByKey"><span class="toc-number">9.</span> <span class="toc-text">sortBy和sortByKey</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sortBy"><span class="toc-number">9.1.</span> <span class="toc-text">sortBy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sortByKey函数"><span class="toc-number">9.2.</span> <span class="toc-text">sortByKey函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#collectAsMap"><span class="toc-number">10.</span> <span class="toc-text">collectAsMap</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="cogroup"><a href="#cogroup" class="headerlink" title="cogroup"></a>cogroup</h2><p>将多个RDD中同一个Key对应的Value组合到一起。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], numPartitions: <span class="type">Int</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)],</span><br><span class="line">       partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], </span><br><span class="line">      numPartitions: <span class="type">Int</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br></pre></td></tr></table></figure></p>
+<p>cogroup函数原型一共有九个（真多）！最多可以组合四个RDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data1 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>)))</span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">3</span>, <span class="string">"very"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> data3 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data1.cogroup(data2, data3)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">------------------------------------</span><br><span class="line">(<span class="number">2</span>,(<span class="type">CompactBuffer</span>(bbs),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">1</span>,(<span class="type">CompactBuffer</span>(www),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">3</span>,(<span class="type">CompactBuffer</span>(),<span class="type">CompactBuffer</span>(very, good),<span class="type">CompactBuffer</span>(good)))</span><br></pre></td></tr></table></figure></p>
+<h2 id="combineByKey"><a href="#combineByKey" class="headerlink" title="combineByKey"></a>combineByKey</h2><p>使用用户设置好的聚合函数对每个Key中的Value进行组合(combine)。可以将输入类型为RDD[(K, V)]转成成RDD[(K, C)]。</p>
+<h3 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>) : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, partitioner: <span class="type">Partitioner</span>, mapSideCombine: </span><br><span class="line">    <span class="type">Boolean</span> = <span class="literal">true</span>, serializer: <span class="type">Serializer</span> = <span class="literal">null</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br></pre></td></tr></table></figure>
+<p>　　第一个和第二个函数都是基于第三个函数实现的，使用的是HashPartitioner，Serializer为null。而第三个函数我们可以指定分区，如果需要使用Serializer的话也可以指定。combineByKey函数比较重要，我们熟悉地诸如aggregateByKey、foldByKey、reduceByKey等函数都是基于该函数实现的。<strong>默认情况会在Map端进行组合操作</strong>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>),(<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data.combineByKey(<span class="type">List</span>(_), (x: <span class="type">List</span> [<span class="type">String</span>], y: <span class="type">String</span>) =&gt; y :: x, (x: <span class="type">List</span>[<span class="type">String</span>],y:<span class="type">List</span>[<span class="type">String</span>]) =&gt; x ::: y)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>,<span class="type">List</span>(com, iteblog, bbs))</span><br><span class="line">(<span class="number">1</span>,<span class="type">List</span>(com, iteblog, www))</span><br><span class="line">(<span class="number">3</span>,<span class="type">List</span>(good))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="string">"iteblog"</span>, <span class="number">1</span>), (<span class="string">"bbs"</span>, <span class="number">1</span>), (<span class="string">"iteblog"</span>, <span class="number">3</span>)))</span><br><span class="line"><span class="keyword">val</span> result2 = data2.combineByKey(x =&gt; x,(x: <span class="type">Int</span>, y:<span class="type">Int</span>) =&gt; x + y, (x:<span class="type">Int</span>, y: <span class="type">Int</span>) =&gt; x + y)</span><br><span class="line">result2.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(iteblog,<span class="number">4</span>)</span><br><span class="line">(bbs,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="coalesce"><a href="#coalesce" class="headerlink" title="coalesce"></a>coalesce</h2><p>对RDD中的分区重新进行合并。</p>
+<h3 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coalesce</span></span>(numPartitions: <span class="type">Int</span>, shuffle: <span class="type">Boolean</span> = <span class="literal">false</span>)</span><br><span class="line">　　　　(<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">T</span>] = <span class="literal">null</span>): <span class="type">RDD</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+<p>返回一个新的RDD，且该RDD的分区个数等于numPartitions个数。如果shuffle设置为true，则会进行shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>))</span><br><span class="line"><span class="keyword">val</span> result = data.coalesce(<span class="number">2</span>, <span class="literal">false</span>)</span><br><span class="line">println(result.partitions.length)</span><br><span class="line">println(result.toDebugString)</span><br><span class="line"><span class="keyword">val</span> result1 = data.coalesce(<span class="number">2</span>, <span class="literal">true</span>)</span><br><span class="line">println(result1.toDebugString)</span><br><span class="line"></span><br><span class="line"><span class="number">2</span></span><br><span class="line">(<span class="number">2</span>) <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">16</span> []</span><br><span class="line"> |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br><span class="line"> </span><br><span class="line">(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">5</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">CoalescedRDD</span>[<span class="number">4</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">ShuffledRDD</span>[<span class="number">3</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> +-(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line">    |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看出shuffle为false的时候并不进行shuffle操作；而为true的时候会进行shuffle操作。RDD.partitions.length可以获取相关RDD的分区数。</p>
+<h2 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h2><p>为当前RDD设置检查点。该函数将会创建一个二进制的文件，并存储到checkpoint目录中，该目录是用SparkContext.setCheckpointDir()设置的。在checkpoint的过程中，该RDD的所有依赖于父RDD中的信息将全部被移出。<strong>对RDD进行checkpoint操作并不会马上被执行，必须执行Action操作才能触发</strong>。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checkpoint</span></span>()</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt;val data = sc.parallelize(1 to 100000 , 15)<br>scala&gt; sc.setCheckpointDir(“/app/ecom/cm/ods/tmp/sunke/spark/checkpoint”)<br>scala&gt; data.checkpoint<br>scala&gt; data.count<br>res3: Long = 100000</p>
+</blockquote>
+<p>结果：</p>
+<blockquote>
+<p>[work@yq01-cm-m32-201502nova228.yq01.baidu.com ~]$ hadoop fs -ls /app/ecom/cm/ods/tmp/sunke/spark/checkpoint<br>16/05/18 11:27:20 INFO common.UpdateService: ZkstatusUpdater to yq01-wutai-hdfs.dmop.baidu.com:54310 started<br>Found 1 items<br>drwxr-xr-x   3 ods ods          0 2016-05-18 11:26 /app/ecom/cm/ods/tmp/sunke/spark/checkpoint/590a5e9b-26de-416f-aecb-22ea5e29d893<br>执行完count之后，会在checkpoint目录下产生出多个（数量和你分区个数有关）二进制的文件。</p>
+</blockquote>
+<h2 id="cartesian"><a href="#cartesian" class="headerlink" title="cartesian"></a>cartesian</h2><p>从名字就可以看出这是笛卡儿的意思，就是对给的两个RDD进行笛卡儿计算。官方文档说明：Return the Cartesian product of this RDD and another one, that is, the RDD of all pairs of elements (a, b) where a is in <code>this</code> and b is in <code>other</code>.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cartesian</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](other: <span class="type">RDD</span>[<span class="type">U</span>]): <span class="type">RDD</span>[(<span class="type">T</span>, <span class="type">U</span>)]</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的是Pair类型的RDD，计算结果是当前RDD和other RDD中每个元素进行笛卡儿计算的结果。最后返回的是CartesianRDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line"><span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>))</span><br><span class="line"><span class="keyword">val</span> result = a.cartesian(b)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">1</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">6</span>)</span><br></pre></td></tr></table></figure></p>
+<p>笛卡儿计算是很恐怖的，它会迅速消耗大量的内存，所以在使用这个函数的时候请小心。</p>
+<h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2><p>使用MEMORY_ONLY储存级别对RDD进行缓存，其内部实现是调用persist()函数的。官方文档定义：Persist this RDD with the default storage level (<code>MEMORY_ONLY</code>).<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cache</span></span>() : <span class="keyword">this</span>.<span class="keyword">type</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt; var data = sc.parallelize(List(1,2,3,4))<br>data: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res65: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, false, false, false, 1)<br>scala&gt; data.cache<br>res66: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res67: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, true, false, true, 1)<br>我们先是定义了一个RDD，然后通过getStorageLevel函数得到该RDD的默认存储级别，这里是NONE。然后我们调用cache函数，将RDD的存储级别改成了MEMORY_ONLY(看StorageLevel的第二个参数)。关于StorageLevel的其他的几种存储级别介绍请参照StorageLevel类进行了解。</console></console></p>
+</blockquote>
+<h2 id="aggregate"><a href="#aggregate" class="headerlink" title="aggregate"></a>aggregate</h2><p>Aggregate the elements of each partition, and then the results for all the partitions, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of this RDD, T. Thus, we need one operation for merging a T into an U and one operation for merging two U’s, as in scala.TraversableOnce. Both of these functions are allowed to modify and return their first argument instead of creating a new U to avoid memory allocation.<br>　　aggregate函数将每个分区里面的元素进行聚合，然后用combine函数将每个分区的结果和初始值(zeroValue)进行combine操作。这个函数最终返回的类型不需要和RDD中元素类型一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregate</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)(seqOp: (<span class="type">U</span>, <span class="type">T</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">U</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seqOP</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"seqOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">combOp</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"combOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> z1 = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>), <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">val</span> result1 = z1.aggregate(<span class="number">3</span>)(seqOP, combOp)</span><br><span class="line">    println(<span class="string">"result1: "</span>+result1)</span><br><span class="line"></span><br><span class="line">计算过程为:  </span><br><span class="line">partition内部聚合：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">1</span>+<span class="number">2</span>+<span class="number">3</span>=<span class="number">9</span></span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">4</span>+<span class="number">5</span>+<span class="number">6</span>=<span class="number">18</span></span><br><span class="line">combine：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">9</span>+<span class="number">18</span></span><br><span class="line"></span><br><span class="line">result1: <span class="number">30</span></span><br></pre></td></tr></table></figure>
+<p>1、reduce函数和combine函数必须满足<strong>交换律(commutative)和结合律(associative)</strong><br>2、从aggregate 函数的定义可知，combine函数的输出类型必须和输入的类型一致</p>
+<h2 id="aggregateByKey"><a href="#aggregateByKey" class="headerlink" title="aggregateByKey"></a>aggregateByKey</h2><p>该函数和aggregate类似，但操作的RDD是Pair类型的。<br>Aggregate the values of each key, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of the values in this RDD, V. Thus, we need one operation for merging a V into a U and one operation for merging two U’s, as in scala.TraversableOnce. The former operation is used for merging values within a partition, and the latter is used for merging values between partitions. To avoid memory allocation, both of these functions are allowed to modify and return their first argument instead of creating a new U.<br>aggregateByKey函数对PairRDD中相同Key的值进行聚合操作，在聚合过程中同样使用了一个中立的初始值。和aggregate函数类似，aggregateByKey返回值的类型不需要和RDD中value的类型一致。因为aggregateByKey是对相同Key中的值进行聚合操作，所以aggregateByKey函数最终返回的类型还是Pair RDD，对应的结果是Key和聚合好的值；而aggregate函数直接是返回非RDD的结果，这点需要注意。在实现过程中，定义了三个aggregateByKey函数原型，但最终调用的aggregateByKey函数都一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第一个aggregateByKey函数我们可以自定义<span class="type">Partitioner</span>。除了这个参数之外，其函数声明和aggregate很类似；其他的aggregateByKey函数实现最终都是调用这个。</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, numPartitions: <span class="type">Int</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第二个aggregateByKey函数可以设置分区的个数(numPartitions)，最终用的是<span class="type">HashPartitioner</span>。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">最后一个aggregateByKey实现先会判断当前<span class="type">RDD</span>是否定义了分区函数，如果定义了则用当前<span class="type">RDD</span>的分区；如果当前<span class="type">RDD</span>并未定义分区 ，则使用<span class="type">HashPartitioner</span>。</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>,<span class="number">3</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>, <span class="number">4</span>),(<span class="number">2</span>,<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seq</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"seq: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">comb</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"comb: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = data.aggregateByKey(<span class="number">1</span>)(seq, comb)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line">计算过程:</span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span>+<span class="number">2</span> <span class="number">1</span>(初始值)+<span class="number">4</span></span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span> </span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">11</span>)</span><br></pre></td></tr></table></figure>
+<p>aggregateByKey和aggregate结果有点不一样。如果用aggregate函数对含有3、2、4三个元素的RDD进行计算，初始值为1的时候，计算的结果应该是10，而这里是9，这是因为aggregate函数中的初始值需要和reduce函数以及combine函数结合计算，而aggregateByKey中的初始值只需要和reduce函数计算，不需要和combine函数结合计算，所以导致结果有点不一样。</p>
+<h2 id="sortBy和sortByKey"><a href="#sortBy和sortByKey" class="headerlink" title="sortBy和sortByKey"></a>sortBy和sortByKey</h2><p>在很多应用场景都需要对结果数据进行排序，Spark中有时也不例外。在Spark中存在两种对RDD进行排序的函数，分别是 sortBy和sortByKey函数。sortBy是对标准的RDD进行排序，它是从Spark 0.9.0之后才引入的（可以参见SPARK-1063）。而sortByKey函数是对PairRDD进行排序，也就是有Key和Value的RDD。下面将分别对这两个函数的实现以及使用进行说明。</p>
+<h3 id="sortBy"><a href="#sortBy" class="headerlink" title="sortBy"></a>sortBy</h3><p>sortBy函数是在org.apache.spark.rdd.RDD类中实现的，它的实现如下：<br>该函数最多可以传三个参数：<br>　　第一个参数是一个函数，该函数的也有一个带T泛型的参数，返回类型和RDD中元素的类型是一致的；<br>　　第二个参数是ascending，从字面的意思大家应该可以猜到，是的，这参数决定排序后RDD中的元素是升序还是降序，默认是true，也就是升序；<br>　　第三个参数是numPartitions，该参数决定排序后的RDD的分区个数，默认排序后的分区个数和排序之前的个数相等，即为this.partitions.size。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Return this RDD sorted by the given key function.</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortBy</span></span>[<span class="type">K</span>](</span><br><span class="line">    f: (<span class="type">T</span>) =&gt; <span class="type">K</span>,</span><br><span class="line">    ascending: <span class="type">Boolean</span> = <span class="literal">true</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span> = <span class="keyword">this</span>.partitions.size)</span><br><span class="line">    (<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">K</span>], ctag: <span class="type">ClassTag</span>[<span class="type">K</span>]): <span class="type">RDD</span>[<span class="type">T</span>] =</span><br><span class="line">  <span class="keyword">this</span>.keyBy[<span class="type">K</span>](f)</span><br><span class="line">      .sortByKey(ascending, numPartitions)</span><br><span class="line">      .values</span><br></pre></td></tr></table></figure></p>
+<p>从sortBy函数的实现可以看出，第一个参数是必须传入的，而后面的两个参数可以不传入。而且sortBy函数函数的实现依赖于sortByKey函数，关于sortByKey函数后面会进行说明。keyBy函数也是RDD类中进行实现的，它的主要作用就是将将传进来的每个元素作用于f(x)中，并返回tuples类型的元素，也就变成了Key-Value类型的RDD了，它的实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line">* Creates tuples of the elements in this RDD by applying `f`.</span><br><span class="line">*/</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">keyBy</span></span>[<span class="type">K</span>](f: <span class="type">T</span> =&gt; <span class="type">K</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">T</span>)] = &#123;</span><br><span class="line">    map(x =&gt; (f(x), x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Demo:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = <span class="type">List</span>(<span class="number">3</span>,<span class="number">1</span>,<span class="number">90</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">12</span>)</span><br><span class="line"><span class="keyword">val</span> rdd = sc.parallelize(data)</span><br><span class="line"><span class="keyword">val</span> result = rdd.sortBy(x =&gt; x, <span class="literal">false</span>)</span><br><span class="line">result.collect.foreach(println)</span><br></pre></td></tr></table></figure></p>
+<h3 id="sortByKey函数"><a href="#sortByKey函数" class="headerlink" title="sortByKey函数"></a>sortByKey函数</h3><p>sortByKey函数作用于Key-Value形式的RDD，并对Key进行排序。它是在org.apache.spark.rdd.OrderedRDDFunctions中实现的，实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortByKey</span></span>(ascending: <span class="type">Boolean</span> = <span class="literal">true</span>, numPartitions: <span class="type">Int</span> = self.partitions.size)</span><br><span class="line">    : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> part = <span class="keyword">new</span> <span class="type">RangePartitioner</span>(numPartitions, self, ascending)</span><br><span class="line">  <span class="keyword">new</span> <span class="type">ShuffledRDD</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">V</span>](self, part)</span><br><span class="line">    .setKeyOrdering(<span class="keyword">if</span> (ascending) ordering <span class="keyword">else</span> ordering.reverse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的RDD一定是ShuffledRDD类型的，因为对源RDD进行排序，必须进行Shuffle操作，而Shuffle操作的结果RDD就是ShuffledRDD。其实这个函数的实现很优雅，里面用到了<strong>RangePartitioner，它可以使得相应的范围Key数据分到同一个partition中，然后内部用到了mapPartitions对每个partition中的数据进行排序</strong>，而每个partition中数据的排序用到了标准的sort机制，避免了大量数据的shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="string">"wyp"</span>, <span class="string">"iteblog"</span>, <span class="string">"com"</span>, <span class="string">"397090770"</span>, <span class="string">"test"</span>), <span class="number">2</span>)</span><br><span class="line">   <span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">3</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">4</span>))</span><br><span class="line">   <span class="keyword">val</span> c = b.zip(a)</span><br><span class="line">   c.sortByKey().collect</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 修改默认的排序规则</span></span><br><span class="line">   <span class="keyword">implicit</span> <span class="keyword">val</span> sortIntegersByString = <span class="keyword">new</span> <span class="type">Ordering</span>[<span class="type">Int</span>] &#123;</span><br><span class="line">     <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">compare</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>) =</span><br><span class="line">       a.toString.compare(b.toString)</span><br><span class="line">   &#125;</span><br><span class="line">   c.sortByKey().collect</span><br></pre></td></tr></table></figure></p>
+<h2 id="collectAsMap"><a href="#collectAsMap" class="headerlink" title="collectAsMap"></a>collectAsMap</h2><p>功能和collect函数类似。该函数用于Pair RDD，最终返回Map类型的结果。官方文档说明：<br>Return the key-value pairs in this RDD to the master as a Map.<br>Warning: this doesn’t return a multimap (so if you have multiple values to the same key, <strong>only one value per key is preserved in the map returned</strong><br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">collectAsMap</span></span>(): <span class="type">Map</span>[<span class="type">K</span>, <span class="type">V</span>]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line">    data.collectAsMap.foreach(print)</span><br><span class="line">(<span class="number">2</span>,com)(<span class="number">1</span>,com)(<span class="number">3</span>,good)</span><br></pre></td></tr></table></figure>
+<p>从结果我们可以看出，如果RDD中同一个Key中存在多个Value，那么后面的Value将会把前面的Value覆盖，最终得到的结果就是Key唯一，而且对应一个Value。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2016/05/18/Spark函数讲解/" data-title="Spark函数讲解 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/05/05/常见Web容器的ClassLoader机制/"  title="常见Web容器的ClassLoader机制">
+ <strong>下一篇：</strong><br/> 
+ <span>常见Web容器的ClassLoader机制
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#cogroup"><span class="toc-number">1.</span> <span class="toc-text">cogroup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#combineByKey"><span class="toc-number">2.</span> <span class="toc-text">combineByKey</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数原型"><span class="toc-number">2.1.</span> <span class="toc-text">函数原型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#coalesce"><span class="toc-number">3.</span> <span class="toc-text">coalesce</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数原型-1"><span class="toc-number">3.1.</span> <span class="toc-text">函数原型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#checkpoint"><span class="toc-number">4.</span> <span class="toc-text">checkpoint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cartesian"><span class="toc-number">5.</span> <span class="toc-text">cartesian</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cache"><span class="toc-number">6.</span> <span class="toc-text">cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aggregate"><span class="toc-number">7.</span> <span class="toc-text">aggregate</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aggregateByKey"><span class="toc-number">8.</span> <span class="toc-text">aggregateByKey</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sortBy和sortByKey"><span class="toc-number">9.</span> <span class="toc-text">sortBy和sortByKey</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sortBy"><span class="toc-number">9.1.</span> <span class="toc-text">sortBy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sortByKey函数"><span class="toc-number">9.2.</span> <span class="toc-text">sortByKey函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#collectAsMap"><span class="toc-number">10.</span> <span class="toc-text">collectAsMap</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="https://github.com/slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>5</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/IO/" title="IO">IO<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
