@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,95 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/05/23/Spark-资料整理/" title="Spark 资料整理" itemprop="url">Spark 资料整理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> 发表于 2016-05-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="一-快速入门"><a href="#一-快速入门" class="headerlink" title="一 快速入门"></a>一 快速入门</h2><p><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="external">Apache Spark快速入门：基本概念和例子(1)</a><br><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="external">Apache Spark快速入门：基本概念和例子(2)</a><br><a href="">Spark Streaming整体执行流程</a><a href="http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/" target="_blank" rel="external">http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/</a></p>
+<h2 id="二-应用调试"><a href="#二-应用调试" class="headerlink" title="二 应用调试"></a>二 应用调试</h2><h3 id="2-1-Spark应用程序运行的日志存在哪里"><a href="#2-1-Spark应用程序运行的日志存在哪里" class="headerlink" title="2.1 Spark应用程序运行的日志存在哪里"></a>2.1 Spark应用程序运行的日志存在哪里</h3><p><a href="http://www.iteblog.com/archives/1353" target="_blank" rel="external">Spark应用程序运行的日志存在哪里</a><br>Spark日志确切的存放路径和部署模式相关：</p>
+<ol>
+<li>如果是Spark Standalone模式，我们可以直接在Master UI界面查看应用程序的日志，在默认情况下这些日志是存储在worker节点的work目录下，这个目录可以通过SPARK_WORKER_DIR参数进行配置。</li>
+<li>如果是Mesos模式，我们同样可以通过Mesos的Master UI界面上看到相关应用程序的日志，这些日志是存储在Mesos slave的work目录下。</li>
+<li>如果是YARN模式，最简单地收集日志的方式是使用YARN的日志收集工具（<figure class="highlight plain"><figcaption><span>logs -applicationId``` ），这个工具可以收集你应用程序相关的运行日志，但是这个工具是有限制的：**应用程序必须运行完**，因为YARN必须首先聚合这些日志；而且你必须开启日志聚合功能（yarn.log-aggregation-enable，在默认情况下，这个参数是false）。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">``` powershell</span><br><span class="line">./bin/yarn logs -applicationId application_1452073024926_19404</span><br><span class="line">or</span><br><span class="line">Tracking UI --&gt; ApplicationMaster --&gt; Executors菜单 --&gt; Logs</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-2-通过可视化途径理解你的Spark应用程序"><a href="#2-2-通过可视化途径理解你的Spark应用程序" class="headerlink" title="2.2 通过可视化途径理解你的Spark应用程序"></a>2.2 通过可视化途径理解你的Spark应用程序</h3><p><a href="http://www.iteblog.com/archives/1405" target="_blank" rel="external">通过可视化途径理解你的Spark应用程序</a><br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Tracking UI --&gt; ApplicationMaster --&gt;Jobs菜单/Stages菜单</span><br><span class="line">分析shuffle的时间</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-3-Spark作业代码-源码-IDE远程调试"><a href="#2-3-Spark作业代码-源码-IDE远程调试" class="headerlink" title="2.3 Spark作业代码(源码)IDE远程调试"></a>2.3 Spark作业代码(源码)IDE远程调试</h3><p><a href="tp://www.iteblog.com/archives/1192" target="_blank" rel="external">Spark作业代码(源码)IDE远程调试</a></p>
+<h3 id="2-4-不要直接继承scala-App来提交代码"><a href="#2-4-不要直接继承scala-App来提交代码" class="headerlink" title="2.4 不要直接继承scala.App来提交代码"></a>2.4 不要直接继承scala.App来提交代码</h3><p>如果你继承了App trait，那么里面的变量被当作了单例类的field了；而如果是main方法，则当作是局部变量了。而且trait App是继承了DelayedInit，所以里面的变量只有用到了main方法的时候才会被初始化。<br><a href="http://www.iteblog.com/archives/1543" target="_blank" rel="external">Spark程序编写：继承App的问题</a> </p>
+<h2 id="三-REST-API"><a href="#三-REST-API" class="headerlink" title="三 REST API"></a>三 REST API</h2><p><a href="http://www.iteblog.com/archives/1386" target="_blank" rel="external">Spark 1.4中REST API介绍</a><br>目前这个API支持正在运行的应用程序，也支持历史服务器。在请求URL都有/api/v1。比如，对于历史服务器来说，我们可以通过<a href="http://:18080/api/v1来获取一些信息；对于正在运行的Spark应用程序，我们可以通过http://www.iteblog.com:4040/api/v1来获取一些信息。" target="_blank" rel="external">http://:18080/api/v1来获取一些信息；对于正在运行的Spark应用程序，我们可以通过http://www.iteblog.com:4040/api/v1来获取一些信息。</a></p>
+<h2 id="四-文件操作"><a href="#四-文件操作" class="headerlink" title="四 文件操作"></a>四 文件操作</h2><h3 id="4-1-Spark多文件输出-MultipleOutputFormat"><a href="#4-1-Spark多文件输出-MultipleOutputFormat" class="headerlink" title="4.1 Spark多文件输出(MultipleOutputFormat)"></a>4.1 Spark多文件输出(MultipleOutputFormat)</h3><p><a href="http://www.iteblog.com/archives/1281" target="_blank" rel="external">Spark多文件输出(MultipleOutputFormat)</a></p>
+<h3 id="4-2-Json"><a href="#4-2-Json" class="headerlink" title="4.2 Json"></a>4.2 Json</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> people = sqlContext.jsonFile(<span class="string">"[the path to file people]"</span>)</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line">people.printSchema()</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLE</span> people</span><br><span class="line"><span class="keyword">USING</span> org.apache.spark.<span class="keyword">sql</span>.<span class="keyword">json</span></span><br><span class="line">OPTIONS (<span class="keyword">path</span> <span class="string">'[the path to the JSON dataset]'</span>)</span><br></pre></td></tr></table></figure>
+<p><a href="http://www.iteblog.com/archives/1260" target="_blank" rel="external">Spark SQL中对Json支持的详细介绍</a></p>
+<h2 id="五-shuffle"><a href="#五-shuffle" class="headerlink" title="五 shuffle"></a>五 shuffle</h2><p><a href="http://www.iteblog.com/archives/1138" target="_blank" rel="external">Spark shuffle：hash和sort性能对比</a><br>随着mapper数量或者Reduce数量的增加，基于hash的shuffle实现的表现比基于sort的shuffle实现的表现越来越糟糕。基于这个事实，在Spark 1.2版本，默认的shuffle将选用基于sort的。在MLlib下，基于sort的Shuffle并不一定比基于hash的Shuffle表现好，所以程序选择哪个Shuffle实现是需要考虑到具体的场景，如果内置的Shuffle实现不能满足自己的需求，我们完全可以自己实现一个Shuffle。用户自定义的Shuffle必须继承ShuffleManager类，重写里面的一些方法。</p>
+<h2 id="六-partition"><a href="#六-partition" class="headerlink" title="六 partition"></a>六 partition</h2><p><a href="http://www.iteblog.com/archives/1522" target="_blank" rel="external">Spark分区器HashPartitioner和RangePartitioner代码详解</a><br><a href="http://www.iteblog.com/archives/1368" target="_blank" rel="external">Spark自定义分区(Partitioner)</a><br>Spark提供了相应的接口，我们只需要扩展Partitioner抽象类，然后实现里面的三个方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.spark</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * An object that defines how the elements in a key-value pair RDD are partitioned by key.</span><br><span class="line"> * Maps each key to a partition ID, from 0 to `numPartitions - 1`.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Partitioner</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">numPartitions</span></span>: <span class="type">Int</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getPartition</span></span>(key: <span class="type">Any</span>): <span class="type">Int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>def numPartitions: Int：这个方法需要返回你想要创建分区的个数；</li>
+<li>def getPartition(key: Any): Int：这个函数需要对输入的key做计算，然后返回该key的分区ID，范围一定是0到numPartitions-1；</li>
+<li>equals()：这个是Java标准的判断相等的函数，之所以要求用户实现这个函数是因为Spark内部会比较两个RDD的分区是否一样。</li>
+</ul>
+<h2 id="七-序列化"><a href="#七-序列化" class="headerlink" title="七 序列化"></a>七 序列化</h2><p><a href="http://www.iteblog.com/archives/1531" target="_blank" rel="external">Spark Task序列化代码分析</a><br><a href="http://www.iteblog.com/archives/1328" target="_blank" rel="external">在Spark中自定义Kryo序列化输入输出API</a><br><a href="http://stackoverflow.com/questions/31394140/require-kryo-serialization-in-spark-scala" target="_blank" rel="external">require-kryo-serialization-in-spark-scala</a></p>
+<p>解决序列化问题:</p>
+<ol>
+<li>使用lazy引用（Lazy Reference）来实现<br>lazy val pool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, redisTimeout)</li>
+<li>把对需要序列化对象的管理放在操作DStream的Output操作范围之内，因为我们知道它是在特定的Executor中进行初始化的，使用一个单例的对象来管理</li>
+</ol>
+<h2 id="八-RDD"><a href="#八-RDD" class="headerlink" title="八 RDD"></a>八 RDD</h2><p><a href="http://www.iteblog.com/archives/1298" target="_blank" rel="external">Spark RDD API扩展开发(1): 自定义函数</a><br><a href="http://www.iteblog.com/archives/1299" target="_blank" rel="external">Spark RDD API扩展开发(2):自定义RDD</a></p>
+<h2 id="九-kafka"><a href="#九-kafka" class="headerlink" title="九 kafka"></a>九 kafka</h2><p><a href="http://www.iteblog.com/archives/1322" target="_blank" rel="external">Spark Streaming和Kafka整合开发指南(一)</a><br><a href="http://www.iteblog.com/archives/1326" target="_blank" rel="external">Spark Streaming和Kafka整合开发指南(二)</a><br><a href="http://www.iteblog.com/archives/1381" target="_blank" rel="external">Spark+Kafka的Direct方式将偏移量发送到Zookeeper实现</a><br><a href="http://www.iteblog.com/archives/1591" target="_blank" rel="external">Spark Streaming和Kafka整合是如何保证数据零丢失</a><br><a href="http://www.iteblog.com/archives/1378" target="_blank" rel="external">Kafka+Spark Streaming+Redis实时系统实践</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/18/Spark函数讲解/" title="Spark函数讲解" itemprop="url">Spark函数讲解</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +177,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> Published 2016-05-18</time>
+    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> 发表于 2016-05-18</time>
     
   </p>
 </header>
@@ -187,7 +276,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> Published 2016-05-05</time>
+    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> 发表于 2016-05-05</time>
     
   </p>
 </header>
@@ -247,7 +336,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> Published 2016-05-04</time>
+    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> 发表于 2016-05-04</time>
     
   </p>
 </header>
@@ -317,7 +406,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> Published 2016-05-03</time>
+    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> 发表于 2016-05-03</time>
     
   </p>
 </header>
@@ -413,7 +502,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
     
   </p>
 </header>
@@ -473,7 +562,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
     
   </p>
 </header>
@@ -537,7 +626,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> 发表于 2016-04-24</time>
     
   </p>
 </header>
@@ -629,7 +718,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> 发表于 2016-04-24</time>
     
   </p>
 </header>
@@ -654,7 +743,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -689,7 +778,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-21T09:01:23.000Z" itemprop="datePublished"> Published 2016-04-21</time>
+    <time datetime="2016-04-21T09:01:23.000Z" itemprop="datePublished"> 发表于 2016-04-21</time>
     
   </p>
 </header>
@@ -738,86 +827,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/10/Tomcat系统架构和设计模式/" title="Tomcat系统架构和设计模式" itemprop="url">Tomcat系统架构和设计模式</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-10T14:02:09.000Z" itemprop="datePublished"> Published 2016-04-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Tomcat-的总体结构"><a href="#Tomcat-的总体结构" class="headerlink" title="Tomcat 的总体结构"></a>Tomcat 的总体结构</h2><p><img src="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/image001.gif" alt="Tomcat 的总体结构"></p>
-<p>从上图中可以看出 Tomcat 的心脏是两个组件：Connector 和 Container，关于这两个组件将在后面详细介绍。Connector 组件是可以被替换，这样可以提供给服务器设计者更多的选择，因为这个组件是如此重要，不仅跟服务器的设计的本身，而且和不同的应用场景也十分相关，所以一个 Container 可以选择对应多个 Connector。多个 Connector 和一个 Container 就形成了一个 Service，Service 的概念大家都很熟悉了，有了 Service 就可以对外提供服务了，但是 Service 还要一个生存的环境，必须要有人能够给她生命、掌握其生死大权，那就非 Server 莫属了。所以整个 Tomcat 的生命周期由 Server 控制。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 1 部分: 工作原理</a></li>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 2 部分: 设计模式分析</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Tomcat/">Tomcat</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Tomcat/">Tomcat</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="https://github.com/slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -827,7 +851,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
@@ -847,7 +871,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>2</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>3</sup></a></li>
 		  
 		
 		  
@@ -868,7 +892,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
 			
@@ -888,6 +912,10 @@
 			
 		
 			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>3</sup></a></li>
 			
 		
@@ -896,27 +924,23 @@
 			
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
 			
 		
 			
@@ -932,7 +956,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
 			
 		
 			
@@ -940,7 +964,7 @@
 			
 		
 			
-				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -948,7 +972,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情链接</p>
     <ul>
         
           <li>
@@ -964,11 +988,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1120,7 +1144,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
