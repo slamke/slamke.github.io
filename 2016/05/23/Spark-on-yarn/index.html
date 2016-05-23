@@ -4,23 +4,29 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Spring Session学习笔记 | 雁渡寒潭 风吹疏竹</title>
+    <title>Spark on yarn | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="分布式cookie-session的实现(spring-session)">
+    <meta name="description" content="模式:
+yarn-cluster：Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。Spark on YARN集群模式作业运行全过程分析
+yarn-client：Spark的driver运行在client进程中，而application master只用来向YARN申请资源。Spark on YARN">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring Session学习笔记">
-<meta property="og:url" content="slamke.github.io/2016/04/24/Spring-Session学习笔记/index.html">
+<meta property="og:title" content="Spark on yarn">
+<meta property="og:url" content="slamke.github.io/2016/05/23/Spark-on-yarn/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="分布式cookie-session的实现(spring-session)">
-<meta property="og:updated_time" content="2016-04-24T11:04:32.140Z">
+<meta property="og:description" content="模式:
+yarn-cluster：Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。Spark on YARN集群模式作业运行全过程分析
+yarn-client：Spark的driver运行在client进程中，而application master只用来向YARN申请资源。Spark on YARN">
+<meta property="og:updated_time" content="2016-05-23T06:34:06.996Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring Session学习笔记">
-<meta name="twitter:description" content="分布式cookie-session的实现(spring-session)">
+<meta name="twitter:title" content="Spark on yarn">
+<meta name="twitter:description" content="模式:
+yarn-cluster：Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。Spark on YARN集群模式作业运行全过程分析
+yarn-client：Spark的driver运行在client进程中，而application master只用来向YARN申请资源。Spark on YARN">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -80,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/24/Spring-Session学习笔记/" title="Spring Session学习笔记" itemprop="url">Spring Session学习笔记</a>
+      <a href="/2016/05/23/Spark-on-yarn/" title="Spark on yarn" itemprop="url">Spark on yarn</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    <time datetime="2016-05-23T06:33:43.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
@@ -96,11 +102,54 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式"><span class="toc-number">1.</span> <span class="toc-text">模式:</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Deployment-Mode-Summary"><span class="toc-number">1.1.</span> <span class="toc-text">Deployment Mode Summary</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动App"><span class="toc-number">2.</span> <span class="toc-text">启动App</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yarn的资源调度"><span class="toc-number">3.</span> <span class="toc-text">yarn的资源调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#搭建环境"><span class="toc-number">4.</span> <span class="toc-text">搭建环境</span></a></li></ol>
 		
 		</div>
 		
-		<p><a href="http://www.iflym.com/index.php/code/201503170001.html" target="_blank" rel="external">分布式cookie-session的实现(spring-session)</a></p>
+		<h2 id="模式"><a href="#模式" class="headerlink" title="模式:"></a>模式:</h2><ul>
+<li>yarn-cluster：<br>Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。<br><a href="http://www.iteblog.com/archives/1189" target="_blank" rel="external">Spark on YARN集群模式作业运行全过程分析</a></li>
+<li>yarn-client：<br>Spark的driver运行在client进程中，而application master只用来向YARN申请资源。<br><a href="http://www.iteblog.com/archives/1191" target="_blank" rel="external">Spark on YARN客户端模式作业运行全过程分析</a></li>
+</ul>
+<h3 id="Deployment-Mode-Summary"><a href="#Deployment-Mode-Summary" class="headerlink" title="Deployment Mode Summary"></a>Deployment Mode Summary</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>YARN Client Mode</th>
+<th>YARN Cluster Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Driver runs in</td>
+<td>Client</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Requests resources</td>
+<td>ApplicationMaster</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Starts executor processes</td>
+<td>YARN NodeManager</td>
+<td>YARN NodeManager</td>
+</tr>
+<tr>
+<td>Persistent services</td>
+<td>YARN ResourceManager and NodeManagers</td>
+<td>YARN ResourceManager and NodeManagers</td>
+</tr>
+<tr>
+<td>Supports Spark Shell</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>参考:<br><a href="http://www.iteblog.com/archives/1223" target="_blank" rel="external">Spark:Yarn-cluster和Yarn-client区别与联系</a><br><a href="http://www.cloudera.com/documentation/enterprise/5-5-x/topics/cdh_ig_running_spark_on_yarn.html" target="_blank" rel="external">Running Spark Applications on YARN</a></p>
+<h2 id="启动App"><a href="#启动App" class="headerlink" title="启动App"></a>启动App</h2><p>在yarn-cluster模式中启动一个application：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit --class path.to.your.Class --master yarn-cluster [options] &lt;app jar&gt; [app options]</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line"></span><br><span class="line">SPARK_JAR=hdfs://hansight/libs/spark-assembly-<span class="number">1.0</span>.<span class="number">2</span>-hadoop2.<span class="number">4.0</span>.<span class="number">2.1</span>.<span class="number">4.0</span>-<span class="number">632</span>.jar \</span><br><span class="line">./bin/spark-submit --class org.apache.spark.examples.SparkPI \</span><br><span class="line">    --master yarn-cluster \</span><br><span class="line">    --num-executors <span class="number">3</span> \</span><br><span class="line">    --driver-memory <span class="number">4</span>g \</span><br><span class="line">    --executor-memory <span class="number">2</span>g \</span><br><span class="line">    --executor-cores <span class="number">1</span> \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    <span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="yarn的资源调度"><a href="#yarn的资源调度" class="headerlink" title="yarn的资源调度"></a>yarn的资源调度</h2><p><a href="http://debugo.com/yarn-scheduler/" target="_blank" rel="external">YARN Capacity Scheduler 简介</a><br>YARN Independent RM 指标:  Weight, Virtual Cores, Min and Max Memory, Max Running Apps, and Scheduling Policy</p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><p><a href="http://wuchong.me/blog/2015/04/04/spark-on-yarn-cluster-deploy/" target="_blank" rel="external">Spark On YARN 集群安装部署</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -108,13 +157,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Yarn/">Yarn</a>
   </div>
 
 </div>
@@ -123,7 +172,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2016/04/24/Spring-Session学习笔记/" data-title="Spring Session学习笔记 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/05/23/Spark-on-yarn/" data-title="Spark on yarn | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -136,19 +185,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/04/24/Java基础-Object类中的方法解析/" title="Java基础:Object类中的方法解析">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Java基础:Object类中的方法解析</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/04/21/正确操作Java集合/"  title="正确操作Java集合">
+<a href="/2016/05/23/Spark和MySQL交互/"  title=" Spark和MySQL交互">
  <strong>下一篇：</strong><br/> 
- <span>正确操作Java集合
+ <span> Spark和MySQL交互
 </span>
 </a>
 </div>
@@ -163,7 +204,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式"><span class="toc-number">1.</span> <span class="toc-text">模式:</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Deployment-Mode-Summary"><span class="toc-number">1.1.</span> <span class="toc-text">Deployment Mode Summary</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动App"><span class="toc-number">2.</span> <span class="toc-text">启动App</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yarn的资源调度"><span class="toc-number">3.</span> <span class="toc-text">yarn的资源调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#搭建环境"><span class="toc-number">4.</span> <span class="toc-text">搭建环境</span></a></li></ol>
  
   </div>
 
