@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,76 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/05/04/SpringTest整合JUnit4使用总结/" title="SpringTest整合JUnit4使用总结" itemprop="url">SpringTest整合JUnit4使用总结</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> 发表于 2016-05-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="一-加入依赖包"><a href="#一-加入依赖包" class="headerlink" title="一 加入依赖包"></a>一 加入依赖包</h1><p>使用Spring的测试框架需要加入以下依赖包：</p>
+<ul>
+<li>JUnit 4 （官方下载：<a href="http://www.junit.org/）" target="_blank" rel="external">http://www.junit.org/）</a></li>
+<li>Spring Test （Spring框架中的test包）</li>
+<li>Spring 相关其他依赖包（不再赘述了，就是context等包）<h1 id="二-创建测试源目录和包"><a href="#二-创建测试源目录和包" class="headerlink" title="二 创建测试源目录和包"></a>二 创建测试源目录和包</h1>在此，推荐创建一个和src平级的源文件目录，因为src内的类都是为日后产品准备的，而此处的类仅仅用于测试。而包的名称可以和src中的目录同名，这样由于在test源目录中，所以不会有冲突，而且名称又一模一样，更方便检索。<h1 id="三-创建测试类"><a href="#三-创建测试类" class="headerlink" title="三 创建测试类"></a>三 创建测试类</h1>创建一个测试用的类，推荐名称为 “被测试类名称 + Test”。<br>测试类应该继承与 <figure class="highlight plain"><figcaption><span>```AbstractTransactionalJUnit4SpringContextTests```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">对于 AbstractJUnit4springcontextTests 和 AbstractTransactionalJUnit4SpringContextTests 类的选择：</span><br><span class="line">如果再你的测试类中，需要用到事务管理（比如要在测试结果出来之后回滚测试内容），就可以使用AbstractTransactionalJUnit4SpringTests类。事务管理的使用方法和正常使用Spring事务管理是一样的。再此需要注意的是，如果想要使用声明式事务管理，即使用AbstractTransactionalJUnitSpringContextTests类，请在applicationContext.xml文件中加入transactionManager bean：</span><br><span class="line">``` xml</span><br><span class="line">&lt;bean id=&quot;transactionManager&quot;</span><br><span class="line">    class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>如果没有添加上述bean，将会抛出NoSuchBeanDefinitionException，指明 No bean named ‘transactionManager’ is definded.</p>
+<h1 id="四-配置测试类"><a href="#四-配置测试类" class="headerlink" title="四 配置测试类"></a>四 配置测试类</h1><p>添加如下内容在class前，用于配置applicationContext.xml文件的位置。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="五-创建测试方法"><a href="#五-创建测试方法" class="headerlink" title="五 创建测试方法"></a>五 创建测试方法</h1><p>创建测试用方法，推荐名称为 “被测方法名称+ Test”。<br>测试方法上方加入 @Test</p>
+<h1 id="六-通过JUnit-4-执行"><a href="#六-通过JUnit-4-执行" class="headerlink" title="六 通过JUnit 4 执行"></a>六 通过JUnit 4 执行</h1><p>右键方法名，选择则“Run As”→“JUnit Test”即可</p>
+<p>附录1：整体测试类文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @(#) UserDaoTest.java</span><br><span class="line"> * </span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">package</span> com.phj.dao;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.phj.entity.User;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoTest</span> <span class="keyword">extends</span> <span class="title">AbstractJUnit4SpringContextTests</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> UserDaoInterface userDao;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saveTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        User user1 = <span class="keyword">new</span> User();</span><br><span class="line">        user1.setUsername(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user1.setNickName(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setEmail(<span class="string">"tom@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user2 = <span class="keyword">new</span> User();</span><br><span class="line">        user2.setUsername(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user2.setNickName(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setEmail(<span class="string">"admin@admin.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user3 = <span class="keyword">new</span> User();</span><br><span class="line">        user3.setUsername(<span class="string">"feihong"</span>);</span><br><span class="line">        user3.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user3.setNickName(<span class="string">"phj"</span>);</span><br><span class="line">        user3.setEmail(<span class="string">"test@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        userDao.save(user1);</span><br><span class="line">        userDao.save(user2);</span><br><span class="line">        userDao.save(user3);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spring/">Spring</a><a href="/tags/Junit/">Junit</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/03/hive的Transform和MR/" title="Hive的Transform和UDF" itemprop="url">Hive的Transform和UDF</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +158,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> Published 2016-05-03</time>
+    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> 发表于 2016-05-03</time>
     
   </p>
 </header>
@@ -184,7 +254,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
     
   </p>
 </header>
@@ -244,7 +314,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
     
   </p>
 </header>
@@ -273,7 +343,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Spark-SQL/">Spark SQL</a><a href="/tags/Spark/">Spark</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-SQL/">Spark SQL</a>
   </div>
 
 </div>
@@ -308,7 +378,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> 发表于 2016-04-24</time>
     
   </p>
 </header>
@@ -400,7 +470,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> 发表于 2016-04-24</time>
     
   </p>
 </header>
@@ -460,7 +530,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-21T09:01:23.000Z" itemprop="datePublished"> Published 2016-04-21</time>
+    <time datetime="2016-04-21T09:01:23.000Z" itemprop="datePublished"> 发表于 2016-04-21</time>
     
   </p>
 </header>
@@ -522,7 +592,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-10T14:02:09.000Z" itemprop="datePublished"> Published 2016-04-10</time>
+    <time datetime="2016-04-10T14:02:09.000Z" itemprop="datePublished"> 发表于 2016-04-10</time>
     
   </p>
 </header>
@@ -587,7 +657,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-07T01:53:26.000Z" itemprop="datePublished"> Published 2016-04-07</time>
+    <time datetime="2016-04-07T01:53:26.000Z" itemprop="datePublished"> 发表于 2016-04-07</time>
     
   </p>
 </header>
@@ -648,7 +718,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-07T01:28:09.000Z" itemprop="datePublished"> Published 2016-04-07</time>
+    <time datetime="2016-04-07T01:28:09.000Z" itemprop="datePublished"> 发表于 2016-04-07</time>
     
   </p>
 </header>
@@ -695,72 +765,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/05/Http-Servlet汇总/" title="Http Servlet汇总" itemprop="url">Http Servlet汇总</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> Published 2016-04-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-servlet/" title="Servlet 工作原理解析" target="_blank" rel="external">Servlet 工作原理解析</a></p>
-<p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-jetty/" title="Jetty 的工作原理以及与 Tomcat 的比较" target="_blank" rel="external">Jetty 的工作原理以及与 Tomcat 的比较</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="https://github.com/slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -770,7 +789,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
@@ -790,7 +809,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>5</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>6</sup></a></li>
 		  
 		
 		  
@@ -811,11 +830,15 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
 			
 				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>6</sup></a></li>
 			
 		
 			
@@ -824,10 +847,6 @@
 		
 			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>5</sup></a></li>
 			
 		
 			
@@ -863,7 +882,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
+				<li><a href="/tags/IO/" title="IO">IO<sup>1</sup></a></li>
 			
 		
 			
@@ -875,11 +894,11 @@
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
 			
 		
 			
@@ -891,7 +910,7 @@
 			
 		
 			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -899,7 +918,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情链接</p>
     <ul>
         
           <li>
@@ -915,11 +934,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1071,7 +1090,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
