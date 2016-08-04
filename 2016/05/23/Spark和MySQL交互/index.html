@@ -11,22 +11,19 @@
     
 
     
-    <meta name="description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件
-一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Properties): DataFrame
-我们只需要提供Dr">
+    <meta name="description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件spark jdbc(mysql) 操作并发度优化
+一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Propert">
 <meta property="og:type" content="article">
 <meta property="og:title" content=" Spark和MySQL交互">
 <meta property="og:url" content="slamke.github.io/2016/05/23/Spark和MySQL交互/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件
-一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Properties): DataFrame
-我们只需要提供Dr">
-<meta property="og:updated_time" content="2016-05-23T06:33:04.395Z">
+<meta property="og:description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件spark jdbc(mysql) 操作并发度优化
+一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Propert">
+<meta property="og:updated_time" content="2016-07-27T05:55:55.179Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content=" Spark和MySQL交互">
-<meta name="twitter:description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件
-一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Properties): DataFrame
-我们只需要提供Dr">
+<meta name="twitter:description" content="Spark读取MySQLSpark读取数据库(Mysql)的四种方式讲解Spark与Mysql(JdbcRDD)整合开发改写Spark JdbcRDD，支持自己定义分区查询条件spark jdbc(mysql) 操作并发度优化
+一、不指定查询条件　　这个方式链接MySql的函数原型是：1def jdbc(url: String, table: String, properties: Propert">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -106,7 +103,7 @@
 		
 		</div>
 		
-		<h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="external">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="external">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="external">改写Spark JdbcRDD，支持自己定义分区查询条件</a></p>
+		<h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="external">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="external">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="external">改写Spark JdbcRDD，支持自己定义分区查询条件</a><br><a href="http://lswyyy.github.io/2015/12/16/%E6%8F%90%E9%AB%98spark-jdbc%E6%93%8D%E4%BD%9C%E5%B9%B6%E5%8F%91%E5%BA%A6/" target="_blank" rel="external">spark jdbc(mysql) 操作并发度优化</a></p>
 <h3 id="一、不指定查询条件"><a href="#一、不指定查询条件" class="headerlink" title="一、不指定查询条件"></a>一、不指定查询条件</h3><p>　　这个方式链接MySql的函数原型是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(url: <span class="type">String</span>, table: <span class="type">String</span>, properties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure></p>
 <p>我们只需要提供Driver的url，需要查询的表名，以及连接表相关属性properties。下面是具体例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, prop )</span><br><span class="line">println(df.count())</span><br><span class="line">println(df.rdd.partitions.size)</span><br></pre></td></tr></table></figure></p>
 <p>我们运行上面的程序，可以看到df.rdd.partitions.size输出结果是1，这个结果的含义是iteblog表的所有数据都是由RDD的一个分区处理的，所以说，如果你这个表很大，很可能会出现OOM<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSetManager: Lost task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">1.0</span> (TID <span class="number">14</span>, spark047219):</span><br><span class="line"> java.lang.OutOfMemoryError: GC overhead limit exceeded at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:<span class="number">3380</span>)</span><br></pre></td></tr></table></figure></p>
@@ -212,7 +209,7 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
 		  
 		
 		  
@@ -220,7 +217,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>5</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>6</sup></a></li>
 		  
 		
 		  
@@ -232,7 +229,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>3</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>4</sup></a></li>
 		  
 		
 		  
@@ -240,7 +237,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Web/" title="Web">Web<sup>5</sup></a></li>
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
 		  
 		
 		</ul>
@@ -253,7 +250,15 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Web/" title="Web">Web<sup>7</sup></a></li>
+				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
 			
 		
 			
@@ -261,7 +266,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>4</sup></a></li>
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -269,11 +274,7 @@
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
 			
 		
 			
@@ -289,15 +290,15 @@
 			
 		
 			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/REST/" title="REST">REST<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
 			
 		
 			
@@ -305,7 +306,15 @@
 			
 		
 			
-				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
 			
 		
 			
@@ -317,19 +326,7 @@
 			
 		
 			
-				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/IO/" title="IO">IO<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
 			
 		
 		</ul>

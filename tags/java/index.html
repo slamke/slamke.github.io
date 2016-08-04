@@ -84,19 +84,6 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">
-  
-
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished">2016-03-23</time>
-
-
-    <h1 itemprop="name">Java IO</h1>
-
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
     <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">
   
 
@@ -104,6 +91,19 @@
 
 
     <h1 itemprop="name">Java中一个线程可以多次start吗?</h1>
+
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">
+  
+
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished">2016-03-23</time>
+
+
+    <h1 itemprop="name">Java IO</h1>
 
   </a>
 </section>
@@ -275,7 +275,14 @@ var _hmt = _hmt || [];
 
     </body>
    </html>
-);
+) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
   });
   if($.fancybox){
     $('.fancybox').fancybox();

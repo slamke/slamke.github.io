@@ -4,26 +4,29 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Spring实现数据库读写分离 | 雁渡寒潭 风吹疏竹</title>
+    <title>Spring @scheduled注解执行定时任务 | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="Github
-参考：spring实现数据库读写分离">
+    <meta name="description" content="创建spring-task.xml 文件
+
+12345678910111213141516171819202122232425262728293031323334&amp;lt;!---加入：xmlns:task=&quot;http://www.springframework.org/schema/task&quot;   xsi:schemaLocation=&quot;http://www.springframework.or">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring实现数据库读写分离">
-<meta property="og:url" content="slamke.github.io/2016/04/07/Spring实现数据库读写分离/index.html">
+<meta property="og:title" content="Spring @scheduled注解执行定时任务">
+<meta property="og:url" content="slamke.github.io/2016/06/14/Spring-scheduled注解执行定时任务/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="Github
-参考：spring实现数据库读写分离">
-<meta property="og:updated_time" content="2016-04-11T11:40:02.278Z">
+<meta property="og:description" content="创建spring-task.xml 文件
+
+12345678910111213141516171819202122232425262728293031323334&amp;lt;!---加入：xmlns:task=&quot;http://www.springframework.org/schema/task&quot;   xsi:schemaLocation=&quot;http://www.springframework.or">
+<meta property="og:updated_time" content="2016-06-14T02:38:39.474Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring实现数据库读写分离">
-<meta name="twitter:description" content="Github
-参考：spring实现数据库读写分离">
+<meta name="twitter:title" content="Spring @scheduled注解执行定时任务">
+<meta name="twitter:description" content="创建spring-task.xml 文件
+
+12345678910111213141516171819202122232425262728293031323334&amp;lt;!---加入：xmlns:task=&quot;http://www.springframework.org/schema/task&quot;   xsi:schemaLocation=&quot;http://www.springframework.or">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -83,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/07/Spring实现数据库读写分离/" title="Spring实现数据库读写分离" itemprop="url">Spring实现数据库读写分离</a>
+      <a href="/2016/06/14/Spring-scheduled注解执行定时任务/" title="Spring @scheduled注解执行定时任务" itemprop="url">Spring @scheduled注解执行定时任务</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-07T01:53:26.000Z" itemprop="datePublished"> Published 2016-04-07</time>
+    <time datetime="2016-06-14T02:30:29.000Z" itemprop="datePublished"> Published 2016-06-14</time>
     
   </p>
 </header>
@@ -103,8 +106,21 @@
 		
 		</div>
 		
-		<p><a href="https://github.com/slamke/spring_read_write" target="_blank" rel="external">Github</a></p>
-<p>参考：<br><a href="http://wiki.xby1993.net/doku.php?id=spring:spring%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB" target="_blank" rel="external">spring实现数据库读写分离</a></p>
+		<ol>
+<li>创建spring-task.xml 文件</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!---加入：xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">   xsi:schemaLocation="http://www.springframework.org/schema/task</span><br><span class="line">	http://www.springframework.org/schema/task/spring-task-3.1.xsd"</span><br><span class="line">--&gt;</span></span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;  </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>  </span><br><span class="line">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>   </span><br><span class="line">    <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>  </span><br><span class="line">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>  </span><br><span class="line">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span>  </span><br><span class="line">    <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span><br><span class="line">    <span class="attr">xmlns:task</span>=<span class="string">"http://www.springframework.org/schema/task"</span>  </span><br><span class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans     </span><br><span class="line">    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd     </span><br><span class="line">    http://www.springframework.org/schema/tx     </span><br><span class="line">    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/aop  </span><br><span class="line">    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/context    </span><br><span class="line">    http://www.springframework.org/schema/context/spring-context-3.2.xsd    </span><br><span class="line">    http://www.springframework.org/schema/mvc  </span><br><span class="line">    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span><br><span class="line">    http://www.springframework.org/schema/task  </span><br><span class="line">    http://www.springframework.org/schema/task/spring-task-3.2.xsd</span><br><span class="line">   "</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">task:annotation-driven</span> /&gt;</span> <span class="comment">&lt;!-- 定时器开关--&gt;</span>  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:annotation-config</span>/&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 自动扫描的包名 --&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.spring.task"</span> /&gt;</span> </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>实现接口和实现类，添加注解和说明</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>  <span class="comment">//import org.springframework.stereotype.Component;  </span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTestServiceImpl</span>  <span class="keyword">implements</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">      <span class="meta">@Scheduled</span>(cron=<span class="string">"0/5 * *  * * ? "</span>)   <span class="comment">//每5秒执行一次  </span></span><br><span class="line">      <span class="meta">@Override</span>  </span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>&#123;  </span><br><span class="line">            System.out.println(<span class="string">"进入测试"</span>);  </span><br><span class="line">      &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>备注：</p>
+<ol>
+<li>spring的@Scheduled注解需要写在实现类上</li>
+<li>定时器的任务方法不能有返回值（如果有返回值，spring初始化的时候会告诉你有个错误、需要设定一个proxytargetclass的某个值为true）</li>
+<li>实现类上要有组件的注解@Component</li>
+</ol>
+<p>参数说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">字段 允许值 允许的特殊字符  </span><br><span class="line">秒 0-59 , - * /  </span><br><span class="line">分 0-59 , - * /  </span><br><span class="line">小时 0-23 , - * /  </span><br><span class="line">日期 1-31 , - * ? / L W C  </span><br><span class="line">月份 1-12 或者 JAN-DEC , - * /  </span><br><span class="line">星期 1-7 或者 SUN-SAT , - * ? / L C #  </span><br><span class="line">年（可选） 留空, 1970-2099 , - * /  </span><br><span class="line">表达式意义  </span><br><span class="line">&quot;0 0 12 * * ?&quot; 每天中午12点触发  </span><br><span class="line">&quot;0 15 10 ? * *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ?&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发  </span><br><span class="line">&quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发  </span><br><span class="line">&quot;0 0/5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0/5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发  </span><br><span class="line">&quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发  </span><br><span class="line">&quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发  </span><br><span class="line">&quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发  </span><br><span class="line">&quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发  </span><br><span class="line">每天早上6点  </span><br><span class="line">0 6 * * *  </span><br><span class="line">每两个小时  </span><br><span class="line">0 */2 * * *  </span><br><span class="line">晚上11点到早上8点之间每两个小时，早上八点  </span><br><span class="line">0 23-7/2，8 * * *  </span><br><span class="line">每个月的4号和每个礼拜的礼拜一到礼拜三的早上11点  </span><br><span class="line">0 11 4 * 1-3  </span><br><span class="line">1月1日早上4点  </span><br><span class="line">0 4 1 1 *</span><br></pre></td></tr></table></figure></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,7 +134,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
+  <span></span> <a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -127,7 +143,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2016/04/07/Spring实现数据库读写分离/" data-title="Spring实现数据库读写分离 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/06/14/Spring-scheduled注解执行定时任务/" data-title="Spring @scheduled注解执行定时任务 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -141,18 +157,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/04/10/Tomcat系统架构和设计模式/" title="Tomcat系统架构和设计模式">
+ <a href="/2016/07/22/WebHDFS与HttpFS的使用/" title="WebHDFS与HttpFS的使用">
   <strong>上一篇：</strong><br/>
   <span>
-  Tomcat系统架构和设计模式</span>
+  WebHDFS与HttpFS的使用</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2016/04/07/hadoop相关记录/"  title="hadoop相关记录">
+<a href="/2016/05/23/Spark-on-yarn/"  title="Spark on yarn">
  <strong>下一篇：</strong><br/> 
- <span>hadoop相关记录
+ <span>Spark on yarn
 </span>
 </a>
 </div>
