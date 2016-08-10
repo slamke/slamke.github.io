@@ -4,35 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Spark SQL汇总 | 雁渡寒潭 风吹疏竹</title>
+    <title>scala mutable和immutable类型转换 | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="使用Spark SQL读取Hive上的数据
-Spark 注册UDF-Scala实现
-Spark SQL使用Hive的UDF
-spark-sql thriftserver 方式使用hive udf函数
-Spark SQL使用Hive的UDF并且注册临时表">
+    <meta name="description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spark SQL汇总">
-<meta property="og:url" content="slamke.github.io/2016/05/02/Spark-SQL汇总/index.html">
+<meta property="og:title" content="scala mutable和immutable类型转换">
+<meta property="og:url" content="slamke.github.io/2016/08/10/scala-mutable和immutable类型转换/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="使用Spark SQL读取Hive上的数据
-Spark 注册UDF-Scala实现
-Spark SQL使用Hive的UDF
-spark-sql thriftserver 方式使用hive udf函数
-Spark SQL使用Hive的UDF并且注册临时表">
-<meta property="og:updated_time" content="2016-05-02T07:25:24.744Z">
+<meta property="og:description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
+<meta property="og:updated_time" content="2016-08-10T01:48:40.652Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spark SQL汇总">
-<meta name="twitter:description" content="使用Spark SQL读取Hive上的数据
-Spark 注册UDF-Scala实现
-Spark SQL使用Hive的UDF
-spark-sql thriftserver 方式使用hive udf函数
-Spark SQL使用Hive的UDF并且注册临时表">
+<meta name="twitter:title" content="scala mutable和immutable类型转换">
+<meta name="twitter:description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -92,14 +80,14 @@ Spark SQL使用Hive的UDF并且注册临时表">
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/05/02/Spark-SQL汇总/" title="Spark SQL汇总" itemprop="url">Spark SQL汇总</a>
+      <a href="/2016/08/10/scala-mutable和immutable类型转换/" title="scala mutable和immutable类型转换" itemprop="url">scala mutable和immutable类型转换</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    <time datetime="2016-08-10T01:46:12.000Z" itemprop="datePublished"> Published 2016-08-10</time>
     
   </p>
 </header>
@@ -108,15 +96,17 @@ Spark SQL使用Hive的UDF并且注册临时表">
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Map"><span class="toc-number">1.</span> <span class="toc-text">Map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#List"><span class="toc-number">2.</span> <span class="toc-text">List</span></a></li></ol>
 		
 		</div>
 		
-		<p><a href="http://www.iteblog.com/archives/1491" target="_blank" rel="external">使用Spark SQL读取Hive上的数据</a></p>
-<p><a href="http://blog.csdn.net/oopsoom/article/details/39401391" target="_blank" rel="external">Spark 注册UDF-Scala实现</a></p>
-<p><a href="http://www.cnblogs.com/luogankun/p/3970153.html" target="_blank" rel="external">Spark SQL使用Hive的UDF</a></p>
-<p><a href="http://www.jianshu.com/p/b81d3f3961b7" target="_blank" rel="external">spark-sql thriftserver 方式使用hive udf函数</a></p>
-<p><a href="https://community.hortonworks.com/articles/768/using-hive-udfudafudtf-with-sparksql.html" target="_blank" rel="external">Spark SQL使用Hive的UDF并且注册临时表</a></p>
+		<p>一般而言，from mutable to immutable, 使用 to<em> 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.<br>from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _</em>).</p>
+<blockquote>
+<p>Note that the to* methods like toList, toMap are is performed in constant time.</p>
+</blockquote>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> mutableMap1 = immutableMap.toMap() <span class="comment">// after 2.8</span></span><br><span class="line"><span class="keyword">val</span> mutbaleMap2 = collection.immutable.<span class="type">Map</span>(x.toList: _*) <span class="comment">// before 2.8</span></span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableMap = scala.collection.immutable.<span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="string">"1"</span>, <span class="number">2</span> -&gt; <span class="string">"2"</span>)</span><br><span class="line"><span class="keyword">val</span> mutableMap = scala.collection.mutable.<span class="type">Map</span>(immutableMap: _*)</span><br></pre></td></tr></table></figure>
+<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = mutableListBuffer.toList</span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = scala.collection.immutable.<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> mutableListBuffer = scala.collection.mutable.<span class="type">ListBuffer</span>(immutableList: _*)</span><br></pre></td></tr></table></figure>
+<p><a href="http://qiita.com/visualskyrim/items/1e92fc99fc3eaf004778" target="_blank" rel="external">参考链接</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -124,13 +114,13 @@ Spark SQL使用Hive的UDF并且注册临时表">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+  <a class="article-category-link" href="/categories/Scala/">Scala</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-SQL/">Spark SQL</a>
+  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/类型转换/">类型转换</a>
   </div>
 
 </div>
@@ -139,7 +129,7 @@ Spark SQL使用Hive的UDF并且注册临时表">
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2016/05/02/Spark-SQL汇总/" data-title="Spark SQL汇总 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/08/10/scala-mutable和immutable类型转换/" data-title="scala mutable和immutable类型转换 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -152,19 +142,11 @@ Spark SQL使用Hive的UDF并且注册临时表">
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/05/02/REST-API-设计最佳实践/" title="REST API 设计最佳实践">
-  <strong>上一篇：</strong><br/>
-  <span>
-  REST API 设计最佳实践</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/04/24/Java基础-Object类中的方法解析/"  title="Java基础:Object类中的方法解析">
+<a href="/2016/08/04/Spark性能优化/"  title="Spark性能优化">
  <strong>下一篇：</strong><br/> 
- <span>Java基础:Object类中的方法解析
+ <span>Spark性能优化
 </span>
 </a>
 </div>
@@ -179,7 +161,7 @@ Spark SQL使用Hive的UDF并且注册临时表">
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Map"><span class="toc-number">1.</span> <span class="toc-text">Map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#List"><span class="toc-number">2.</span> <span class="toc-text">List</span></a></li></ol>
  
   </div>
 
