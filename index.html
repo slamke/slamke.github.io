@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,395 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/11/27/SparkStreaming数据产生与导入相关的内存分析/" title="SparkStreaming数据产生与导入相关的内存分析" itemprop="url">SparkStreaming数据产生与导入相关的内存分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-11-27T14:30:08.000Z" itemprop="datePublished"> Published 2016-11-27</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>转自<a href="http://www.jianshu.com/p/9e44d3fd62af" target="_blank" rel="external">Spark Streaming 数据产生与导入相关的内存分析</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我这篇文章会分几个点来描述Spark Streaming 的Receiver在内存方面的表现。</p>
+<ul>
+<li>一个大致的数据接受流程</li>
+<li>一些存储结构的介绍</li>
+<li>哪些点可能导致内存问题，以及相关的配置参数<br>另外，有位大牛写了<a href="https://github.com/proflin/CoolplaySpark/tree/master/Spark%20Streaming%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E7%B3%BB%E5%88%97" target="_blank" rel="external">Spark Streaming 源码解析系列</a>，我觉得写的不错，这里也推荐下。</li>
+</ul>
+<p>我在部门尽力推荐使用Spark Streaming做数据处理，目前已经应用在日志处理，机器学习等领域。这期间也遇到不少问题，尤其是Kafka在接受到的数据量非常大的情况下，会有一些内存相关的问题。</p>
+<p>另外特别说明下，我们仅仅讨论的是High Level的Kafka Stream，也就是输入流通过如下方式创建：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">KafkaUtils</span>.createStream</span><br></pre></td></tr></table></figure></p>
+<p>并且不开启WAL的情况下。</p>
+<h1 id="数据接受流程"><a href="#数据接受流程" class="headerlink" title="数据接受流程"></a>数据接受流程</h1><p>启动Spark Streaming(后续缩写为SS)后，SS 会选择一台Executor 启动ReceiverSupervisor,并且标记为Active状态。接着按如下步骤处理：</p>
+<ol>
+<li><p>ReceiverSupervisor会启动对应的Receiver(这里是KafkaReceiver)</p>
+</li>
+<li><p>KafkaReceiver 会根据配置启动新的线程接受数据，在该线程中调用 ReceiverSupervisor.store 方法填充数据，注意，这里是一条一条填充的。</p>
+</li>
+<li><p>ReceiverSupervisor 会调用 BlockGenerator.addData 进行数据填充。</p>
+</li>
+</ol>
+<p>到目前为止，整个过程不会有太多内存消耗，正常的一个线性调用。所有复杂的数据结构都隐含在 BlockGenerator 中。</p>
+<h1 id="BlockGenerator-存储结构"><a href="#BlockGenerator-存储结构" class="headerlink" title="BlockGenerator 存储结构"></a>BlockGenerator 存储结构</h1><p>BlockGenerator 会复杂些，这里有几个点，</p>
+<ol>
+<li><p>维护了一个缓存 currentBuffer ，就是一个无限长度的ArrayBuffer。currentBuffer 并不会被复用，而是每次都会新建，然后把老的对象直接封装成Block，BlockGenerator会负责保证currentBuffer 只有一个。currentBuffer 填充的速度是可以被限制的，以秒为单位，配置参数为 spark.streaming.receiver.maxRate。这个是Spark内存控制的第一道防线，填充currentBuffer 是阻塞的，消费Kafka的线程直接做填充。</p>
+</li>
+<li><p>维护了一个 blocksForPushing 队列， size 默认为10个(1.5.1版本)，可通过 spark.streaming.blockQueueSize 进行配置。该队列主要用来实现生产-消费模式。每个元素其实是一个currentBuffer形成的block。</p>
+</li>
+<li><p>blockIntervalTimer 是一个定时器。其实是一个生产者，负责将currentBuffer 的数据放到 blocksForPushing 中。通过参数 spark.streaming.blockInterval 设置，默认为200ms。放的方式很简单，直接把currentBuffer做为Block的数据源。这就是为什么currentBuffer不会被复用。</p>
+</li>
+<li><p>blockPushingThread 也是一个定时器，负责将Block从blocksForPushing取出来,然后交给BlockManagerBasedBlockHandler.storeBlock 方法。10毫秒会取一次，不可配置。到这一步，才真的将数据放到了Spark的BlockManager中。</p>
+</li>
+</ol>
+<p>步骤描述完了，我们看看有哪些值得注意的地方。</p>
+<h1 id="currentBuffer"><a href="#currentBuffer" class="headerlink" title="currentBuffer"></a>currentBuffer</h1><p>首先自然要说下currentBuffer,如果200ms期间你从Kafka接受的数据足够大，则足以把内存承包了。而且currentBuffer使用的并不是spark的storage内存，而是有限的用于运算存储的内存。 默认应该是 heap*0.4。除了把内存搞爆掉了，还有一个是GC。导致receiver所在的Executor 极容易挂掉，处理速度也巨慢。 如果你在SparkUI发现Receiver挂掉了，考虑有没有可能是这个问题。</p>
+<h1 id="blocksForPushing"><a href="#blocksForPushing" class="headerlink" title="blocksForPushing"></a>blocksForPushing</h1><p>blocksForPushing 这个是作为currentBuffer 和BlockManager之间的中转站。默认存储的数据最大可以达到 10*currentBuffer 大小。一般不打可能，除非你的 spark.streaming.blockInterval 设置的比10ms 还小，官方推荐最小也要设置成 50ms，你就不要搞对抗了。所以这块不用太担心。</p>
+<h1 id="blockPushingThread"><a href="#blockPushingThread" class="headerlink" title="blockPushingThread"></a>blockPushingThread</h1><p>blockPushingThread 负责从 blocksForPushing 获取数据，并且写入 BlockManager 。这里很蛋疼的事情是，blockPushingThread只写他自己所在的Executor的 blockManager,也就是每个batch周期的数据都会被 一个Executor给扛住了。 这是导致内存被撑爆的最大风险。 也就是说，每个batch周期接受到的数据最好不要超过接受Executor的内存(Storage)的一半。否则有你受的。我发现在数据量很大的情况下，最容易挂掉的就是Receiver所在的Executor了。 建议Spark-Streaming团队最好是能将数据写入到多个BlockManager上。</p>
+<h1 id="StorageLevel的配置问题"><a href="#StorageLevel的配置问题" class="headerlink" title="StorageLevel的配置问题"></a>StorageLevel的配置问题</h1><p>另外还有几个值得注意的问题：</p>
+<p>如果你配置成Memory_Disk ,如果Receiver所在的Executor一旦挂掉，你也歇菜了，整个Spark Streaming作业会失败。失败的原因是一部分block找不到了。</p>
+<p>如果你配置成Memory_Disk_2，数据会被replication到不同的节点。一般而言不会出现作业失败或者丢数据。但解决不了Receiver也容易挂的问题，当然还是主要还是内存引起的。</p>
+<p>最好是采用默认设置 MEMORY_AND_DISK_SER_2 比较靠谱些。</p>
+<p>这里面还有一个风险点就是，如果某个batch processing延迟了，那么对应的BlockManager的数据不会被释放，然后下一个batch的数据还在进，也会加重内存问题。</p>
+<h1 id="动态控制消费速率以及相关论文"><a href="#动态控制消费速率以及相关论文" class="headerlink" title="动态控制消费速率以及相关论文"></a>动态控制消费速率以及相关论文</h1><p>另外，spark的消费速度可以设置上限以外，亦可以根据processing time 来动态调整。通过 spark.streaming.backpressure.enabled 设置为true 可以打开。算法的论文可参考： Socc 2014: Adaptive Stream Processing using Dynamic Batch Sizing ,还是有用的，我现在也都开启着。</p>
+<p>Spark里除了这个 Dynamic,还有一个就是Dynamic Allocation,也就是Executor数量会根据资源使用情况，自动伸缩。我其实蛮喜欢Spark这个特色的。具体的可以查找下相关设计文档。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-Streaming/">Spark Streaming</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/10/26/Spark-SQL学习笔记/" title="Spark SQL 学习笔记" itemprop="url">Spark SQL 学习笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-10-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Spark-SQL-学习笔记"><a href="#Spark-SQL-学习笔记" class="headerlink" title="Spark SQL 学习笔记"></a>Spark SQL 学习笔记</h2><p><a href="http://lxw1234.com/archives/2015/06/296.htm" target="_blank" rel="external">Spark SQL中实现Hive MapJoin</a><br>重点参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 定义</span><br><span class="line">- DataFrames</span><br><span class="line">A DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a table in a relational database or a data frame in R/Python, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as: structured data files, tables in Hive, external databases, or existing RDDs.</span><br><span class="line"></span><br><span class="line">- Datasets</span><br><span class="line">A Dataset is a new experimental interface added in Spark 1.6 that tries to provide the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 概述</span><br><span class="line">入口:  SQLContext </span><br><span class="line">``` scala</span><br><span class="line">val sc: SparkContext // An existing SparkContext.</span><br><span class="line">val sqlContext = new org.apache.spark.sql.SQLContext(sc)</span><br><span class="line"></span><br><span class="line">// this is used to implicitly convert an RDD to a DataFrame.</span><br><span class="line">import sqlContext.implicits._</span><br></pre></td></tr></table></figure></p>
+<p>Hive支持:   HiveContext<br>功能: more complete HiveQL parser, access to Hive UDFs, and the ability to read data from Hive tables</p>
+<h3 id="Creating-DataFrames"><a href="#Creating-DataFrames" class="headerlink" title="Creating DataFrames"></a>Creating DataFrames</h3><p>With a SQLContext, applications can create DataFrames from an existing RDD, from a Hive table, or from data sources.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sc: <span class="type">SparkContext</span> <span class="comment">// An existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.json(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Displays the content of the DataFrame to stdout</span></span><br><span class="line">df.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Print the schema in a tree format</span></span><br><span class="line">df.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select only the "name" column</span></span><br><span class="line">df.select(<span class="string">"name"</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select everybody, but increment the age by 1</span></span><br><span class="line">df.select(df(<span class="string">"name"</span>), df(<span class="string">"age"</span>) + <span class="number">1</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select people older than 21</span></span><br><span class="line">df.filter(df(<span class="string">"age"</span>) &gt; <span class="number">21</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Count people by age</span></span><br><span class="line">df.groupBy(<span class="string">"age"</span>).count().show()</span><br></pre></td></tr></table></figure></p>
+<h3 id="运行sql"><a href="#运行sql" class="headerlink" title="运行sql"></a>运行sql</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM table"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Creating-Datasets"><a href="#Creating-Datasets" class="headerlink" title="Creating Datasets"></a>Creating Datasets</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Encoders for most common types are automatically provided by importing sqlContext.implicits._</span></span><br><span class="line"><span class="keyword">val</span> ds = <span class="type">Seq</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).toDS()</span><br><span class="line">ds.map(_ + <span class="number">1</span>).collect() <span class="comment">// Returns: Array(2, 3, 4)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/ <span class="type">DataFrames</span> can be converted to a <span class="type">Dataset</span> by providing a <span class="class"><span class="keyword">class</span>. <span class="title">Mapping</span> <span class="title">will</span> <span class="title">be</span> <span class="title">done</span> <span class="title">by</span> <span class="title">name</span>.</span></span><br><span class="line"><span class="keyword">val</span> path = <span class="string">"examples/src/main/resources/people.json"</span></span><br><span class="line"><span class="keyword">val</span> people = sqlContext.read.json(path).as[<span class="type">Person</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="Interoperating-with-RDDs"><a href="#Interoperating-with-RDDs" class="headerlink" title="Interoperating with RDDs"></a>Interoperating with RDDs</h2><h3 id="Inferring-the-Schema-Using-Reflection"><a href="#Inferring-the-Schema-Using-Reflection" class="headerlink" title="Inferring the Schema Using Reflection"></a>Inferring the Schema Using Reflection</h3><p>The Scala interface for Spark SQL supports automatically converting an RDD containing <strong>case classes</strong> to a DataFrame. </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="comment">// this is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the schema using a case class.</span></span><br><span class="line"><span class="comment">// Note: Case classes in Scala 2.10 can support only up to 22 fields. To work around this limit,</span></span><br><span class="line"><span class="comment">// you can use custom classes that implement the Product interface.</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Int</span></span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD of Person objects and register it as a table.</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>).map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Person</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim.toInt)).toDF()</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> teenagers = sqlContext.sql(<span class="string">"SELECT name, age FROM people WHERE age &gt;= 13 AND age &lt;= 19"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// 可以使用索引访问每一行中的列</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or by field name:</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t.getAs[<span class="type">String</span>](<span class="string">"name"</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// row.getValuesMap[T] retrieves multiple columns at once into a Map[String, T]</span></span><br><span class="line">teenagers.map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"name"</span>, <span class="string">"age"</span>))).collect().foreach(println)</span><br><span class="line"><span class="comment">// Map("name" -&gt; "Justin", "age" -&gt; 19)</span></span><br></pre></td></tr></table></figure>
+<h3 id="Programmatically-Specifying-the-Schema"><a href="#Programmatically-Specifying-the-Schema" class="headerlink" title="Programmatically Specifying the Schema"></a>Programmatically Specifying the Schema</h3><ol>
+<li>Create an RDD of Rows from the original RDD;</li>
+<li>Create the schema represented by a StructType matching the structure of Rows in the RDD created in Step 1.</li>
+<li>Apply the schema to the RDD of Rows via createDataFrame method provided by SQLContext.<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The schema is encoded in a string</span></span><br><span class="line"><span class="keyword">val</span> schemaString = <span class="string">"name age"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Row.</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">Row</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Spark SQL data types</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.types.&#123;<span class="type">StructType</span>,<span class="type">StructField</span>,<span class="type">StringType</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate the schema based on the string of schema</span></span><br><span class="line"><span class="keyword">val</span> schema =</span><br><span class="line">  <span class="type">StructType</span>(</span><br><span class="line">    schemaString.split(<span class="string">" "</span>).map(fieldName =&gt; <span class="type">StructField</span>(fieldName, <span class="type">StringType</span>, <span class="literal">true</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Convert records of the RDD (people) to Rows.</span></span><br><span class="line"><span class="keyword">val</span> rowRDD = people.map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Row</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply the schema to the RDD.</span></span><br><span class="line"><span class="keyword">val</span> peopleDataFrame = sqlContext.createDataFrame(rowRDD, schema)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Register the DataFrames as a table.</span></span><br><span class="line">peopleDataFrame.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> results = sqlContext.sql(<span class="string">"SELECT name FROM people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// The columns of a row in the result can be accessed by field index or by field name.</span></span><br><span class="line">results.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Data-Sources"><a href="#Data-Sources" class="headerlink" title="Data Sources"></a>Data Sources</h2><h3 id="Generic-Load-Save-Functions"><a href="#Generic-Load-Save-Functions" class="headerlink" title="Generic Load/Save Functions"></a>Generic Load/Save Functions</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.read.load(<span class="string">"examples/src/main/resources/users.parquet"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"favorite_color"</span>).write.save(<span class="string">"namesAndFavColors.parquet"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 显式指定格式</span></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.format(<span class="string">"json"</span>).load(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"age"</span>).write.format(<span class="string">"parquet"</span>).save(<span class="string">"namesAndAges.parquet"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Run-SQL-on-files-directly"><a href="#Run-SQL-on-files-directly" class="headerlink" title="Run SQL on files directly"></a>Run SQL on files directly</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM parquet.`examples/src/main/resources/users.parquet`"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Saving-to-Persistent-Tables"><a href="#Saving-to-Persistent-Tables" class="headerlink" title="Saving to Persistent Tables"></a>Saving to Persistent Tables</h3><p>When working with a HiveContext, DataFrames can also be saved as persistent tables using the saveAsTable command. Unlike the registerTempTable command, saveAsTable will materialize the contents of the dataframe and create a pointer to the data in the HiveMetastore.<br>将会真的使用hive创建一张内表</p>
+<h2 id="Parquet"><a href="#Parquet" class="headerlink" title="Parquet"></a>Parquet</h2><h3 id="Partition-Discovery-分区"><a href="#Partition-Discovery-分区" class="headerlink" title="Partition Discovery 分区"></a>Partition Discovery 分区</h3><p>Currently, numeric data types and string type are supported.<br>参数设置: spark.sql.sources.partitionColumnTypeInference.enabled    true.<br>文件路径  path/to/table/gender=male </p>
+<h3 id="Schema-Merging"><a href="#Schema-Merging" class="headerlink" title="Schema Merging"></a>Schema Merging</h3><p>支持Parquet属性变更<br>该属性默认被关闭<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sqlContext from the previous example is used in this example.</span></span><br><span class="line"><span class="comment">// This is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a simple DataFrame, stored into a partition directory</span></span><br><span class="line"><span class="keyword">val</span> df1 = sc.makeRDD(<span class="number">1</span> to <span class="number">5</span>).map(i =&gt; (i, i * <span class="number">2</span>)).toDF(<span class="string">"single"</span>, <span class="string">"double"</span>)</span><br><span class="line">df1.write.parquet(<span class="string">"data/test_table/key=1"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create another DataFrame in a new partition directory,</span></span><br><span class="line"><span class="comment">// adding a new column and dropping an existing column</span></span><br><span class="line"><span class="keyword">val</span> df2 = sc.makeRDD(<span class="number">6</span> to <span class="number">10</span>).map(i =&gt; (i, i * <span class="number">3</span>)).toDF(<span class="string">"single"</span>, <span class="string">"triple"</span>)</span><br><span class="line">df2.write.parquet(<span class="string">"data/test_table/key=2"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Read the partitioned table</span></span><br><span class="line"><span class="keyword">val</span> df3 = sqlContext.read.option(<span class="string">"mergeSchema"</span>, <span class="string">"true"</span>).parquet(<span class="string">"data/test_table"</span>)</span><br><span class="line">df3.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// The final schema consists of all 3 columns in the Parquet files together</span></span><br><span class="line"><span class="comment">// with the partitioning column appeared in the partition directory paths.</span></span><br><span class="line"><span class="comment">// root</span></span><br><span class="line"><span class="comment">// |-- single: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- double: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- triple: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- key : int (nullable = true)</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="hive支持"><a href="#hive支持" class="headerlink" title="hive支持"></a>hive支持</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.hive.<span class="type">HiveContext</span>(sc)</span><br><span class="line"></span><br><span class="line">sqlContext.sql(<span class="string">"CREATE TABLE IF NOT EXISTS src (key INT, value STRING)"</span>)</span><br><span class="line">sqlContext.sql(<span class="string">"LOAD DATA LOCAL INPATH 'examples/src/main/resources/kv1.txt' INTO TABLE src"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Queries are expressed in HiveQL</span></span><br><span class="line">sqlContext.sql(<span class="string">"FROM src SELECT key, value"</span>).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+<h2 id="JDBC-To-Other-Databases"><a href="#JDBC-To-Other-Databases" class="headerlink" title="JDBC To Other Databases"></a>JDBC To Other Databases</h2><p>支持JDBC协议连接其他数据源<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> jdbcDF = sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:postgresql:dbserver"</span>,</span><br><span class="line">  <span class="string">"dbtable"</span> -&gt; <span class="string">"schema.tablename"</span>)).load()</span><br></pre></td></tr></table></figure></p>
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>Caching Data In Memory</p>
+<ol>
+<li>sqlContext.cacheTable(“tableName”)  / sqlContext.uncacheTable(“tableName”)</li>
+<li>dataFrame.cache()</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spark.sql.inMemoryColumnarStorage.compressed</td>
+<td>true</td>
+<td>是否进行</td>
+</tr>
+<tr>
+<td>spark.sql.inMemoryColumnarStorage.batchSize</td>
+<td>10000</td>
+<td>cache时的batch的大小</td>
+</tr>
+<tr>
+<td>spark.sql.autoBroadcastJoinThreshold</td>
+<td>10485760 (10 MB)</td>
+<td>join时进行广播的数据量</td>
+</tr>
+<tr>
+<td>spark.sql.tungsten.enabled</td>
+<td>true</td>
+<td>是否开启tungsten支持</td>
+</tr>
+<tr>
+<td>spark.sql.shuffle.partitions</td>
+<td>200</td>
+<td>join和聚合时shuffle的分区数量</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Distributed-SQL-Engine"><a href="#Distributed-SQL-Engine" class="headerlink" title="Distributed SQL Engine"></a>Distributed SQL Engine</h2><p>启动ThriftServer 使用beeline或者JDBC连接使用</p>
+<ol>
+<li>Running the Thrift JDBC/ODBC server<br>The Thrift JDBC/ODBC server implemented here corresponds to the HiveServer2 in Hive 1.2.1 You can test the JDBC server with the beeline script that comes with either Spark or Hive 1.2.1.<br>To start the JDBC/ODBC server, run the following in the Spark directory:<blockquote>
+<p>./sbin/start-thriftserver.sh</p>
+</blockquote>
+</li>
+</ol>
+<p>or</p>
+<blockquote>
+<p>./sbin/start-thriftserver.sh \<br>  –hiveconf hive.server2.thrift.port=<listening-port> \<br>  –hiveconf hive.server2.thrift.bind.host=<listening-host> \<br>  –master <master-uri></master-uri></listening-host></listening-port></p>
+</blockquote>
+<ol>
+<li>use beeline to test the Thrift JDBC/ODBC server:<blockquote>
+<p>./bin/beeline<br>beeline&gt; !connect jdbc:hive2://localhost:10000</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="其他特性"><a href="#其他特性" class="headerlink" title="其他特性"></a>其他特性</h2><h3 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h3><p>NOTE: CACHE TABLE tbl is now eager by default not lazy. Don’t need to trigger cache materialization manually anymore.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CACHE</span> [<span class="type">LAZY</span>] <span class="type">TABLE</span> [<span class="type">AS</span> <span class="type">SELECT</span>] ...</span><br><span class="line"><span class="type">CACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br><span class="line"><span class="type">UNCACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br></pre></td></tr></table></figure></p>
+<h2 id="动态分区"><a href="#动态分区" class="headerlink" title="动态分区"></a>动态分区</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').saveAsTable(...)</span><br><span class="line">or</span><br><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').insertInto(...)</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/09/26/Spark-Streaming-Backpressure分析/" title="Spark Streaming Backpressure分析" itemprop="url">Spark Streaming Backpressure分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-09-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-09-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="1-为什么引入Backpressure"><a href="#1-为什么引入Backpressure" class="headerlink" title="1. 为什么引入Backpressure"></a>1. 为什么引入Backpressure</h2><p>默认情况下，Spark Streaming通过Receiver以生产者生产数据的速率接收数据，计算过程中会出现batch processing time &gt; batch interval的情况，其中batch processing time 为实际计算一个批次花费时间， batch interval为Streaming应用设置的批处理间隔。这意味着Spark Streaming的数据接收速率高于Spark从队列中移除数据的速率，也就是数据处理能力低，在设置间隔内不能完全处理当前接收速率接收的数据。如果这种情况持续过长的时间，会造成数据在内存中堆积，导致Receiver所在Executor内存溢出等问题（如果设置StorageLevel包含disk, 则内存存放不下的数据会溢写至disk, 加大延迟）。Spark 1.5以前版本，用户如果要限制Receiver的数据接收速率，可以通过设置静态配制参数“spark.streaming.receiver.maxRate”的值来实现，此举虽然可以通过限制接收速率，来适配当前的处理能力，防止内存溢出，但也会引入其它问题。比如：producer数据生产高于maxRate，当前集群处理能力也高于maxRate，这就会造成资源利用率下降等问题。为了更好的协调数据接收速率与资源处理能力，Spark Streaming 从v1.5开始引入反压机制（back-pressure）,通过动态控制数据接收速率来适配集群数据处理能力。</p>
+<h2 id="2-Backpressure"><a href="#2-Backpressure" class="headerlink" title="2. Backpressure"></a>2. Backpressure</h2><p>Spark Streaming Backpressure:  根据JobScheduler反馈作业的执行信息来动态调整Receiver数据接收率。通过属性“spark.streaming.backpressure.enabled”来控制是否启用backpressure机制，默认值false，即不启用。</p>
+<h2 id="3-流量控制点"><a href="#3-流量控制点" class="headerlink" title="3. 流量控制点"></a>3. 流量控制点</h2><p>当Receiver开始接收数据时，会通过supervisor.pushSingle()方法将接收的数据存入currentBuffer等待BlockGenerator定时将数据取走，包装成block. 在将数据存放入currentBuffer之时，要获取许可（令牌）。如果获取到许可就可以将数据存入buffer, 否则将被阻塞，进而阻塞Receiver从数据源拉取数据。<br>其令牌投放采用令牌桶机制进行， 原理如下图所示:</p>
+<p><img src="http://images.cnblogs.com/cnblogs_com/barrenlake/745320/o_%e4%bb%a4%e7%89%8c%e6%a1%b6%e6%9c%ba%e5%88%b6.png" alt=""></p>
+<p>牌桶机制： 大小固定的令牌桶可自行以恒定的速率源源不断地产生令牌。如果令牌不被消耗，或者被消耗的速度小于产生的速度，令牌就会不断地增多，直到把桶填满。后面再产生的令牌就会从桶中溢出。最后桶中可以保存的最大令牌数永远不会超过桶的大小。当进行某操作时需要令牌时会从令牌桶中取出相应的令牌数，如果获取到则继续操作，否则阻塞。用完之后不用放回。</p>
+<p>Streaming 数据流被Receiver接收后，按行解析后存入iterator中。然后逐个存入Buffer，在存入buffer时会先获取token，如果没有token存在，则阻塞；如果获取到则将数据存入buffer.  然后等价后续生成block操作。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/09/19/Java8-Optional用法/" title="Java8 Optional用法" itemprop="url">Java8 Optional用法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-09-19T00:47:51.000Z" itemprop="datePublished"> Published 2016-09-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/util/Optional.java" target="_blank" rel="external">Optional源码</a></p>
+<p>Optional 的三种构造方式: Optional.of(obj),  Optional.ofNullable(obj) 和明确的 Optional.empty()</p>
+<ul>
+<li>Optional.of(obj): 它要求传入的 obj 不能是 null 值的, 否则还没开始进入角色就倒在了 NullPointerException 异常上了.</li>
+<li>Optional.ofNullable(obj): 它以一种智能的, 宽容的方式来构造一个 Optional 实例. 来者不拒, 传 null 进到就得到 Optional.empty(), 非 null 就调用 Optional.of(obj).</li>
+</ul>
+<p>观点:  </p>
+<ol>
+<li>当我们非常非常的明确将要传给 Optional.of(obj) 的 obj 参数不可能为 null 时, 比如它是一个刚 new 出来的对象(Optional.of(new User(…))), 或者是一个非 null 常量时;  </li>
+<li>当想为 obj 断言不为 null 时, 即我们想在万一 obj 为 null 立即报告 NullPointException 异常, 立即修改, 而不是隐藏空指针异常时, 我们就应该果断的用 Optional.of(obj) 来构造 Optional 实例, 而不让任何不可预计的 null 值有可乘之机隐身于 Optional 中.</li>
+</ol>
+<p>使用：</p>
+<ul>
+<li><p>存在即返回, 无则提供默认值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> user.orElse(<span class="keyword">null</span>);  <span class="comment">//而不是 return user.isPresent() ? user.get() : null;</span></span><br><span class="line"><span class="keyword">return</span> user.orElse(UNKNOWN_USER);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>存在即返回, 无则由函数来产生</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> user.orElseGet(() -&gt; fetchAUserFromDatabase()); <span class="comment">//而不要 return user.isPresent() ? user: fetchAUserFromDatabase();</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>存在才对它做点什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user.ifPresent(System.out::println);</span><br><span class="line"><span class="keyword">return</span> user.map(u -&gt; u.getOrders()).orElse(Collections.emptyList())</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>map  是可能无限级联的, 比如再深一层, 获得用户名的大写形式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> user.map(u -&gt; u.getUsername())</span><br><span class="line">           .map(name -&gt; name.toUpperCase())</span><br><span class="line">           .orElse(<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Java8/">Java8</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/08/24/Spark-Job任务提交-取消/" title="Spark Job任务提交,取消,查看进度" itemprop="url">Spark Job任务提交,取消,查看进度</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +477,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-24T03:29:45.000Z" itemprop="datePublished"> 发表于 2016-08-24</time>
+    <time datetime="2016-08-24T03:29:45.000Z" itemprop="datePublished"> Published 2016-08-24</time>
     
   </p>
 </header>
@@ -150,7 +539,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-23T01:32:07.000Z" itemprop="datePublished"> 发表于 2016-08-23</time>
+    <time datetime="2016-08-23T01:32:07.000Z" itemprop="datePublished"> Published 2016-08-23</time>
     
   </p>
 </header>
@@ -216,7 +605,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-23T01:25:20.000Z" itemprop="datePublished"> 发表于 2016-08-23</time>
+    <time datetime="2016-08-23T01:25:20.000Z" itemprop="datePublished"> Published 2016-08-23</time>
     
   </p>
 </header>
@@ -292,7 +681,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-11T03:57:38.000Z" itemprop="datePublished"> 发表于 2016-08-11</time>
+    <time datetime="2016-08-11T03:57:38.000Z" itemprop="datePublished"> Published 2016-08-11</time>
     
   </p>
 </header>
@@ -370,7 +759,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-10T01:46:12.000Z" itemprop="datePublished"> 发表于 2016-08-10</time>
+    <time datetime="2016-08-10T01:46:12.000Z" itemprop="datePublished"> Published 2016-08-10</time>
     
   </p>
 </header>
@@ -436,7 +825,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-08-04T04:33:05.000Z" itemprop="datePublished"> 发表于 2016-08-04</time>
+    <time datetime="2016-08-04T04:33:05.000Z" itemprop="datePublished"> Published 2016-08-04</time>
     
   </p>
 </header>
@@ -556,307 +945,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/07/31/Java动态技术/" title="Java动态技术" itemprop="url">Java动态技术</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-07-31T09:35:10.000Z" itemprop="datePublished"> 发表于 2016-07-31</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="https://www.ibm.com/developerworks/cn/java/j-dyn0916/" target="_blank" rel="external">Java 编程的动态性， 第四部分: 用 Javassist 进行类转换</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/动态/">动态</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/07/26/Servlet-Listener之ServletContextListener用法/" title="Servlet Listener之ServletContextListener用法" itemprop="url">Servlet Listener之ServletContextListener用法</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-07-26T13:28:46.000Z" itemprop="datePublished"> 发表于 2016-07-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>本文旨在解释JavaEE中的ServletContextListener接口及用法。 </p>
-<p>1.何时需要使用ServletContextListener？ </p>
-<p>通常我们可能有这样的需求：即在web 应用启动之前运行一些代码。例如：我们可能需要创建一个数据库连接以便web应用在任何时候都能使用它执行一些操作，并且当web应用关闭的时候能够关闭数据库连接。 </p>
-<p>2.如何实现这个需求？</p>
-<p>Java EE规范提供了一个叫ServletContextListener的接口，这个接口可以实现我们的需求。ServletContextListener监听servlet context的生命周期事件。当这个listener关联的web应用启动和关闭的时候，这个接口会收到通知。下面是javadoc对这个接口的说明：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Implementations of this interface receive notifications about changes to the servlet context of the web application they are part of. To receive notification events, the implementation class must be configured in the deployment descriptor for the web application.</span><br></pre></td></tr></table></figure></p>
-<p>如果想要监听web应用的启动，可以使用contextInitialized(ServletContextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the web application initialization process is starting. All ServletContextListeners are notified of context initialization before any filter or servlet in the web application is initialized.</span><br></pre></td></tr></table></figure></p>
-<p>如果要监听web应用的停止（关闭），用contextDestroyed(ServletCOntextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the servlet context is about to be shut down. All servlets and filters have been destroy()ed before any ServletContextListeners are notified of context destruction.</span><br></pre></td></tr></table></figure></p>
-<p>如下创建一个监听器类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cruise;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextEvent;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextListener;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyServletContextListener</span> <span class="keyword">implements</span> <span class="title">ServletContextListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextInitialized</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context initialized"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextDestroyed</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context destroyed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>接下来在web.xml文件中配置listener<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">web-app</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>com.thejavageek.MyServletContextListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>配置完成后，部署应用到tomcat服务器并启动tomcat，将会看到如下的日志。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INFO: Starting service Catalina</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.catalina.core.StandardEngine start</span><br><span class="line">INFO: Starting Servlet Engine: Apache Tomcat/6.0.35</span><br><span class="line">context initialized</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.coyote.http11.Http11Protocol start</span><br><span class="line">INFO: Starting Coyote HTTP/1.1 on http-8080</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.jk.common.ChannelSocket init</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li><p>继承thread<br>``` java<br>public class ThreadListener extends Thread implements ServletContextListener {</p>
-<p> public void contextInitialized(ServletContextEvent event) {</p>
-<pre><code>super.start();
-</code></pre><p> }</p>
-<p> public void contextDestroyed(ServletContextEvent event) {</p>
-<pre><code>super.stop();
-</code></pre><p> }</p>
-<p> @override<br> public void run(){</p>
-<p> }</p>
-</li>
-</ol>
-<p>}</p>
-<p>``` </p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/07/22/WebHDFS与HttpFS的使用/" title="WebHDFS与HttpFS的使用" itemprop="url">WebHDFS与HttpFS的使用</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-07-22T13:49:24.000Z" itemprop="datePublished"> 发表于 2016-07-22</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="WebHDFS与HttpFS的使用"><a href="#WebHDFS与HttpFS的使用" class="headerlink" title="WebHDFS与HttpFS的使用"></a>WebHDFS与HttpFS的使用</h2><h2 id="WebHDFS"><a href="#WebHDFS" class="headerlink" title="WebHDFS"></a>WebHDFS</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>提供HDFS的RESTful接口，可通过此接口进行HDFS文件操作。</p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>WebHDFS服务内置在HDFS中，不需额外安装、启动。</p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>需要在hdfs-site.xml打开WebHDFS开关，此开关默认打开。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.webhdfs.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>连接NameNode的50070端口进行文件操作。</p>
-<p>比如：<figure class="highlight plain"><figcaption><span>"http://ctrl:50070/webhdfs/v1/?op=liststatus&user.name=root" | python -mjson.tool```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 更多操作</span><br><span class="line">参考文档：[官方WebHDFS REST API](https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)</span><br><span class="line"></span><br><span class="line">## HttpFS(Hadoop HDFS over HTTP)</span><br><span class="line"></span><br><span class="line">### 介绍</span><br><span class="line"></span><br><span class="line">HttpFS is a server that provides a REST HTTP gateway supporting all HDFS File System operations (read and write). And it is inteoperable with the webhdfs REST HTTP API.</span><br><span class="line"></span><br><span class="line">### 安装</span><br><span class="line"></span><br><span class="line">Hadoop自带，不需要额外安装。默认服务未启动，需要手工启动。</span><br><span class="line"></span><br><span class="line">### 配置</span><br><span class="line"></span><br><span class="line">- httpfs-site.xml</span><br><span class="line">有配置文件httpfs-site.xml，此配置文件一般保存默认即可，无需修改。</span><br><span class="line"></span><br><span class="line">- hdfs-site.xml</span><br><span class="line">需要增加如下配置，其他两个参数名称中的root代表的是启动hdfs服务的OS用户，应以实际的用户名称代替。</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;  </span><br><span class="line">    &lt;name&gt;hadoop.proxyuser.root.hosts&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;  </span><br><span class="line">&lt;property&gt;  </span><br><span class="line">&lt;name&gt;hadoop.proxyuser.root.groups&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sbin/httpfs.sh start</span><br><span class="line">sbin/httpfs.sh stop</span><br></pre></td></tr></table></figure>
-<p>启动后，默认监听14000端口：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@ctrl sbin]<span class="comment"># netstat -antp | grep 14000</span></span><br><span class="line">tcp        <span class="number">0</span>      <span class="number">0</span> :::<span class="number">14000</span>   :::*       LISTEN      <span class="number">7415</span>/java</span><br><span class="line">[root@ctrl sbin]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><p>curl “<a href="http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root" target="_blank" rel="external">http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root</a>“ | python -mjson.tool</p>
-<h3 id="更多操作"><a href="#更多操作" class="headerlink" title="更多操作"></a>更多操作</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p>更多操作：<br><a href="https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html" target="_blank" rel="external">官方WebHDFS REST API</a><br><a href="http://hadoop.apache.org/docs/r2.4.1/hadoop-hdfs-httpfs/index.html" target="_blank" rel="external">HttpFS官方文档</a></p>
-<h3 id="WebHDFS与HttpFS的关系"><a href="#WebHDFS与HttpFS的关系" class="headerlink" title="WebHDFS与HttpFS的关系"></a>WebHDFS与HttpFS的关系</h3><p>WebHDFS vs HttpFs Major difference between WebHDFS and HttpFs: WebHDFS needs access to all nodes of the cluster and when some data is read it is transmitted from that node directly, whereas in HttpFs, a singe node will act similar to a “gateway” and will be a single point of data transfer to the client node. So, HttpFs could be choked during a large file transfer but the good thing is that we are minimizing the footprint required to access HDFS.</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/HDFS/">HDFS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/06/14/Spring-scheduled注解执行定时任务/" title="Spring @scheduled注解执行定时任务" itemprop="url">Spring @scheduled注解执行定时任务</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-06-14T02:30:29.000Z" itemprop="datePublished"> 发表于 2016-06-14</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <ol>
-<li>创建spring-task.xml 文件</li>
-</ol>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!---加入：xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">   xsi:schemaLocation="http://www.springframework.org/schema/task</span><br><span class="line">	http://www.springframework.org/schema/task/spring-task-3.1.xsd"</span><br><span class="line">--&gt;</span></span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;  </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>  </span><br><span class="line">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>   </span><br><span class="line">    <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>  </span><br><span class="line">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>  </span><br><span class="line">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span>  </span><br><span class="line">    <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span><br><span class="line">    <span class="attr">xmlns:task</span>=<span class="string">"http://www.springframework.org/schema/task"</span>  </span><br><span class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans     </span><br><span class="line">    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd     </span><br><span class="line">    http://www.springframework.org/schema/tx     </span><br><span class="line">    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/aop  </span><br><span class="line">    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/context    </span><br><span class="line">    http://www.springframework.org/schema/context/spring-context-3.2.xsd    </span><br><span class="line">    http://www.springframework.org/schema/mvc  </span><br><span class="line">    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span><br><span class="line">    http://www.springframework.org/schema/task  </span><br><span class="line">    http://www.springframework.org/schema/task/spring-task-3.2.xsd</span><br><span class="line">   "</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">task:annotation-driven</span> /&gt;</span> <span class="comment">&lt;!-- 定时器开关--&gt;</span>  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:annotation-config</span>/&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 自动扫描的包名 --&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.spring.task"</span> /&gt;</span> </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
-<ol>
-<li>实现接口和实现类，添加注解和说明</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>  <span class="comment">//import org.springframework.stereotype.Component;  </span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTestServiceImpl</span>  <span class="keyword">implements</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">      <span class="meta">@Scheduled</span>(cron=<span class="string">"0/5 * *  * * ? "</span>)   <span class="comment">//每5秒执行一次  </span></span><br><span class="line">      <span class="meta">@Override</span>  </span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>&#123;  </span><br><span class="line">            System.out.println(<span class="string">"进入测试"</span>);  </span><br><span class="line">      &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>备注：</p>
-<ol>
-<li>spring的@Scheduled注解需要写在实现类上</li>
-<li>定时器的任务方法不能有返回值（如果有返回值，spring初始化的时候会告诉你有个错误、需要设定一个proxytargetclass的某个值为true）</li>
-<li>实现类上要有组件的注解@Component</li>
-</ol>
-<p>参数说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">字段 允许值 允许的特殊字符  </span><br><span class="line">秒 0-59 , - * /  </span><br><span class="line">分 0-59 , - * /  </span><br><span class="line">小时 0-23 , - * /  </span><br><span class="line">日期 1-31 , - * ? / L W C  </span><br><span class="line">月份 1-12 或者 JAN-DEC , - * /  </span><br><span class="line">星期 1-7 或者 SUN-SAT , - * ? / L C #  </span><br><span class="line">年（可选） 留空, 1970-2099 , - * /  </span><br><span class="line">表达式意义  </span><br><span class="line">&quot;0 0 12 * * ?&quot; 每天中午12点触发  </span><br><span class="line">&quot;0 15 10 ? * *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ?&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发  </span><br><span class="line">&quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发  </span><br><span class="line">&quot;0 0/5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0/5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发  </span><br><span class="line">&quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发  </span><br><span class="line">&quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发  </span><br><span class="line">&quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发  </span><br><span class="line">&quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发  </span><br><span class="line">每天早上6点  </span><br><span class="line">0 6 * * *  </span><br><span class="line">每两个小时  </span><br><span class="line">0 */2 * * *  </span><br><span class="line">晚上11点到早上8点之间每两个小时，早上八点  </span><br><span class="line">0 23-7/2，8 * * *  </span><br><span class="line">每个月的4号和每个礼拜的礼拜一到礼拜三的早上11点  </span><br><span class="line">0 11 4 * 1-3  </span><br><span class="line">1月1日早上4点  </span><br><span class="line">0 4 1 1 *</span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spring/">Spring</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spring/">Spring</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -866,7 +969,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -878,7 +981,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>6</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>7</sup></a></li>
 		  
 		
 		  
@@ -890,7 +993,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>7</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>10</sup></a></li>
 		  
 		
 		  
@@ -911,27 +1014,23 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">标签</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>11</sup></a></li>
+			
 		
 			
 				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>8</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java/" title="Java">Java<sup>5</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
 			
 		
 			
@@ -943,6 +1042,18 @@
 			
 		
 			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
 			
 		
@@ -951,27 +1062,7 @@
 			
 		
 			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
 			
 		
 			
@@ -979,11 +1070,15 @@
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
 			
 		
 			
@@ -991,7 +1086,15 @@
 			
 		
 			
-				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -999,7 +1102,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情链接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -1015,11 +1118,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1171,7 +1274,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

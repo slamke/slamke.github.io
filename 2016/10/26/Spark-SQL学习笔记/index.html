@@ -1,0 +1,664 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spark SQL 学习笔记 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="Spark SQL 学习笔记Spark SQL中实现Hive MapJoin重点参数1234567891011121314151617## 定义- DataFramesA DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a tab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark SQL 学习笔记">
+<meta property="og:url" content="slamke.github.io/2016/10/26/Spark-SQL学习笔记/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="Spark SQL 学习笔记Spark SQL中实现Hive MapJoin重点参数1234567891011121314151617## 定义- DataFramesA DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a tab">
+<meta property="og:updated_time" content="2016-10-30T14:38:15.482Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark SQL 学习笔记">
+<meta name="twitter:description" content="Spark SQL 学习笔记Spark SQL中实现Hive MapJoin重点参数1234567891011121314151617## 定义- DataFramesA DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a tab">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/10/26/Spark-SQL学习笔记/" title="Spark SQL 学习笔记" itemprop="url">Spark SQL 学习笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-10-26</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-SQL-学习笔记"><span class="toc-number">1.</span> <span class="toc-text">Spark SQL 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-DataFrames"><span class="toc-number">1.1.</span> <span class="toc-text">Creating DataFrames</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行sql"><span class="toc-number">1.2.</span> <span class="toc-text">运行sql</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-Datasets"><span class="toc-number">2.</span> <span class="toc-text">Creating Datasets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interoperating-with-RDDs"><span class="toc-number">3.</span> <span class="toc-text">Interoperating with RDDs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inferring-the-Schema-Using-Reflection"><span class="toc-number">3.1.</span> <span class="toc-text">Inferring the Schema Using Reflection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Programmatically-Specifying-the-Schema"><span class="toc-number">3.2.</span> <span class="toc-text">Programmatically Specifying the Schema</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Sources"><span class="toc-number">4.</span> <span class="toc-text">Data Sources</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Generic-Load-Save-Functions"><span class="toc-number">4.1.</span> <span class="toc-text">Generic Load/Save Functions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-SQL-on-files-directly"><span class="toc-number">4.2.</span> <span class="toc-text">Run SQL on files directly</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saving-to-Persistent-Tables"><span class="toc-number">4.3.</span> <span class="toc-text">Saving to Persistent Tables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parquet"><span class="toc-number">5.</span> <span class="toc-text">Parquet</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Discovery-分区"><span class="toc-number">5.1.</span> <span class="toc-text">Partition Discovery 分区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Schema-Merging"><span class="toc-number">5.2.</span> <span class="toc-text">Schema Merging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hive支持"><span class="toc-number">6.</span> <span class="toc-text">hive支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC-To-Other-Databases"><span class="toc-number">7.</span> <span class="toc-text">JDBC To Other Databases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能优化"><span class="toc-number">8.</span> <span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Distributed-SQL-Engine"><span class="toc-number">9.</span> <span class="toc-text">Distributed SQL Engine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他特性"><span class="toc-number">10.</span> <span class="toc-text">其他特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching"><span class="toc-number">10.1.</span> <span class="toc-text">Caching</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态分区"><span class="toc-number">11.</span> <span class="toc-text">动态分区</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="Spark-SQL-学习笔记"><a href="#Spark-SQL-学习笔记" class="headerlink" title="Spark SQL 学习笔记"></a>Spark SQL 学习笔记</h2><p><a href="http://lxw1234.com/archives/2015/06/296.htm" target="_blank" rel="external">Spark SQL中实现Hive MapJoin</a><br>重点参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 定义</span><br><span class="line">- DataFrames</span><br><span class="line">A DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a table in a relational database or a data frame in R/Python, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as: structured data files, tables in Hive, external databases, or existing RDDs.</span><br><span class="line"></span><br><span class="line">- Datasets</span><br><span class="line">A Dataset is a new experimental interface added in Spark 1.6 that tries to provide the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 概述</span><br><span class="line">入口:  SQLContext </span><br><span class="line">``` scala</span><br><span class="line">val sc: SparkContext // An existing SparkContext.</span><br><span class="line">val sqlContext = new org.apache.spark.sql.SQLContext(sc)</span><br><span class="line"></span><br><span class="line">// this is used to implicitly convert an RDD to a DataFrame.</span><br><span class="line">import sqlContext.implicits._</span><br></pre></td></tr></table></figure></p>
+<p>Hive支持:   HiveContext<br>功能: more complete HiveQL parser, access to Hive UDFs, and the ability to read data from Hive tables</p>
+<h3 id="Creating-DataFrames"><a href="#Creating-DataFrames" class="headerlink" title="Creating DataFrames"></a>Creating DataFrames</h3><p>With a SQLContext, applications can create DataFrames from an existing RDD, from a Hive table, or from data sources.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sc: <span class="type">SparkContext</span> <span class="comment">// An existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.json(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Displays the content of the DataFrame to stdout</span></span><br><span class="line">df.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Print the schema in a tree format</span></span><br><span class="line">df.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select only the "name" column</span></span><br><span class="line">df.select(<span class="string">"name"</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select everybody, but increment the age by 1</span></span><br><span class="line">df.select(df(<span class="string">"name"</span>), df(<span class="string">"age"</span>) + <span class="number">1</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select people older than 21</span></span><br><span class="line">df.filter(df(<span class="string">"age"</span>) &gt; <span class="number">21</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Count people by age</span></span><br><span class="line">df.groupBy(<span class="string">"age"</span>).count().show()</span><br></pre></td></tr></table></figure></p>
+<h3 id="运行sql"><a href="#运行sql" class="headerlink" title="运行sql"></a>运行sql</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM table"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Creating-Datasets"><a href="#Creating-Datasets" class="headerlink" title="Creating Datasets"></a>Creating Datasets</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Encoders for most common types are automatically provided by importing sqlContext.implicits._</span></span><br><span class="line"><span class="keyword">val</span> ds = <span class="type">Seq</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).toDS()</span><br><span class="line">ds.map(_ + <span class="number">1</span>).collect() <span class="comment">// Returns: Array(2, 3, 4)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/ <span class="type">DataFrames</span> can be converted to a <span class="type">Dataset</span> by providing a <span class="class"><span class="keyword">class</span>. <span class="title">Mapping</span> <span class="title">will</span> <span class="title">be</span> <span class="title">done</span> <span class="title">by</span> <span class="title">name</span>.</span></span><br><span class="line"><span class="keyword">val</span> path = <span class="string">"examples/src/main/resources/people.json"</span></span><br><span class="line"><span class="keyword">val</span> people = sqlContext.read.json(path).as[<span class="type">Person</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="Interoperating-with-RDDs"><a href="#Interoperating-with-RDDs" class="headerlink" title="Interoperating with RDDs"></a>Interoperating with RDDs</h2><h3 id="Inferring-the-Schema-Using-Reflection"><a href="#Inferring-the-Schema-Using-Reflection" class="headerlink" title="Inferring the Schema Using Reflection"></a>Inferring the Schema Using Reflection</h3><p>The Scala interface for Spark SQL supports automatically converting an RDD containing <strong>case classes</strong> to a DataFrame. </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="comment">// this is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the schema using a case class.</span></span><br><span class="line"><span class="comment">// Note: Case classes in Scala 2.10 can support only up to 22 fields. To work around this limit,</span></span><br><span class="line"><span class="comment">// you can use custom classes that implement the Product interface.</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Int</span></span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD of Person objects and register it as a table.</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>).map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Person</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim.toInt)).toDF()</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> teenagers = sqlContext.sql(<span class="string">"SELECT name, age FROM people WHERE age &gt;= 13 AND age &lt;= 19"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// 可以使用索引访问每一行中的列</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or by field name:</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t.getAs[<span class="type">String</span>](<span class="string">"name"</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// row.getValuesMap[T] retrieves multiple columns at once into a Map[String, T]</span></span><br><span class="line">teenagers.map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"name"</span>, <span class="string">"age"</span>))).collect().foreach(println)</span><br><span class="line"><span class="comment">// Map("name" -&gt; "Justin", "age" -&gt; 19)</span></span><br></pre></td></tr></table></figure>
+<h3 id="Programmatically-Specifying-the-Schema"><a href="#Programmatically-Specifying-the-Schema" class="headerlink" title="Programmatically Specifying the Schema"></a>Programmatically Specifying the Schema</h3><ol>
+<li>Create an RDD of Rows from the original RDD;</li>
+<li>Create the schema represented by a StructType matching the structure of Rows in the RDD created in Step 1.</li>
+<li>Apply the schema to the RDD of Rows via createDataFrame method provided by SQLContext.<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The schema is encoded in a string</span></span><br><span class="line"><span class="keyword">val</span> schemaString = <span class="string">"name age"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Row.</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">Row</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Spark SQL data types</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.types.&#123;<span class="type">StructType</span>,<span class="type">StructField</span>,<span class="type">StringType</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate the schema based on the string of schema</span></span><br><span class="line"><span class="keyword">val</span> schema =</span><br><span class="line">  <span class="type">StructType</span>(</span><br><span class="line">    schemaString.split(<span class="string">" "</span>).map(fieldName =&gt; <span class="type">StructField</span>(fieldName, <span class="type">StringType</span>, <span class="literal">true</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Convert records of the RDD (people) to Rows.</span></span><br><span class="line"><span class="keyword">val</span> rowRDD = people.map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Row</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply the schema to the RDD.</span></span><br><span class="line"><span class="keyword">val</span> peopleDataFrame = sqlContext.createDataFrame(rowRDD, schema)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Register the DataFrames as a table.</span></span><br><span class="line">peopleDataFrame.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> results = sqlContext.sql(<span class="string">"SELECT name FROM people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// The columns of a row in the result can be accessed by field index or by field name.</span></span><br><span class="line">results.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Data-Sources"><a href="#Data-Sources" class="headerlink" title="Data Sources"></a>Data Sources</h2><h3 id="Generic-Load-Save-Functions"><a href="#Generic-Load-Save-Functions" class="headerlink" title="Generic Load/Save Functions"></a>Generic Load/Save Functions</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.read.load(<span class="string">"examples/src/main/resources/users.parquet"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"favorite_color"</span>).write.save(<span class="string">"namesAndFavColors.parquet"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 显式指定格式</span></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.format(<span class="string">"json"</span>).load(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"age"</span>).write.format(<span class="string">"parquet"</span>).save(<span class="string">"namesAndAges.parquet"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Run-SQL-on-files-directly"><a href="#Run-SQL-on-files-directly" class="headerlink" title="Run SQL on files directly"></a>Run SQL on files directly</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM parquet.`examples/src/main/resources/users.parquet`"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Saving-to-Persistent-Tables"><a href="#Saving-to-Persistent-Tables" class="headerlink" title="Saving to Persistent Tables"></a>Saving to Persistent Tables</h3><p>When working with a HiveContext, DataFrames can also be saved as persistent tables using the saveAsTable command. Unlike the registerTempTable command, saveAsTable will materialize the contents of the dataframe and create a pointer to the data in the HiveMetastore.<br>将会真的使用hive创建一张内表</p>
+<h2 id="Parquet"><a href="#Parquet" class="headerlink" title="Parquet"></a>Parquet</h2><h3 id="Partition-Discovery-分区"><a href="#Partition-Discovery-分区" class="headerlink" title="Partition Discovery 分区"></a>Partition Discovery 分区</h3><p>Currently, numeric data types and string type are supported.<br>参数设置: spark.sql.sources.partitionColumnTypeInference.enabled    true.<br>文件路径  path/to/table/gender=male </p>
+<h3 id="Schema-Merging"><a href="#Schema-Merging" class="headerlink" title="Schema Merging"></a>Schema Merging</h3><p>支持Parquet属性变更<br>该属性默认被关闭<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sqlContext from the previous example is used in this example.</span></span><br><span class="line"><span class="comment">// This is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a simple DataFrame, stored into a partition directory</span></span><br><span class="line"><span class="keyword">val</span> df1 = sc.makeRDD(<span class="number">1</span> to <span class="number">5</span>).map(i =&gt; (i, i * <span class="number">2</span>)).toDF(<span class="string">"single"</span>, <span class="string">"double"</span>)</span><br><span class="line">df1.write.parquet(<span class="string">"data/test_table/key=1"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create another DataFrame in a new partition directory,</span></span><br><span class="line"><span class="comment">// adding a new column and dropping an existing column</span></span><br><span class="line"><span class="keyword">val</span> df2 = sc.makeRDD(<span class="number">6</span> to <span class="number">10</span>).map(i =&gt; (i, i * <span class="number">3</span>)).toDF(<span class="string">"single"</span>, <span class="string">"triple"</span>)</span><br><span class="line">df2.write.parquet(<span class="string">"data/test_table/key=2"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Read the partitioned table</span></span><br><span class="line"><span class="keyword">val</span> df3 = sqlContext.read.option(<span class="string">"mergeSchema"</span>, <span class="string">"true"</span>).parquet(<span class="string">"data/test_table"</span>)</span><br><span class="line">df3.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// The final schema consists of all 3 columns in the Parquet files together</span></span><br><span class="line"><span class="comment">// with the partitioning column appeared in the partition directory paths.</span></span><br><span class="line"><span class="comment">// root</span></span><br><span class="line"><span class="comment">// |-- single: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- double: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- triple: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- key : int (nullable = true)</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="hive支持"><a href="#hive支持" class="headerlink" title="hive支持"></a>hive支持</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.hive.<span class="type">HiveContext</span>(sc)</span><br><span class="line"></span><br><span class="line">sqlContext.sql(<span class="string">"CREATE TABLE IF NOT EXISTS src (key INT, value STRING)"</span>)</span><br><span class="line">sqlContext.sql(<span class="string">"LOAD DATA LOCAL INPATH 'examples/src/main/resources/kv1.txt' INTO TABLE src"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Queries are expressed in HiveQL</span></span><br><span class="line">sqlContext.sql(<span class="string">"FROM src SELECT key, value"</span>).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+<h2 id="JDBC-To-Other-Databases"><a href="#JDBC-To-Other-Databases" class="headerlink" title="JDBC To Other Databases"></a>JDBC To Other Databases</h2><p>支持JDBC协议连接其他数据源<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> jdbcDF = sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:postgresql:dbserver"</span>,</span><br><span class="line">  <span class="string">"dbtable"</span> -&gt; <span class="string">"schema.tablename"</span>)).load()</span><br></pre></td></tr></table></figure></p>
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>Caching Data In Memory</p>
+<ol>
+<li>sqlContext.cacheTable(“tableName”)  / sqlContext.uncacheTable(“tableName”)</li>
+<li>dataFrame.cache()</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spark.sql.inMemoryColumnarStorage.compressed</td>
+<td>true</td>
+<td>是否进行</td>
+</tr>
+<tr>
+<td>spark.sql.inMemoryColumnarStorage.batchSize</td>
+<td>10000</td>
+<td>cache时的batch的大小</td>
+</tr>
+<tr>
+<td>spark.sql.autoBroadcastJoinThreshold</td>
+<td>10485760 (10 MB)</td>
+<td>join时进行广播的数据量</td>
+</tr>
+<tr>
+<td>spark.sql.tungsten.enabled</td>
+<td>true</td>
+<td>是否开启tungsten支持</td>
+</tr>
+<tr>
+<td>spark.sql.shuffle.partitions</td>
+<td>200</td>
+<td>join和聚合时shuffle的分区数量</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Distributed-SQL-Engine"><a href="#Distributed-SQL-Engine" class="headerlink" title="Distributed SQL Engine"></a>Distributed SQL Engine</h2><p>启动ThriftServer 使用beeline或者JDBC连接使用</p>
+<ol>
+<li>Running the Thrift JDBC/ODBC server<br>The Thrift JDBC/ODBC server implemented here corresponds to the HiveServer2 in Hive 1.2.1 You can test the JDBC server with the beeline script that comes with either Spark or Hive 1.2.1.<br>To start the JDBC/ODBC server, run the following in the Spark directory:<blockquote>
+<p>./sbin/start-thriftserver.sh</p>
+</blockquote>
+</li>
+</ol>
+<p>or</p>
+<blockquote>
+<p>./sbin/start-thriftserver.sh \<br>  –hiveconf hive.server2.thrift.port=<listening-port> \<br>  –hiveconf hive.server2.thrift.bind.host=<listening-host> \<br>  –master <master-uri></master-uri></listening-host></listening-port></p>
+</blockquote>
+<ol>
+<li>use beeline to test the Thrift JDBC/ODBC server:<blockquote>
+<p>./bin/beeline<br>beeline&gt; !connect jdbc:hive2://localhost:10000</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="其他特性"><a href="#其他特性" class="headerlink" title="其他特性"></a>其他特性</h2><h3 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h3><p>NOTE: CACHE TABLE tbl is now eager by default not lazy. Don’t need to trigger cache materialization manually anymore.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CACHE</span> [<span class="type">LAZY</span>] <span class="type">TABLE</span> [<span class="type">AS</span> <span class="type">SELECT</span>] ...</span><br><span class="line"><span class="type">CACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br><span class="line"><span class="type">UNCACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br></pre></td></tr></table></figure></p>
+<h2 id="动态分区"><a href="#动态分区" class="headerlink" title="动态分区"></a>动态分区</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').saveAsTable(...)</span><br><span class="line">or</span><br><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').insertInto(...)</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2016/10/26/Spark-SQL学习笔记/" data-title="Spark SQL 学习笔记 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/11/27/SparkStreaming数据产生与导入相关的内存分析/" title="SparkStreaming数据产生与导入相关的内存分析">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SparkStreaming数据产生与导入相关的内存分析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/09/26/Spark-Streaming-Backpressure分析/"  title="Spark Streaming Backpressure分析">
+ <strong>下一篇：</strong><br/> 
+ <span>Spark Streaming Backpressure分析
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-SQL-学习笔记"><span class="toc-number">1.</span> <span class="toc-text">Spark SQL 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-DataFrames"><span class="toc-number">1.1.</span> <span class="toc-text">Creating DataFrames</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行sql"><span class="toc-number">1.2.</span> <span class="toc-text">运行sql</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-Datasets"><span class="toc-number">2.</span> <span class="toc-text">Creating Datasets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interoperating-with-RDDs"><span class="toc-number">3.</span> <span class="toc-text">Interoperating with RDDs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inferring-the-Schema-Using-Reflection"><span class="toc-number">3.1.</span> <span class="toc-text">Inferring the Schema Using Reflection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Programmatically-Specifying-the-Schema"><span class="toc-number">3.2.</span> <span class="toc-text">Programmatically Specifying the Schema</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Sources"><span class="toc-number">4.</span> <span class="toc-text">Data Sources</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Generic-Load-Save-Functions"><span class="toc-number">4.1.</span> <span class="toc-text">Generic Load/Save Functions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-SQL-on-files-directly"><span class="toc-number">4.2.</span> <span class="toc-text">Run SQL on files directly</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saving-to-Persistent-Tables"><span class="toc-number">4.3.</span> <span class="toc-text">Saving to Persistent Tables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parquet"><span class="toc-number">5.</span> <span class="toc-text">Parquet</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Discovery-分区"><span class="toc-number">5.1.</span> <span class="toc-text">Partition Discovery 分区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Schema-Merging"><span class="toc-number">5.2.</span> <span class="toc-text">Schema Merging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hive支持"><span class="toc-number">6.</span> <span class="toc-text">hive支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC-To-Other-Databases"><span class="toc-number">7.</span> <span class="toc-text">JDBC To Other Databases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能优化"><span class="toc-number">8.</span> <span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Distributed-SQL-Engine"><span class="toc-number">9.</span> <span class="toc-text">Distributed SQL Engine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他特性"><span class="toc-number">10.</span> <span class="toc-text">其他特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching"><span class="toc-number">10.1.</span> <span class="toc-text">Caching</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态分区"><span class="toc-number">11.</span> <span class="toc-text">动态分区</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>10</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>11</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

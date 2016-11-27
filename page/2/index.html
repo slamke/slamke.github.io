@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,292 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/07/31/Java动态技术/" title="Java动态技术" itemprop="url">Java动态技术</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-07-31T09:35:10.000Z" itemprop="datePublished"> Published 2016-07-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://www.ibm.com/developerworks/cn/java/j-dyn0916/" target="_blank" rel="external">Java 编程的动态性， 第四部分: 用 Javassist 进行类转换</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/动态/">动态</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/07/26/Servlet-Listener之ServletContextListener用法/" title="Servlet Listener之ServletContextListener用法" itemprop="url">Servlet Listener之ServletContextListener用法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-07-26T13:28:46.000Z" itemprop="datePublished"> Published 2016-07-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>本文旨在解释JavaEE中的ServletContextListener接口及用法。 </p>
+<p>1.何时需要使用ServletContextListener？ </p>
+<p>通常我们可能有这样的需求：即在web 应用启动之前运行一些代码。例如：我们可能需要创建一个数据库连接以便web应用在任何时候都能使用它执行一些操作，并且当web应用关闭的时候能够关闭数据库连接。 </p>
+<p>2.如何实现这个需求？</p>
+<p>Java EE规范提供了一个叫ServletContextListener的接口，这个接口可以实现我们的需求。ServletContextListener监听servlet context的生命周期事件。当这个listener关联的web应用启动和关闭的时候，这个接口会收到通知。下面是javadoc对这个接口的说明：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Implementations of this interface receive notifications about changes to the servlet context of the web application they are part of. To receive notification events, the implementation class must be configured in the deployment descriptor for the web application.</span><br></pre></td></tr></table></figure></p>
+<p>如果想要监听web应用的启动，可以使用contextInitialized(ServletContextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the web application initialization process is starting. All ServletContextListeners are notified of context initialization before any filter or servlet in the web application is initialized.</span><br></pre></td></tr></table></figure></p>
+<p>如果要监听web应用的停止（关闭），用contextDestroyed(ServletCOntextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the servlet context is about to be shut down. All servlets and filters have been destroy()ed before any ServletContextListeners are notified of context destruction.</span><br></pre></td></tr></table></figure></p>
+<p>如下创建一个监听器类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cruise;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextEvent;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextListener;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyServletContextListener</span> <span class="keyword">implements</span> <span class="title">ServletContextListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextInitialized</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context initialized"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextDestroyed</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context destroyed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来在web.xml文件中配置listener<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">web-app</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>com.thejavageek.MyServletContextListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>配置完成后，部署应用到tomcat服务器并启动tomcat，将会看到如下的日志。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INFO: Starting service Catalina</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.catalina.core.StandardEngine start</span><br><span class="line">INFO: Starting Servlet Engine: Apache Tomcat/6.0.35</span><br><span class="line">context initialized</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.coyote.http11.Http11Protocol start</span><br><span class="line">INFO: Starting Coyote HTTP/1.1 on http-8080</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.jk.common.ChannelSocket init</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li><p>继承thread<br>``` java<br>public class ThreadListener extends Thread implements ServletContextListener {</p>
+<p> public void contextInitialized(ServletContextEvent event) {</p>
+<pre><code>super.start();
+</code></pre><p> }</p>
+<p> public void contextDestroyed(ServletContextEvent event) {</p>
+<pre><code>super.stop();
+</code></pre><p> }</p>
+<p> @override<br> public void run(){</p>
+<p> }</p>
+</li>
+</ol>
+<p>}</p>
+<p>``` </p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/07/22/WebHDFS与HttpFS的使用/" title="WebHDFS与HttpFS的使用" itemprop="url">WebHDFS与HttpFS的使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-07-22T13:49:24.000Z" itemprop="datePublished"> Published 2016-07-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="WebHDFS与HttpFS的使用"><a href="#WebHDFS与HttpFS的使用" class="headerlink" title="WebHDFS与HttpFS的使用"></a>WebHDFS与HttpFS的使用</h2><h2 id="WebHDFS"><a href="#WebHDFS" class="headerlink" title="WebHDFS"></a>WebHDFS</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>提供HDFS的RESTful接口，可通过此接口进行HDFS文件操作。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>WebHDFS服务内置在HDFS中，不需额外安装、启动。</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>需要在hdfs-site.xml打开WebHDFS开关，此开关默认打开。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.webhdfs.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>连接NameNode的50070端口进行文件操作。</p>
+<p>比如：<figure class="highlight plain"><figcaption><span>"http://ctrl:50070/webhdfs/v1/?op=liststatus&user.name=root" | python -mjson.tool```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 更多操作</span><br><span class="line">参考文档：[官方WebHDFS REST API](https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)</span><br><span class="line"></span><br><span class="line">## HttpFS(Hadoop HDFS over HTTP)</span><br><span class="line"></span><br><span class="line">### 介绍</span><br><span class="line"></span><br><span class="line">HttpFS is a server that provides a REST HTTP gateway supporting all HDFS File System operations (read and write). And it is inteoperable with the webhdfs REST HTTP API.</span><br><span class="line"></span><br><span class="line">### 安装</span><br><span class="line"></span><br><span class="line">Hadoop自带，不需要额外安装。默认服务未启动，需要手工启动。</span><br><span class="line"></span><br><span class="line">### 配置</span><br><span class="line"></span><br><span class="line">- httpfs-site.xml</span><br><span class="line">有配置文件httpfs-site.xml，此配置文件一般保存默认即可，无需修改。</span><br><span class="line"></span><br><span class="line">- hdfs-site.xml</span><br><span class="line">需要增加如下配置，其他两个参数名称中的root代表的是启动hdfs服务的OS用户，应以实际的用户名称代替。</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;  </span><br><span class="line">    &lt;name&gt;hadoop.proxyuser.root.hosts&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;  </span><br><span class="line">&lt;property&gt;  </span><br><span class="line">&lt;name&gt;hadoop.proxyuser.root.groups&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sbin/httpfs.sh start</span><br><span class="line">sbin/httpfs.sh stop</span><br></pre></td></tr></table></figure>
+<p>启动后，默认监听14000端口：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@ctrl sbin]<span class="comment"># netstat -antp | grep 14000</span></span><br><span class="line">tcp        <span class="number">0</span>      <span class="number">0</span> :::<span class="number">14000</span>   :::*       LISTEN      <span class="number">7415</span>/java</span><br><span class="line">[root@ctrl sbin]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><p>curl “<a href="http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root" target="_blank" rel="external">http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root</a>“ | python -mjson.tool</p>
+<h3 id="更多操作"><a href="#更多操作" class="headerlink" title="更多操作"></a>更多操作</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p>更多操作：<br><a href="https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html" target="_blank" rel="external">官方WebHDFS REST API</a><br><a href="http://hadoop.apache.org/docs/r2.4.1/hadoop-hdfs-httpfs/index.html" target="_blank" rel="external">HttpFS官方文档</a></p>
+<h3 id="WebHDFS与HttpFS的关系"><a href="#WebHDFS与HttpFS的关系" class="headerlink" title="WebHDFS与HttpFS的关系"></a>WebHDFS与HttpFS的关系</h3><p>WebHDFS vs HttpFs Major difference between WebHDFS and HttpFs: WebHDFS needs access to all nodes of the cluster and when some data is read it is transmitted from that node directly, whereas in HttpFs, a singe node will act similar to a “gateway” and will be a single point of data transfer to the client node. So, HttpFs could be choked during a large file transfer but the good thing is that we are minimizing the footprint required to access HDFS.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/HDFS/">HDFS</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/06/14/Spring-scheduled注解执行定时任务/" title="Spring @scheduled注解执行定时任务" itemprop="url">Spring @scheduled注解执行定时任务</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-06-14T02:30:29.000Z" itemprop="datePublished"> Published 2016-06-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <ol>
+<li>创建spring-task.xml 文件</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!---加入：xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">   xsi:schemaLocation="http://www.springframework.org/schema/task</span><br><span class="line">	http://www.springframework.org/schema/task/spring-task-3.1.xsd"</span><br><span class="line">--&gt;</span></span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;  </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>  </span><br><span class="line">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>   </span><br><span class="line">    <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>  </span><br><span class="line">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>  </span><br><span class="line">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span>  </span><br><span class="line">    <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span><br><span class="line">    <span class="attr">xmlns:task</span>=<span class="string">"http://www.springframework.org/schema/task"</span>  </span><br><span class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans     </span><br><span class="line">    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd     </span><br><span class="line">    http://www.springframework.org/schema/tx     </span><br><span class="line">    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/aop  </span><br><span class="line">    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/context    </span><br><span class="line">    http://www.springframework.org/schema/context/spring-context-3.2.xsd    </span><br><span class="line">    http://www.springframework.org/schema/mvc  </span><br><span class="line">    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span><br><span class="line">    http://www.springframework.org/schema/task  </span><br><span class="line">    http://www.springframework.org/schema/task/spring-task-3.2.xsd</span><br><span class="line">   "</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">task:annotation-driven</span> /&gt;</span> <span class="comment">&lt;!-- 定时器开关--&gt;</span>  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:annotation-config</span>/&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 自动扫描的包名 --&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.spring.task"</span> /&gt;</span> </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>实现接口和实现类，添加注解和说明</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>  <span class="comment">//import org.springframework.stereotype.Component;  </span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTestServiceImpl</span>  <span class="keyword">implements</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">      <span class="meta">@Scheduled</span>(cron=<span class="string">"0/5 * *  * * ? "</span>)   <span class="comment">//每5秒执行一次  </span></span><br><span class="line">      <span class="meta">@Override</span>  </span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>&#123;  </span><br><span class="line">            System.out.println(<span class="string">"进入测试"</span>);  </span><br><span class="line">      &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>备注：</p>
+<ol>
+<li>spring的@Scheduled注解需要写在实现类上</li>
+<li>定时器的任务方法不能有返回值（如果有返回值，spring初始化的时候会告诉你有个错误、需要设定一个proxytargetclass的某个值为true）</li>
+<li>实现类上要有组件的注解@Component</li>
+</ol>
+<p>参数说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">字段 允许值 允许的特殊字符  </span><br><span class="line">秒 0-59 , - * /  </span><br><span class="line">分 0-59 , - * /  </span><br><span class="line">小时 0-23 , - * /  </span><br><span class="line">日期 1-31 , - * ? / L W C  </span><br><span class="line">月份 1-12 或者 JAN-DEC , - * /  </span><br><span class="line">星期 1-7 或者 SUN-SAT , - * ? / L C #  </span><br><span class="line">年（可选） 留空, 1970-2099 , - * /  </span><br><span class="line">表达式意义  </span><br><span class="line">&quot;0 0 12 * * ?&quot; 每天中午12点触发  </span><br><span class="line">&quot;0 15 10 ? * *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ?&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发  </span><br><span class="line">&quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发  </span><br><span class="line">&quot;0 0/5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0/5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发  </span><br><span class="line">&quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发  </span><br><span class="line">&quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发  </span><br><span class="line">&quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发  </span><br><span class="line">&quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发  </span><br><span class="line">每天早上6点  </span><br><span class="line">0 6 * * *  </span><br><span class="line">每两个小时  </span><br><span class="line">0 */2 * * *  </span><br><span class="line">晚上11点到早上8点之间每两个小时，早上八点  </span><br><span class="line">0 23-7/2，8 * * *  </span><br><span class="line">每个月的4号和每个礼拜的礼拜一到礼拜三的早上11点  </span><br><span class="line">0 11 4 * 1-3  </span><br><span class="line">1月1日早上4点  </span><br><span class="line">0 4 1 1 *</span><br></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spring/">Spring</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/23/Spark-on-yarn/" title="Spark on yarn" itemprop="url">Spark on yarn</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +374,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-23T06:33:43.000Z" itemprop="datePublished"> 发表于 2016-05-23</time>
+    <time datetime="2016-05-23T06:33:43.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
@@ -191,7 +477,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-23T06:32:22.000Z" itemprop="datePublished"> 发表于 2016-05-23</time>
+    <time datetime="2016-05-23T06:32:22.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
@@ -270,7 +556,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> 发表于 2016-05-23</time>
+    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
@@ -359,7 +645,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> 发表于 2016-05-18</time>
+    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> Published 2016-05-18</time>
     
   </p>
 </header>
@@ -458,7 +744,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> 发表于 2016-05-05</time>
+    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> Published 2016-05-05</time>
     
   </p>
 </header>
@@ -518,7 +804,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> 发表于 2016-05-04</time>
+    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> Published 2016-05-04</time>
     
   </p>
 </header>
@@ -575,333 +861,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/05/03/hive的Transform和MR/" title="Hive的Transform和UDF" itemprop="url">Hive的Transform和UDF</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> 发表于 2016-05-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="UDTF"><a href="#UDTF" class="headerlink" title="UDTF"></a>UDTF</h2><ul>
-<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888819.html" target="_blank" rel="external">Hive中UDTF编写和使用</a></li>
-</ul>
-<h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><ul>
-<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html" target="_blank" rel="external">Hive udaf开发入门和运行过程详解</a></li>
-<li><a href="http://blog.csdn.net/desilting/article/details/45505121" target="_blank" rel="external">Hive通用型自定义聚合函数（UDAF）</a></li>
-</ul>
-<h2 id="Hive中的TRANSFORM：使用脚本完成Map-Reduce"><a href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：使用脚本完成Map/Reduce"></a>Hive中的TRANSFORM：使用脚本完成Map/Reduce</h2><p>转自: <a href="http://www.coder4.com/archives/4052" target="_blank" rel="external">http://www.coder4.com/archives/4052</a></p>
-<p>首先来看一下数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; select * from test;</span><br><span class="line">OK</span><br><span class="line">1       3</span><br><span class="line">2       2</span><br><span class="line">3       1</span><br></pre></td></tr></table></figure></p>
-<p>假设，我们要输出每一列的md5值。在目前的hive中是没有这个udf的。</p>
-<p>我们看一下Python的代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/home/tops/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    line = line.strip()</span><br><span class="line">    arr = line.split()</span><br><span class="line">    md5_arr = []</span><br><span class="line">    <span class="keyword">for</span> a <span class="keyword">in</span> arr:</span><br><span class="line">        md5_arr.append(hashlib.md5(a).hexdigest())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"\t"</span>.join(md5_arr)</span><br></pre></td></tr></table></figure></p>
-<p>在Hive中，使用脚本，首先要将他们加入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add file /xxxx/test.py</span><br></pre></td></tr></table></figure>
-<p>然后，在调用时，使用TRANSFORM语法。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    TRANSFORM (col1, col2) </span><br><span class="line">    USING &apos;./test.py&apos; </span><br><span class="line">    AS (new1, new2) </span><br><span class="line">FORM </span><br><span class="line">    test;</span><br></pre></td></tr></table></figure>
-<p>这里，我们使用了AS，指定输出的若干个列，分别对应到哪个列名。如果省略这句，则Hive会将第1个tab前的结果作为key，后面其余作为value。</p>
-<p>这里有一个小坑：有时候，我们结合INSERT OVERWRITE使用上述TRANSFORM，而目标表，其分割副可能不是\t。但是请牢记：TRANSFORM的分割符号，传入、传出脚本的，永远是\t。不要考虑外面其他的分割符号！</p>
-<p>最后，解释一下MAP、REDUCE。</p>
-<p>在有的Hive语句中，大家可能会看到SELECT MAP (…)  USING ‘xx.py’这样的语法。</p>
-<p>然而，在Hive中，MAP、REDUCE只不过是TRANSFORM的别名，Hive不保证一定会在map/reduce中调用脚本。看看官方文档是怎么说的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Formally, MAP ... and REDUCE ... are syntactic transformations of SELECT TRANSFORM ( ... ). In other words, they serve as comments or notes to the reader of the query. BEWARE: Use of these keywords may be dangerous as (e.g.) typing &quot;REDUCE&quot; does not force a reduce phase to occur and typing &quot;MAP&quot; does not force a new map phase!</span><br></pre></td></tr></table></figure>
-<p>所以、混用map reduce语法关键字，甚至会引起混淆，所以建议大家还是都用TRANSFORM吧。</p>
-<p>友情提示：如果脚本不是Python，而是awk、sed等系统内置命令，可以直接使用，而不用add file。</p>
-<p>如果表中有MAP，ARRAY等复杂类型，怎么用TRANSFORM生成？</p>
-<p>例如：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> features</span><br><span class="line">(</span><br><span class="line">    <span class="keyword">id</span> <span class="built_in">BIGINT</span>,</span><br><span class="line">    norm_features <span class="keyword">MAP</span>&lt;<span class="keyword">STRING</span>, <span class="built_in">FLOAT</span>&gt; </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<p>答案是，要在脚本的输出中，对特殊字段按照HDFS文件中的格式输出即可。</p>
-<p>例如，以上面的表结构为例，每行输出应为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1^Ifeature1^C1.0^Bfeature2^C2.0</span><br></pre></td></tr></table></figure>
-<p>其中^I是tab键，这是TRANSFORM要求的分割符号。^B和^C是Hive存储时MAP类型的KV分割符。</p>
-<p>另外，在Hive的TRANSFORM语句的时候，要注意AS中加上类型声明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT TRANSFORM(stuff)</span><br><span class="line">USING &apos;script&apos;</span><br><span class="line">AS (thing1 INT, thing2 MAP&lt;STRING, FLOAT&gt;)</span><br></pre></td></tr></table></figure></p>
-<h2 id="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><a href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce"></a>Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Mapper.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Mapper</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Maps a single row into an intermediate rows.</span><br><span class="line">   * </span><br><span class="line">   * <span class="doctag">@param</span> record</span><br><span class="line">   *          input record</span><br><span class="line">   * <span class="doctag">@param</span> output</span><br><span class="line">   *          collect mapped rows.</span><br><span class="line">   * <span class="doctag">@throws</span> Exception</span><br><span class="line">   *           on error</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(String[] record, Output output)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以将一列拆分为多列</p>
-<p>使用样例:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExecuteMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String FULL_PATH_CLASS = <span class="string">"com.***.dpop.ods.mr.impl."</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Mapper&gt; mappers = <span class="keyword">new</span> HashMap&lt;String, Mapper&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Process class must be given"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> GenericMR().map(System.in, System.out,</span><br><span class="line">                getMapper(args[<span class="number">0</span>], Arrays.copyOfRange(args, <span class="number">1</span>, args.length)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Mapper <span class="title">getMapper</span><span class="params">(String parserClass, String[] args)</span></span><br><span class="line">            <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mappers.containsKey(parserClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> mappers.get(parserClass);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class[] classes = <span class="keyword">new</span> Class[args.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; classes.length; ++i) &#123;</span><br><span class="line">            classes[i] = String.class;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Mapper mapper = (Mapper) Class.forName(FULL_PATH_CLASS + parserClass).getConstructor(classes).newInstance(args);</span><br><span class="line">            mappers.put(parserClass, mapper);</span><br><span class="line">            <span class="keyword">return</span> mapper;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"Unknown MapperClass:"</span> + parserClass, e);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span>  ClassNotFoundException(<span class="string">"Error Constructing processor"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MR_USING=" USING 'java -Xmx512m -Xms512m -cp ods-mr-1.0.jar:hive-contrib-2.3.33.jar com.***.dpop.ods.mr.api.ExecuteMap "</span><br><span class="line"></span><br><span class="line">COMMAND="FROM dw_rtb.event_fact_adx_auction "</span><br><span class="line">COMMAND="$&#123;COMMAND&#125; INSERT overwrite TABLE dw_rtb.event_fact_mid_adx_auction_ad PARTITION(yymmdd=$&#123;CURRENT_DATE&#125;) SELECT transform(search_id, print_time, pthread_id, ad_s) $&#123;MR_USING&#125; EventFactMidAdxAuctionAdMapper' as search_id, print_time, pthread_id, ad_s, ssp_id WHERE $INSERT_PARTITION and original = 'exinternal' "</span><br></pre></td></tr></table></figure>
-<h2 id="Hive-Python-Streaming的原理及写法"><a href="#Hive-Python-Streaming的原理及写法" class="headerlink" title="Hive Python Streaming的原理及写法"></a>Hive Python Streaming的原理及写法</h2><p><a href="http://www.tuicool.com/articles/vmumUjA" target="_blank" rel="external">http://www.tuicool.com/articles/vmumUjA</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hive/">Hive</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hive/">Hive</a><a href="/tags/MR/">MR</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/05/02/REST-API-设计最佳实践/" title="REST API 设计最佳实践" itemprop="url">REST API 设计最佳实践</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://waylau.com/best-practices-for-better-restful-api/" target="_blank" rel="external">RESTful API 设计最佳实践</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/REST/">REST</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/REST/">REST</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/05/02/Spark-SQL汇总/" title="Spark SQL汇总" itemprop="url">Spark SQL汇总</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> 发表于 2016-05-02</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://www.iteblog.com/archives/1491" target="_blank" rel="external">使用Spark SQL读取Hive上的数据</a></p>
-<p><a href="http://blog.csdn.net/oopsoom/article/details/39401391" target="_blank" rel="external">Spark 注册UDF-Scala实现</a></p>
-<p><a href="http://www.cnblogs.com/luogankun/p/3970153.html" target="_blank" rel="external">Spark SQL使用Hive的UDF</a></p>
-<p><a href="http://www.jianshu.com/p/b81d3f3961b7" target="_blank" rel="external">spark-sql thriftserver 方式使用hive udf函数</a></p>
-<p><a href="https://community.hortonworks.com/articles/768/using-hive-udfudafudtf-with-sparksql.html" target="_blank" rel="external">Spark SQL使用Hive的UDF并且注册临时表</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-SQL/">Spark SQL</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/24/Java基础-Object类中的方法解析/" title="Java基础:Object类中的方法解析" itemprop="url">Java基础:Object类中的方法解析</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> 发表于 2016-04-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。</p>
-<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg" alt="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg"></p>
-<h1 id="Object类中的方法"><a href="#Object类中的方法" class="headerlink" title="Object类中的方法"></a>Object类中的方法</h1><p>Java中的每个类都具有定义在Object类中的这些方法。</p>
-<h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><figure class="highlight plain"><figcaption><span>Object()```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，Java中通过形如 new A(args..)形式创建一个属于该类型的对象。其中A即是类名，A(args..)即此类定义中相对应的构造函数。通过此种形式创建的对象都是通过类中的构造函数完成。为体现此特性，Java中规定：在类定义过程中，对于未定义构造函数的类，默认会有一个无参数的构造函数，作为所有类的基类，Object类自然要反映出此特性，在源码中，未给出Object类构造函数定义，但实际上，此构造函数是存在的。</span><br><span class="line"> </span><br><span class="line">当然，并不是所有的类都是通过此种方式去构建，也自然的，并不是所有的类构造函数都是public。</span><br><span class="line"></span><br><span class="line">## private static native void registerNatives();</span><br><span class="line"> </span><br><span class="line">registerNatives函数前面有native关键字修饰，Java中，用native关键字修饰的函数表明该方法的实现并不是在Java中去完成，而是由C/C++去完成，并被编译成了.dll，由Java去调用。方法的具体实现体在dll文件中，对于不同平台，其具体实现应该有所不同。用native修饰，即表示操作系统，需要提供此方法，Java本身需要使用。具体到registerNatives()方法本身，其主要作用是将C/C++中的方法映射到Java中的native方法，实现方法命名的解耦。</span><br><span class="line"></span><br><span class="line">## protected Object clone()</span><br><span class="line"></span><br><span class="line">Creates and returns a copy of this object.</span><br><span class="line"></span><br><span class="line">Object类中的说明是：</span><br><span class="line">``` java</span><br><span class="line">　　protected Object clone() throws CloneNotSupportedException</span><br></pre></td></tr></table></figure>
-<p>这个方法比较特殊：<br>首先，使用这个方法的类必须实现java.lang.Cloneable接口，否则会抛出CloneNotSupportedException异常。<br>Cloneable接口中不包含任何方法，所以实现它时只要在类声明中加上implements语句即可。</p>
-<p>第二个比较特殊的地方在于这个方法是protected修饰的，覆写clone()方法的时候需要写成public，才能让类外部的代码调用。</p>
-<h2 id="public-final-native-Class-lt-gt-getClass"><a href="#public-final-native-Class-lt-gt-getClass" class="headerlink" title="public final native Class&lt;?&gt; getClass();"></a>public final native Class&lt;?&gt; getClass();</h2><p>getClass()也是一个native方法，返回的是此Object对象的类对象/运行时类对象Class&lt;?&gt;。效果与Object.class相同。</p>
-<p>首先解释下”类对象”的概念：在Java中，类是是对具有一组相同特征或行为的实例的抽象并进行描述，对象则是此类所描述的特征或行为的具体实例。作为概念层次的类，其本身也具有某些共同的特性，如都具有类名称、由类加载器去加载，都具有包，具有父类，属性和方法等。于是，Java中有专门定义了一个类，Class，去描述其他类所具有的这些特性，因此，从此角度去看，类本身也都是属于Class类的对象。为与经常意义上的对象相区分，在此称之为”类对象”。</p>
-<h2 id="boolean-equals-Object-obj"><a href="#boolean-equals-Object-obj" class="headerlink" title="boolean equals(Object obj)"></a>boolean equals(Object obj)</h2><p>Indicates whether some other object is “equal to” this one.<br>“==”运算符判断两个引用是否指向同一个对象。==表示的是变量值完成相同（对于基础类型，地址中存储的是值，引用类型则存储指向实际对象的地址）；<br>equals表示的是对象的内容完全相同，此处的内容多指对象的特征/属性。</p>
-<p>对于Object类的equals()方法来说，它判断调用equals()方法的引用于传进来的引用是否一致，即这两个引用是否指向的是同一个对象。</p>
-<p>Object类中的equals()方法如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">this</span> == obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>即Object类中的equals()方法等价于==。</p>
-<p>只有当继承Object的类覆写（override）了equals()方法之后，继承类实现了用equals()方法比较两个对象是否相等，才可以说equals()方法与==的不同。</p>
-<p>equals()方法需要具有如下特点：</p>
-<ul>
-<li>自反性（reflexive）：任何非空引用x，x.equals(x)返回为true。</li>
-<li>对称性（symmetric）：任何非空引用x和y，x.equals(y)返回true当且仅当y.equals(x)返回true。</li>
-<li>传递性（transitive）：任何非空引用x和y，如果x.equals(y)返回true，并且y.equals(z)返回true，那么x.equals(z)返回true。</li>
-<li>一致性（consistent）：两个非空引用x和y，x.equals(y)的多次调用应该保持一致的结果，（前提条件是在多次比较之间没有修改x和y用于比较的相关信息）。</li>
-<li>约定：对于任何非空引用x，x.equals(null)应该返回为false。</li>
-<li><strong>并且覆写equals()方法时，应该同时覆写hashCode()方法，反之亦然。</strong></li>
-</ul>
-<h2 id="int-hashCode"><a href="#int-hashCode" class="headerlink" title="int hashCode()"></a>int hashCode()</h2><p>Returns a hash code value for the object.</p>
-<p>当你覆写（override）了equals()方法之后，必须也覆写hashCode()方法，反之亦然。</p>
-<p>这个方法返回一个整型值（hash code value），如果两个对象被equals()方法判断为相等，那么它们就应该拥有同样的hash code。</p>
-<p>Object类的hashCode()方法为不同的对象返回不同的值，Object类的hashCode值表示的是对象的地址。</p>
-<p>hashCode的一般性契约（需要满足的条件）如下：</p>
-<p>1.在Java应用的一次执行过程中，如果对象用于equals比较的信息没有被修改，那么同一个对象多次调用hashCode()方法应该返回同一个整型值。应用的多次执行中，这个值不需要保持一致，即每次执行都是保持着各自不同的值。<br>2.如果equals()判断两个对象相等，那么它们的hashCode()方法应该返回同样的值。<br>3.并没有强制要求如果equals()判断两个对象不相等，那么它们的hashCode()方法就应该返回不同的值。即，两个对象用equals()方法比较返回false，它们的hashCode可以相同也可以不同。但是，应该意识到，为两个不相等的对象产生两个不同的hashCode可以改善哈希表的性能。</p>
-<p><strong>WHY?</strong><br>其实，这主要体现在hashCode()方法的作用上，其主要用于增强哈希表的性能。</p>
-<p>以集合类中，以Set为例，当新加一个对象时，需要判断现有集合中是否已经存在与此对象相等的对象，如果没有hashCode()方法，需要将Set进行一次遍历，并逐一用equals()方法判断两个对象是否相等，此种算法时间复杂度为o(n)。通过借助于hasCode方法，先计算出即将新加入对象的哈希码，然后根据哈希算法计算出此对象的位置，直接判断此位置上是否已有对象即可。（注：Set的底层用的是Map的原理实现）</p>
-<h2 id="String-toString"><a href="#String-toString" class="headerlink" title="String toString()"></a>String toString()</h2><p>Returns a string representation of the object.<br>当打印引用，如调用System.out.println()时，会自动调用对象的toString()方法，打印出引用所指的对象的toString()方法的返回值，因为每个类都直接或间接地继承自Object，因此每个类都有toString()方法。</p>
-<p>Object类中的toString()方法定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getClass().getName() + <span class="string">"@"</span> + Integer.toHexString(hashCode());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="wait-…-notify-notifyAll"><a href="#wait-…-notify-notifyAll" class="headerlink" title="wait(…) / notify() / notifyAll()"></a>wait(…) / notify() / notifyAll()</h2><h2 id="protected-void-finalize"><a href="#protected-void-finalize" class="headerlink" title="protected void finalize()"></a>protected void finalize()</h2><p>finalize方法主要与Java垃圾回收机制有关。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -911,7 +885,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -923,7 +897,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>6</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>7</sup></a></li>
 		  
 		
 		  
@@ -935,7 +909,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>7</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>10</sup></a></li>
 		  
 		
 		  
@@ -956,27 +930,23 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">标签</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>11</sup></a></li>
+			
 		
 			
 				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>8</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java/" title="Java">Java<sup>5</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
 			
 		
 			
@@ -988,6 +958,18 @@
 			
 		
 			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
 			
 		
@@ -996,27 +978,7 @@
 			
 		
 			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
 			
 		
 			
@@ -1024,11 +986,15 @@
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
 			
 		
 			
@@ -1036,7 +1002,15 @@
 			
 		
 			
-				<li><a href="/tags/Https/" title="Https">Https<sup>1</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -1044,7 +1018,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情链接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -1060,11 +1034,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1216,7 +1190,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
