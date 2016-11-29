@@ -81,6 +81,99 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/11/29/scala的类型和反射机制/" title="scala的类型和反射机制" itemprop="url">scala的类型和反射机制</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> Published 2016-11-29</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>#Scala的反射机制</p>
+<ol>
+<li><p>Manifest &amp; ClassManifest<br>Manifest是在编译时捕捉的，编码了“捕捉时”所致的类型信息。然后就可以在运行时检查和使用类型信息，但是manifest只能捕捉当Manifest被查找时在隐式作用域里的类型。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first</span></span>[<span class="type">A</span> : <span class="type">ClassManifest</span>](x:<span class="type">Array</span>[<span class="type">A</span>]) = <span class="type">Array</span>(x(<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ClassTag &amp; TypeTag</p>
+</li>
+</ol>
+<ul>
+<li><p>ClassTag[T]保存了被泛型擦除后的原始类型T,提供给运行时的</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">mkArray</span></span>[<span class="type">T</span> : <span class="type">ClassTag</span>](elems: <span class="type">T</span>*) = <span class="type">Array</span>[<span class="type">T</span>](elems: _*)</span><br><span class="line">mkArray: [<span class="type">T</span>](elems: <span class="type">T</span>*)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: scala.reflect.<span class="type">ClassTag</span>[<span class="type">T</span>])<span class="type">Array</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>TypeTag则保存所有具体的类型</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramInfo</span></span>[<span class="type">T</span>](x: <span class="type">T</span>)(<span class="keyword">implicit</span> tag: <span class="type">TypeTag</span>[<span class="type">T</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> targs = tag.tpe <span class="keyword">match</span> &#123; <span class="keyword">case</span> <span class="type">TypeRef</span>(_, _, args) =&gt; args &#125;</span><br><span class="line">  println(<span class="string">s"type of <span class="subst">$x</span> has type arguments <span class="subst">$targs</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line">scala&gt; paramInfo(<span class="number">42</span>)</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> 42 <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"></span>)</span></span><br><span class="line">scala&gt; paramInfo(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> <span class="title">List</span>(<span class="params">1, 2</span>) <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"><span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>可以看到，获取到的类型是具体的类型，而不是被擦除后的类型List(Any)</p>
+<p>scala在2.10里却用TypeTag替代了Manifest，用ClassTag替代了ClassManifest，原因是在路径依赖类型中，Manifest存在问题：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span>&#123;<span class="class"><span class="keyword">class</span> <span class="title">Bar</span>&#125;</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">m</span></span>(f: <span class="type">Foo</span>)(b: f.<span class="type">Bar</span>)(<span class="keyword">implicit</span> ev: <span class="type">Manifest</span>[f.<span class="type">Bar</span>]) = ev</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> f1 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b1 = <span class="keyword">new</span> f1.<span class="type">Bar</span></span><br><span class="line">scala&gt; <span class="keyword">val</span> f2 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b2 = <span class="keyword">new</span> f2.<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev1 = m(f1)(b1)</span><br><span class="line">ev1: <span class="type">Manifest</span>[f1.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">681e731</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev2 = m(f2)(b2)</span><br><span class="line">ev2: <span class="type">Manifest</span>[f2.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">3e50039</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; ev1 == ev2 <span class="comment">// they should be different, thus the result is wrong</span></span><br><span class="line">res28: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<p>ev1 不应该等于 ev2 的，因为其依赖路径（外部实例）是不一样的。<br>还有其他因素，所以在2.10版本里，使用 TypeTag 替代了 Manifest<br>TypeTag:由编辑器生成,只能通过隐式参数或者上下文绑定获取<br>可以有两种方式获取:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用typeTag</span></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">getTypeTag</span></span>[<span class="type">T</span>:<span class="type">TypeTag</span>](a:<span class="type">T</span>) = typeTag[<span class="type">T</span>]</span><br><span class="line">getTypeTag: [<span class="type">T</span>](a: <span class="type">T</span>)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>])reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用implicitly 等价的 </span></span><br><span class="line"><span class="comment">//scala&gt;def getTypeTag[T:TypeTag](a:T) = implicitly[TypeTag[T]]</span></span><br><span class="line"></span><br><span class="line">scala&gt; getTypeTag(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line">res0: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]] = <span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]]</span><br></pre></td></tr></table></figure></p>
+<p>通过TypeTag的tpe方法获得需要的Type(如果不是从对象换取Type 而是从class中获得 可以直接用 typeOf[类名])</p>
+<ol>
+<li><p>反射获取TypeTag和ClassTag<br><a href="http://www.programcreek.com/java-api-examples/index.php?api=scala.reflect.ClassTag" target="_blank" rel="external">JavaCodeExample</a><br>String———-&gt;Calss————–&gt;Manifest——–&gt;TypeTag<br>Class.forName    ManifestFactory.classType scala.reflect.runtime.universe.manifestToTypeTag</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe</span><br><span class="line"><span class="keyword">import</span> scala.reflect.<span class="type">ManifestFactory</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> className = <span class="string">"java.lang.String"</span></span><br><span class="line"><span class="keyword">val</span> mirror = universe.runtimeMirror(getClass.getClassLoader)</span><br><span class="line"><span class="keyword">val</span> cls = <span class="type">Class</span>.forName(className)</span><br><span class="line"><span class="keyword">val</span> t = universe.manifestToTypeTag(mirror, <span class="type">ManifestFactory</span>.classType(cls))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>classOf与getClass方法的差异</p>
+</li>
+</ol>
+<p>getClass 方法得到的是 Class[A]的某个子类，而 classOf[A] 得到是正确的 Class[A]，但是去比较的话，这两个类型是equals为true的</p>
+<p>classOf获取运行时的类型。classOf[T] 相当于 java中的T.class; 而getClass:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listClass = classOf[<span class="type">List</span>[_]]</span><br><span class="line">   * <span class="comment">// listClass is java.lang.Class[List[_]] = class scala.collection.immutable.List</span></span><br><span class="line"><span class="keyword">val</span> mapIntString = classOf[<span class="type">Map</span>[<span class="type">Int</span>,<span class="type">String</span>]]</span><br><span class="line">   * <span class="comment">// mapIntString is java.lang.Class[Map[Int,String]] = interface scala.collection.immutable.Map</span></span><br><span class="line">   * &#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span>  <span class="title">A</span></span></span><br><span class="line">scala&gt; <span class="keyword">val</span> a = <span class="keyword">new</span> <span class="type">A</span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass</span><br><span class="line">res2: <span class="type">Class</span>[_ &lt;: <span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; classOf[<span class="type">A</span>]</span><br><span class="line">res3: <span class="type">Class</span>[<span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass  == classOf[<span class="type">A</span>]</span><br><span class="line">res13: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<p>这种细微的差别，体现在类型赋值时，因为java里的 Class[T]是不支持协变的，所以无法把一个 Class[_ &lt; : A] 赋值给一个 Class[A]<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> c:<span class="type">Class</span>[<span class="type">A</span>] = a.getClass</span><br><span class="line">&lt;console&gt;:<span class="number">9</span>: error: <span class="class"><span class="keyword">type</span> <span class="title">mismatch</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>类(class)与类型(type)是两个不一样的概念</p>
+<p>(在java里因为早期一直使用class表达type，并且现在也延续这样的习惯)；类型(type)比类(class)更”具体”，任何数据都有类型。类是面向对象系统里对同一类数据的抽象，在没有泛型之前，类型系统不存在高阶概念，直接与类一一映射，而泛型出现之后，就不在一一映射了。比如定义class List[T] {}, 可以有List[Int] 和 List[String]等具体类型，它们的类是同一个List，但类型则根据不同的构造参数类型而不同。</p>
+<p>类型一致的对象它们的类也是一致的，反过来，类一致的，其类型不一定一致。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; classOf[<span class="type">List</span>[<span class="type">Int</span>]] == classOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res16: <span class="type">Boolean</span> = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">scala&gt; typeOf[<span class="type">List</span>[<span class="type">Int</span>]] == typeOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res17: <span class="type">Boolean</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Scala/">Scala</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/反射/">反射</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/11/27/SparkStreaming数据产生与导入相关的内存分析/" title="SparkStreaming数据产生与导入相关的内存分析" itemprop="url">SparkStreaming数据产生与导入相关的内存分析</a>
   </h1>
   <p class="article-author">By
@@ -812,139 +905,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/08/04/Spark性能优化/" title="Spark性能优化" itemprop="url">Spark性能优化</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-08-04T04:33:05.000Z" itemprop="datePublished"> Published 2016-08-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>参考:<br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-1/" target="_blank" rel="external">how-to-tune-your-apache-spark-jobs-part-1</a><br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/" target="_blank" rel="external">how-to-tune-your-apache-spark-jobs-part-2</a><br><a href="http://gitlab.baidu.com/metastore/metastore_doc/blob/master/file/tuning_spark_streaming.md" target="_blank" rel="external">tuning_spark_streaming</a><br><a href="http://www.iteblog.com/archives/1333" target="_blank" rel="external">Spark Streaming性能调优详解</a></p>
-<p><a href="http://www.iteblog.com/archives/1672" target="_blank" rel="external">Spark性能优化：shuffle调优</a><br><a href="http://www.iteblog.com/archives/1671" target="_blank" rel="external">Spark性能优化：数据倾斜调优</a></p>
-<p><a href="http://www.iteblog.com/archives/1657" target="_blank" rel="external">Spark性能优化：开发调优篇</a><br><a href="https://spark-summit.org/east-2016/events/top-5-mistakes-when-writing-spark-applications/" target="_blank" rel="external">top-5-mistakes-when-writing-spark-applications</a>  强力推荐</p>
-<h2 id="一-基础说明"><a href="#一-基础说明" class="headerlink" title="一 基础说明"></a>一 基础说明</h2><ul>
-<li>job–&gt;stage–&gt;task<br>job划分为stage，stage划分为Task，一个Task运行在一个core上</li>
-<li>executor–&gt;core<br>The number of tasks in a stage is the same as the number of partitions in the last RDD in the stage. </li>
-</ul>
-<h2 id="二-Tuning-Resource-Allocation"><a href="#二-Tuning-Resource-Allocation" class="headerlink" title="二 Tuning Resource Allocation"></a>二 Tuning Resource Allocation</h2><p><a href="http://www.infoq.com/cn/presentations/gc-tuning-of-spark-application" target="_blank" rel="external">Spark应用的GC调优</a> –&gt;重点讲解了G1垃圾回收器的调优工作<br><a href="http://www.iteblog.com/archives/1659" target="_blank" rel="external">Spark性能优化：资源调优篇</a><br>Every Spark executor in an application has the same fixed number of cores and same fixed heap size.</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--executor-cores/ spark.executor.cores 提交时通过该参数设置每个executor的core数量，决定了<span class="type">Task</span>的并行度</span><br><span class="line">--executor-memory/spark.executor.memory 设置executor的<span class="type">JVM</span> memory</span><br><span class="line">--num-executors/spark.executor.instances 设置executor的数量</span><br><span class="line">spark.dynamicAllocation.enabled 设置动态申请资源(value设为<span class="literal">true</span>)，此时不要设置num-executors</span><br><span class="line">spark.yarn.executor.memoryOverhead 设置堆外的memory大小</span><br></pre></td></tr></table></figure>
-<h3 id="spark-dynamicAllocation-enabled"><a href="#spark-dynamicAllocation-enabled" class="headerlink" title="spark.dynamicAllocation.enabled"></a>spark.dynamicAllocation.enabled</h3><p>executor空闲超时后，会被移除<br>对于Spark Streaming，数据按时间段到达，为了防止executor频繁出现添加移除现象，应该禁用该功能。</p>
-<h3 id="内存格局"><a href="#内存格局" class="headerlink" title="内存格局"></a>内存格局</h3><p><img src="http://blog.cloudera.com/wp-content/uploads/2015/03/spark-tuning2-f1.png" alt="enter image description here"></p>
-<p>说明:</p>
-<ul>
-<li><p>The application master, which is a non-executor container with the special capability of requesting containers from YARN, takes up resources of its own that must be budgeted in. In yarn-client mode, it defaults to a 1024MB and one vcore. In yarn-cluster mode, the application master runs the driver, so it’s often useful to bolster its resources with the –driver-memory and –driver-cores properties.</p>
-</li>
-<li><p>Running executors with too much memory often results in excessive garbage collection delays. 64GB is a rough guess at a good upper limit for a single executor.最多4G内存，防止GC压力过大。</p>
-</li>
-<li><p>I’ve noticed that the HDFS client has trouble with tons of concurrent threads. A rough guess is that at most five tasks per executor can achieve full write throughput, so it’s good to keep the number of cores per executor below that number. 最多5个Task可以同时达到最高的HDFS写入带宽</p>
-</li>
-<li><p>Running tiny executors (with a single core and just enough memory needed to run a single task, for example) throws away the benefits that come from running multiple tasks in a single JVM. For example, broadcast variables need to be replicated once on each executor, so many small executors will result in many more copies of the data.</p>
-</li>
-</ul>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h3><p>保留内存和core给hadoop ，yarn等系统运行</p>
-<h3 id="Slimming-Down-Your-Data-Structures"><a href="#Slimming-Down-Your-Data-Structures" class="headerlink" title="Slimming Down Your Data Structures"></a>Slimming Down Your Data Structures</h3><p>定制序列化方法,减少序列化后的存储占用<br>spark.serializer=org.apache.spark.serializer.KryoSerializer</p>
-<h2 id="三-Tuning-Parallelism"><a href="#三-Tuning-Parallelism" class="headerlink" title="三 Tuning Parallelism"></a>三 Tuning Parallelism</h2><p>分区过少时，Task数量有限，无法充分利用机器资源。<br>方法:</p>
-<ul>
-<li>Use the repartition transformation, which will trigger a shuffle.</li>
-<li>Configure your InputFormat to create more splits.</li>
-<li>Write the input data out to HDFS with a smaller block size.</li>
-</ul>
-<h3 id="3-1-参数spark-default-parallelism"><a href="#3-1-参数spark-default-parallelism" class="headerlink" title="3.1 参数spark.default.parallelism"></a>3.1 参数spark.default.parallelism</h3><p>参数说明：该参数用于设置每个stage的默认task数量。这个参数极为重要，如果不设置可能会直接影响你的Spark作业性能。</p>
-<p>　　参数调优建议：Spark作业的默认task数量为500~1000个较为合适。很多同学常犯的一个错误就是不去设置这个参数，那么此时就会导致Spark自己根据底层HDFS的block数量来设置task的数量，默认是一个HDFS block对应一个task。通常来说，Spark默认设置的数量是偏少的（比如就几十个task），如果task数量偏少的话，就会导致你前面设置好的Executor的参数都前功尽弃。</p>
-<h2 id="减少shuffle以及shuffle的数据量"><a href="#减少shuffle以及shuffle的数据量" class="headerlink" title="减少shuffle以及shuffle的数据量"></a>减少shuffle以及shuffle的数据量</h2><ul>
-<li><p>操作<strong>repartition</strong> , <strong>join</strong>, <strong>cogroup</strong>, and any of the <strong>*By</strong> or <strong>*ByKey</strong> transformations can result in shuffles. </p>
-</li>
-<li><p>Avoid <strong>groupByKey</strong> when performing an associative reductive operation. For example, <strong>rdd.groupByKey().mapValues(_.sum)</strong> will produce the same results as <strong>rdd.reduceByKey(<em> + </em>)</strong><br>However, the former will transfer the entire dataset across the network, while the latter will compute local sums for each key in each partition and combine those local sums into larger sums after shuffling.<br><img src="http://www.iteblog.com/pic/reduce_by.png" alt="enter image description here"><br><img src="http://www.iteblog.com/pic/group_by.png" alt="enter image description here"><br>以下函数应该优先于 groupByKey ：</p>
-</li>
-</ul>
-<ol>
-<li>combineByKey组合数据，但是组合之后的数据类型与输入时值的类型不一样。</li>
-<li>foldByKey 合并每一个 key 的所有值，在级联函数和“零值”中使用。</li>
-</ol>
-<ul>
-<li>Avoid <strong>reduceByKey</strong> When the input and output value types are different. <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map(kv =&gt; (kv._1, <span class="keyword">new</span> <span class="type">Set</span>[<span class="type">String</span>]() + kv._2))</span><br><span class="line">    .reduceByKey(_ ++ _)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>This code results in tons of unnecessary object creation because a new set must be allocated for each record. It’s better to use aggregateByKey, which performs the map-side aggregation more efficiently:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> zero = <span class="keyword">new</span> collection.mutable.<span class="type">Set</span>[<span class="type">String</span>]()</span><br><span class="line">rdd.aggregateByKey(zero)(</span><br><span class="line">    (set, v) =&gt; set += v,</span><br><span class="line">    (set1, set2) =&gt; set1 ++= set2)</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>Avoid the <code>flatMap-join-groupBy</code> pattern. When two datasets are already grouped by key and you want to join them and keep them grouped, you can just use <code>cogroup</code>. That avoids all the overhead associated with unpacking and repacking the groups.     join数据源时直接使用<code>cogroup</code></li>
-</ul>
-<h2 id="四-shuffle不发生的情况"><a href="#四-shuffle不发生的情况" class="headerlink" title="四 shuffle不发生的情况"></a>四 shuffle不发生的情况</h2><ul>
-<li>两个数据源进行join时，已经进行group分组后，如果分组时使用的是同样的partitioner，那么进行join时是不需要进行shuffle的。</li>
-<li>当数据量较少时，使用广播变量，不需要shuffle</li>
-</ul>
-<h2 id="When-More-Shuffles-are-Better"><a href="#When-More-Shuffles-are-Better" class="headerlink" title="When More Shuffles are Better"></a>When More Shuffles are Better</h2><p>当数据partition较少，数据量较大时，进行shuffle可以提高partition数量，提高并行度，从而达到提高效率的目的。</p>
-<h2 id="五-RDD"><a href="#五-RDD" class="headerlink" title="五 RDD"></a>五 RDD</h2><p><a href="http://www.iteblog.com/archives/1657" target="_blank" rel="external">Spark性能优化：开发调优篇</a></p>
-<ul>
-<li>原则一：避免创建重复的RDD</li>
-<li>原则二：尽可能复用同一个RDD</li>
-<li>原则三：对多次使用的RDD进行持久化  cache persist</li>
-<li>原则四：尽量避免使用shuffle类算子  广播大变量 </li>
-<li>原则五：使用map-side预聚合的shuffle操作</li>
-<li>原则六：使用高性能的算子<ul>
-<li><strong>使用reduceByKey/aggregateByKey替代groupByKey</strong></li>
-<li><strong>使用mapPartitions替代普通map(mapPartitions类的算子</strong>，一次函数调用会处理一个partition所有的数据，而不是一次函数调用处理一条，性能相对来说会高一些。)</li>
-<li><strong>使用foreachPartitions替代foreach</strong>(一次函数调用处理一个partition的所有数据，而不是一次函数调用处理一条数据)</li>
-<li><strong>使用filter之后进行coalesce操作</strong>(通常对一个RDD执行filter算子过滤掉RDD中较多数据后（比如30%以上的数据），建议使用coalesce算子，手动减少RDD的partition数量，将RDD中的数据压缩到更少的partition中去。)</li>
-</ul>
-</li>
-<li>原则七：广播大变量 </li>
-<li>原则八：使用Kryo优化序列化性能</li>
-<li>原则九：优化数据结构<h2 id="5-1-不要将大型RDD中所有元素发送到Driver端"><a href="#5-1-不要将大型RDD中所有元素发送到Driver端" class="headerlink" title="5.1 不要将大型RDD中所有元素发送到Driver端"></a>5.1 不要将大型RDD中所有元素发送到Driver端</h2>慎重使用<code>collect countByKey countByValue collectAsMap</code>等函数，使用<code>take或者takeSample</code>来限制数据大小的上限</li>
-</ul>
-<h2 id="六-其他"><a href="#六-其他" class="headerlink" title="六 其他"></a>六 其他</h2><h3 id="6-1-Spark优化：禁止应用程序将依赖的Jar包传到HDFS"><a href="#6-1-Spark优化：禁止应用程序将依赖的Jar包传到HDFS" class="headerlink" title="6.1 Spark优化：禁止应用程序将依赖的Jar包传到HDFS"></a>6.1 Spark优化：禁止应用程序将依赖的Jar包传到HDFS</h3><p><a href="http://www.iteblog.com/archives/1173" target="_blank" rel="external">Spark优化：禁止应用程序将依赖的Jar包传到HDFS</a><br>编辑spark-default.conf文件，添加以下内容：<br>spark.yarn.jar=hdfs://my/home/iteblog/spark_lib/spark-assembly-1.1.0-hadoop2.2.0.jar<br>也就是使得spark.yarn.jar指向我们HDFS上的Spark lib库。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/性能优化/">性能优化</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -989,7 +949,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Scala/" title="Scala">Scala<sup>1</sup></a></li>
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>2</sup></a></li>
 		  
 		
 		  
@@ -1034,7 +994,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>3</sup></a></li>
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
 			
 		
 			
@@ -1042,19 +1002,7 @@
 			
 		
 			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>3</sup></a></li>
 			
 		
 			
@@ -1062,7 +1010,19 @@
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
 			
 		
 			
@@ -1070,11 +1030,19 @@
 			
 		
 			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Dropwizard/" title="Dropwizard">Dropwizard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/动态/" title="动态">动态<sup>1</sup></a></li>
+				<li><a href="/tags/类型转换/" title="类型转换">类型转换<sup>1</sup></a></li>
 			
 		
 			
@@ -1082,19 +1050,11 @@
 			
 		
 			
-				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/MR/" title="MR">MR<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
 			
 		
 		</ul>
