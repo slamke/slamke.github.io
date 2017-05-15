@@ -1,0 +1,632 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Scala隐式转换和隐式参数 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="前言Scala的implicit功能很强大，可以自动地给对象”添加一个属性”。 这里打上引号的原因是Scala内部进行编译的时候会自动加上隐式转换函数。
+很多Scala开源框架内部都大量使用了implicit。因为implicit真的很强大，写得好的implicit可以让代码更优雅。但个人感觉implicit也有一些缺点，比如使用了implicit之后，看源码或者使用一些library的时候无法下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala隐式转换和隐式参数">
+<meta property="og:url" content="slamke.github.io/2017/05/15/Scala隐式转换和隐式参数/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="前言Scala的implicit功能很强大，可以自动地给对象”添加一个属性”。 这里打上引号的原因是Scala内部进行编译的时候会自动加上隐式转换函数。
+很多Scala开源框架内部都大量使用了implicit。因为implicit真的很强大，写得好的implicit可以让代码更优雅。但个人感觉implicit也有一些缺点，比如使用了implicit之后，看源码或者使用一些library的时候无法下">
+<meta property="og:updated_time" content="2017-05-15T03:41:31.426Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala隐式转换和隐式参数">
+<meta name="twitter:description" content="前言Scala的implicit功能很强大，可以自动地给对象”添加一个属性”。 这里打上引号的原因是Scala内部进行编译的时候会自动加上隐式转换函数。
+很多Scala开源框架内部都大量使用了implicit。因为implicit真的很强大，写得好的implicit可以让代码更优雅。但个人感觉implicit也有一些缺点，比如使用了implicit之后，看源码或者使用一些library的时候无法下">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/15/Scala隐式转换和隐式参数/" title="Scala隐式转换和隐式参数" itemprop="url">Scala隐式转换和隐式参数</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-15T03:27:59.000Z" itemprop="datePublished"> Published 2017-05-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式转换规则"><span class="toc-number">2.</span> <span class="toc-text">隐式转换规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#标记规则-Marking-Rule"><span class="toc-number">2.1.</span> <span class="toc-text">标记规则(Marking Rule)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#作用域规则-Scope-Rule"><span class="toc-number">2.2.</span> <span class="toc-text">作用域规则(Scope Rule)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一次编译只隐式转换一次-One-at-a-time-Rule"><span class="toc-number">2.3.</span> <span class="toc-text">一次编译只隐式转换一次(One-at-a-time Rule)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式转换类型"><span class="toc-number">3.</span> <span class="toc-text">隐式转换类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式转换成正确的类型"><span class="toc-number">3.1.</span> <span class="toc-text">隐式转换成正确的类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法调用的隐式转换"><span class="toc-number">3.2.</span> <span class="toc-text">方法调用的隐式转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式参数"><span class="toc-number">4.</span> <span class="toc-text">隐式参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-number">5.</span> <span class="toc-text">其他</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Scala的implicit功能很强大，可以自动地给对象”添加一个属性”。 这里打上引号的原因是Scala内部进行编译的时候会自动加上隐式转换函数。</p>
+<p>很多Scala开源框架内部都大量使用了implicit。因为implicit真的很强大，写得好的implicit可以让代码更优雅。但个人感觉implicit也有一些缺点，比如使用了implicit之后，看源码或者使用一些library的时候无法下手，因为你根本不知道作者哪里写了implicit。这个也会对初学者造成一些困扰。</p>
+<p>比如Scala中Option就有一个implicit可以将Option转换成Iterable：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">val</span> map = <span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="number">11</span>, <span class="number">2</span> -&gt; <span class="number">22</span>, <span class="number">3</span> -&gt; <span class="number">33</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> newList = list.flatMap &#123;</span><br><span class="line">    num =&gt; map.get(num) <span class="comment">// map.get方法返回的是Option，可以被隐式转换成Iterable</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以下是implicit的一个小例子。</p>
+<p>比如以下一个例子，定义一个Int类型的变量num，但是赋值给了一个Double类型的数值。这时候就会编译错误：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> num: <span class="type">Int</span> = <span class="number">3.5</span> <span class="comment">// Compile Error</span></span><br></pre></td></tr></table></figure>
+<p>但是我们加了一个隐式转换之后，就没问题了:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">double2Int</span></span>(d: <span class="type">Double</span>) = d.toInt</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> num: <span class="type">Int</span> = <span class="number">3.5</span> <span class="comment">// 3， 这段代码会被编译成 val num: Int = double2Int(3.5)</span></span><br></pre></td></tr></table></figure>
+<h2 id="隐式转换规则"><a href="#隐式转换规则" class="headerlink" title="隐式转换规则"></a>隐式转换规则</h2><h3 id="标记规则-Marking-Rule"><a href="#标记规则-Marking-Rule" class="headerlink" title="标记规则(Marking Rule)"></a>标记规则(Marking Rule)</h3><p>任何变量，函数或者对象都可以用implicit这个关键字进行标记，表示可以进行隐式转换。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">intToString</span></span>(x: <span class="type">Int</span>) = x.toString</span><br></pre></td></tr></table></figure>
+<p>编译器可能会将x + y 转换成 convert(x) + y 如果convert被标记成implicit。<br>同样只有哪些使用 implicit 关键字的定义才是可以使用的隐式定义。<strong>关键字 implicit 用来标记一个隐式定义</strong>。编译器才可以选择它作为隐式变化的候选项。你可以使用 implicit 来标记任意变量，函数或是对象。</p>
+<h3 id="作用域规则-Scope-Rule"><a href="#作用域规则-Scope-Rule" class="headerlink" title="作用域规则(Scope Rule)"></a>作用域规则(Scope Rule)</h3><p>在一个作用域内，一个隐式转换必须是一个唯一的标识。</p>
+<p>比如说MyUtils这个object里有很多隐式转换。x + y 不会使用MyUtils里的隐式转换。 除非import进来。 import MyUtils._</p>
+<p>Scala编译器还能在companion class中去找companion object中定义的隐式转换。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Player</span> </span>&#123;</span><br><span class="line">    <span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">getClub</span></span>(player: <span class="type">Player</span>): <span class="type">Club</span> = <span class="type">Club</span>(player.clubName)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Player</span>(<span class="params">val name: <span class="type">String</span>, val age: <span class="type">Int</span>, val clubName: <span class="type">String</span></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> p = <span class="keyword">new</span> <span class="type">Player</span>(<span class="string">"costa"</span>, <span class="number">27</span>, <span class="string">"Chelsea"</span>)</span><br><span class="line"></span><br><span class="line">println(p.welcome) <span class="comment">// Chelsea welcome you here!</span></span><br><span class="line">println(p.playerNum) <span class="comment">// 21</span></span><br></pre></td></tr></table></figure>
+<h3 id="一次编译只隐式转换一次-One-at-a-time-Rule"><a href="#一次编译只隐式转换一次-One-at-a-time-Rule" class="headerlink" title="一次编译只隐式转换一次(One-at-a-time Rule)"></a>一次编译只隐式转换一次(One-at-a-time Rule)</h3><p>Scala不会把 x + y 转换成 convert1(convert2(x)) + y</p>
+<h2 id="隐式转换类型"><a href="#隐式转换类型" class="headerlink" title="隐式转换类型"></a>隐式转换类型</h2><h3 id="隐式转换成正确的类型"><a href="#隐式转换成正确的类型" class="headerlink" title="隐式转换成正确的类型"></a>隐式转换成正确的类型</h3><p>这种类型是Scala编译器对隐式转换的第一选择。 比如说编译器看到一个类型的X的数据，但是需要一个类型为Y的数据，那么就会去找把X类型转换成Y类型的隐式转换。</p>
+<p>本文一开始的double2Int方法就是这种类型的隐式转换。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">double2Int</span></span>(d: <span class="type">Double</span>) = d.toInt</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> num: <span class="type">Int</span> = <span class="number">3.5</span> <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+<p>当编译器发现变量num是个Int类型，并且用Double类型给它赋值的时候，会报错。 但是在报错之前，编译器会查找Double =&gt; Int的隐式转换。然后发现了double2Int这个隐式转换函数。于是就使用了隐式转换。</p>
+<h3 id="方法调用的隐式转换"><a href="#方法调用的隐式转换" class="headerlink" title="方法调用的隐式转换"></a>方法调用的隐式转换</h3><p>比如这段代码 obj.doSomeThing。 比如obj对象没有doSomeThing这个方法，编译器会会去查找拥有doSomeThing方法的类型，并且看obj类型是否有隐式转换成有doSomeThing类型的函数。有的话就是将obj对象隐式转换成拥有doSomeThing方法的对象。</p>
+<p>以下是一个例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Int</span></span>) </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">+</span></span>(num: <span class="type">Int</span>) = age + num</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">+</span></span>(p: <span class="type">Person</span>) = age + p.age</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> person = <span class="type">Person</span>(<span class="string">"format"</span>, <span class="number">99</span>)</span><br><span class="line">println(person + <span class="number">1</span>) <span class="comment">// 100</span></span><br><span class="line"><span class="comment">//  println(1 + person)  报错，因为Int的+方法没有有Person参数的重载方法</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">personAddAge</span></span>(x: <span class="type">Int</span>) = <span class="type">Person</span>(<span class="string">"unknown"</span>, x)</span><br><span class="line"></span><br><span class="line">println(<span class="number">1</span> + person) <span class="comment">// 100</span></span><br></pre></td></tr></table></figure>
+<p>**<br>有了隐式转换方法之后，编译器检查 1 + person 表达式，发现Int的+方法没有有Person参数的重载方法。在放弃之前查看是否有将Int类型的对象转换成以Person为参数的+方法的隐式转换函数，于是找到了，然后就进行了隐式转换。</p>
+<p>Scala的Predef中也使用了方法调用的隐式转换。</p>
+<p>Map(1 -&gt; 11, 2 -&gt; 22)<br>上面这段Map中的参数是个二元元组。 Int没有 -&gt; 方法。 但是在Predef中定义了：</p>
+<p>implicit final class ArrowAssoc<a href="private val self: A">A</a> extends AnyVal {<br>    @inline def -&gt; <a href="y: B" target="_blank" rel="external">B</a>: Tuple2[A, B] = Tuple2(self, y)<br>    def →<a href="y: B" target="_blank" rel="external">B</a>: Tuple2[A, B] = -&gt;(y)<br>}</p>
+<h2 id="隐式参数"><a href="#隐式参数" class="headerlink" title="隐式参数"></a>隐式参数</h2><p><strong>隐式参数的意义是当方法需要多个参数的时候，可以定义一些隐式参数，这些隐式参数可以被自动加到方法填充的参数里，而不必手填充</strong>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">implicitParamFunc</span></span>(name: <span class="type">String</span>)(<span class="keyword">implicit</span> tiger: <span class="type">Tiger</span>, lion: <span class="type">Lion</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(name + <span class="string">" have a tiget and a lion, their names are: "</span> + tiger.name + <span class="string">", "</span> + lion.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Zoo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">val</span> tiger = <span class="type">Tiger</span>(<span class="string">"tiger1"</span>)</span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">val</span> lion = <span class="type">Lion</span>(<span class="string">"lion1"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="type">Zoo</span>._</span><br><span class="line"></span><br><span class="line">implicitParamFunc(<span class="string">"format"</span>)</span><br></pre></td></tr></table></figure>
+<p>上面这个代码中implicitParamFunc中的第二个参数定义成了隐式参数。</p>
+<p>然后在Zoo对象里定义了两个隐式变量，import进来之后，调用implicitParamFunc方法的时候这两个变量被自动填充到了参数里。</p>
+<p>这里需要注意的是<strong>不仅仅方法中的参数需要被定义成隐式参数，对应的隐式参数的变量也需要被定义成隐式变量</strong>。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>对象中的隐式转换可以只import自己需要的。</p>
+<p>object MyUtils {<br>    implicit def a …<br>    implicit def b …<br>}</p>
+<p>import MyUtils.a<br>隐式转换修饰符implicit可以修饰class，method，变量，object。</p>
+<p>修饰方法和变量的隐式转换本文已经介绍过，就不继续说了。</p>
+<p>修饰class的隐式转换，它的作用跟修饰method的隐式转换类似：</p>
+<p>implicit class RangeMarker(val start: Int) {<br>    def –&gt;(end: Int) = start to end<br>}</p>
+<p>1 –&gt; 10 // Range(1, 10)<br>上段代码可以改造成使用Value Class完成类的隐式转换：</p>
+<p>implicit class RangeMaker(start: Int) extends AnyVal {<br>    def –&gt;(end: Int) = start to end<br>}<br>修饰object的隐式转换：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Calculate</span>[<span class="type">T</span>] </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">T</span>, y: <span class="type">T</span>): <span class="type">T</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="class"><span class="keyword">object</span> <span class="title">IntCal</span> <span class="keyword">extends</span> <span class="title">Calculate</span>[<span class="type">Int</span>] </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x + y</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="class"><span class="keyword">object</span> <span class="title">ListCal</span> <span class="keyword">extends</span> <span class="title">Calculate</span>[<span class="type">List</span>[<span class="type">Int</span>]] </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">List</span>[<span class="type">Int</span>], y: <span class="type">List</span>[<span class="type">Int</span>]): <span class="type">List</span>[<span class="type">Int</span>] = x ::: y</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">implicitObjMethod</span></span>[<span class="type">T</span>](x: <span class="type">T</span>, y: <span class="type">T</span>)(<span class="keyword">implicit</span> cal: <span class="type">Calculate</span>[<span class="type">T</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(x + <span class="string">" + "</span> + y + <span class="string">" = "</span> + cal.add(x, y))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">implicitObjMethod(<span class="number">1</span>, <span class="number">2</span>) <span class="comment">// 1 + 2 = 3</span></span><br><span class="line">implicitObjMethod(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>), <span class="type">List</span>(<span class="number">3</span>, <span class="number">4</span>)) <span class="comment">// List(1, 2) + List(3, 4) = List(1, 2, 3, 4)</span></span><br></pre></td></tr></table></figure></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Scala/">Scala</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Scala/">Scala</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2017/05/15/Scala隐式转换和隐式参数/" data-title="Scala隐式转换和隐式参数 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2017/05/12/Spark如何处理异常/"  title="Spark如何处理异常">
+ <strong>下一篇：</strong><br/> 
+ <span>Spark如何处理异常
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式转换规则"><span class="toc-number">2.</span> <span class="toc-text">隐式转换规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#标记规则-Marking-Rule"><span class="toc-number">2.1.</span> <span class="toc-text">标记规则(Marking Rule)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#作用域规则-Scope-Rule"><span class="toc-number">2.2.</span> <span class="toc-text">作用域规则(Scope Rule)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一次编译只隐式转换一次-One-at-a-time-Rule"><span class="toc-number">2.3.</span> <span class="toc-text">一次编译只隐式转换一次(One-at-a-time Rule)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式转换类型"><span class="toc-number">3.</span> <span class="toc-text">隐式转换类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式转换成正确的类型"><span class="toc-number">3.1.</span> <span class="toc-text">隐式转换成正确的类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法调用的隐式转换"><span class="toc-number">3.2.</span> <span class="toc-text">方法调用的隐式转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#隐式参数"><span class="toc-number">4.</span> <span class="toc-text">隐式参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-number">5.</span> <span class="toc-text">其他</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

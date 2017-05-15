@@ -84,19 +84,6 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">
-  
-
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished">2016-03-23</time>
-
-
-    <h1 itemprop="name">Java IO</h1>
-
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
     <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">
   
 
@@ -104,6 +91,19 @@
 
 
     <h1 itemprop="name">Java中一个线程可以多次start吗?</h1>
+
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">
+  
+
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished">2016-03-23</time>
+
+
+    <h1 itemprop="name">Java IO</h1>
 
   </a>
 </section>
@@ -146,7 +146,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
 		
 		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
 		
@@ -275,7 +275,42 @@ var _hmt = _hmt || [];
 
     </body>
    </html>
-="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
 <script src="/fancybox/jquery.fancybox.pack.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){ 

@@ -81,84 +81,36 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/05/Http-Servlet汇总/" title="Http Servlet汇总" itemprop="url">Http Servlet汇总</a>
+      <a href="/2016/08/23/Hive中order-by-sort-by-distribute-by-cluster-by的区别/" title="Hive中order by,sort by,distribute by,cluster by的区别" itemprop="url">Hive中order by,sort by,distribute by,cluster by的区别</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> Published 2016-04-05</time>
+    <time datetime="2016-08-23T01:25:20.000Z" itemprop="datePublished"> Published 2016-08-23</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-servlet/" title="Servlet 工作原理解析" target="_blank" rel="external">Servlet 工作原理解析</a></p>
-<p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-jetty/" title="Jetty 的工作原理以及与 Tomcat 的比较" target="_blank" rel="external">Jetty 的工作原理以及与 Tomcat 的比较</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/03/https是如何确保安全的/" title="https是如何确保安全的" itemprop="url">https是如何确保安全的</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> Published 2016-04-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="https是如何确保安全的"><a href="#https是如何确保安全的" class="headerlink" title="https是如何确保安全的"></a>https是如何确保安全的</h1><h2 id="什么是Https"><a href="#什么是Https" class="headerlink" title="什么是Https"></a>什么是Https</h2><p>HTTPS（全称：Hypertext Transfer Protocol over Secure Socket Layer），是以安全为目标的HTTP通道，简单讲是HTTP的安全版。即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL</p>
-<h2 id="Https的作用"><a href="#Https的作用" class="headerlink" title="Https的作用"></a>Https的作用</h2><p>内容加密 建立一个信息安全通道，来保证数据传输的安全；<br>身份认证 确认网站的真实性<br>数据完整性 防止内容被第三方冒充或者篡改</p>
-<h2 id="Https的劣势"><a href="#Https的劣势" class="headerlink" title="Https的劣势"></a>Https的劣势</h2><p>对数据进行加解密决定了它比http慢<br>需要进行非对称的加解密，且需要三次握手。首次连接比较慢点，当然现在也有很多的优化。</p>
-<p>出于安全考虑，浏览器不会在本地保存HTTPS缓存。实际上，只要在HTTP头中使用特定命令，HTTPS是可以缓存的。Firefox默认只在内存中缓存HTTPS。但是，只要头命令中有Cache-Control: Public，缓存就会被写到硬盘上。 IE只要http头允许就可以缓存https内容，缓存策略与是否使用HTTPS协议无关。</p>
-<h2 id="HTTPS和HTTP的区别"><a href="#HTTPS和HTTP的区别" class="headerlink" title="HTTPS和HTTP的区别"></a>HTTPS和HTTP的区别</h2><p>https协议需要到CA申请证书。<br>http是超文本传输协议，信息是明文传输；https 则是具有安全性的ssl加密传输协议。<br>http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。<br>http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
-<h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><ul>
-<li>为什么要有数字证书？</li>
-</ul>
-<p>对于请求方来说，它怎么能确定它所得到的公钥一定是从目标主机那里发布的，而且没有被篡改过呢？亦或者请求的目标主机本本身就从事窃取用户信息的不正当行为呢？这时候，我们需要有一个权威的值得信赖的第三方机构(一般是由政府审核并授权的机构)来统一对外发放主机机构的公钥，只要请求方这种机构获取公钥，就避免了上述问题的发生。</p>
-<h2 id="SSL、TLS的握手过程"><a href="#SSL、TLS的握手过程" class="headerlink" title="SSL、TLS的握手过程"></a>SSL、TLS的握手过程</h2><p>SSL与TLS握手整个过程如下图所示，下面会详细介绍每一步的具体内容：<br><img src="https://segmentfault.com/image?src=http://sean-images.qiniudn.com/tls-ssl.svg&amp;objectId=1190000002554673&amp;token=ec9df05ae1ad4ca98daa795a168ea462" alt="握手"></p>
-<p>现在的https基本都使用TLS了，因为更加安全.</p>
-<p>SSL协议在握手阶段使用的是非对称加密，在传输阶段使用的是对称加密，也就是说在SSL上传送的数据是使用对称密钥加密的！因为非对称加密的速度缓慢，耗费资源。其实当客户端和主机使用非对称加密方式建立连接后，客户端和主机已经决定好了在传输过程使用的对称加密算法和关键的对称加密密钥，由于这个过程本身是安全可靠的，也即对称加密密钥是不可能被窃取盗用的，因此，保证了在传输过程中对数据进行对称加密也是安全可靠的，因为除了客户端和主机之外，不可能有第三方窃取并解密出对称加密密钥！如果有人窃听通信，他可以知道双方选择的加密方法，以及三个随机数中的两个。整个通话的安全，只取决于第三个随机数（Premaster secret）能不能被破解。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>https实际就是在TCP层与http层之间加入了SSL/TLS来为上层的安全保驾护航，主要用到对称加密、非对称加密、证书，等技术进行客户端与服务器的数据加密传输，最终达到保证整个通信的安全性。</p>
-<p>流程:<br>前提：CA证书<br>握手阶段: 生成随机数 + 数据摘要 + 数字签名 + 非对称加密算法 ==&gt; 对称机密的密钥<br>数据传输阶段： 基于对称加密密钥的交流</p>
+        <p>转自：<a href="http://blog.csdn.net/lzm1340458776/article/details/43306115" target="_blank" rel="external">http://blog.csdn.net/lzm1340458776/article/details/43306115</a></p>
+<h2 id="order-by"><a href="#order-by" class="headerlink" title="order by"></a>order by</h2><p>order by会对输入做<strong>全局排序</strong>，因此<strong>只有一个Reducer</strong>(多个Reducer无法保证全局有序)，然而只有一个Reducer，会导致当输入规模较大时，消耗较长的计算时间。关于order by的详细介绍请参考这篇文章：Hive Order by操作。</p>
+<h2 id="sort-by"><a href="#sort-by" class="headerlink" title="sort by"></a>sort by</h2><p>sort by不是全局排序，其在数据进入reducer前完成排序，因此，如果用sort by进行排序，并且<strong>设置mapred.reduce.tasks&gt;1，则sort by只会保证每个reducer的输出有序</strong>，并不保证全局有序。sort by不同于order by，它不受hive.mapred.mode属性的影响，sort by的数据只能保证在同一个reduce中的数据可以按指定字段排序。使用sort by你可以指定执行的reduce个数(通过set mapred.reduce.tasks=n来指定)，对输出的数据再执行归并排序，即可得到全部结果。</p>
+<h2 id="distribute-by"><a href="#distribute-by" class="headerlink" title="distribute by"></a>distribute by</h2><p><strong>distribute by是控制在map端如何拆分数据给reduce端的</strong>。hive会根据distribute by后面列，对应reduce的个数进行分发，默认是采用hash算法。sort by为每个reduce产生一个排序文件。在有些情况下，你需要控制某个特定行应该到哪个reducer，这通常是为了进行后续的聚集操作。distribute by刚好可以做这件事。因此，distribute by经常和sort by配合使用。</p>
+<p>注：Distribute by和sort by的使用场景</p>
+<ol>
+<li><p>Map输出的文件大小不均。</p>
+</li>
+<li><p>Reduce输出文件大小不均。</p>
+</li>
+<li><p>小文件过多。</p>
+</li>
+<li><p>文件超大。</p>
+</li>
+</ol>
+<h2 id="cluster-by"><a href="#cluster-by" class="headerlink" title="cluster by"></a>cluster by</h2><p>cluster by除了具有distribute by的功能外还兼具sort by的功能。但是排序只能是倒叙排序，不能指定排序规则为ASC或者DESC。</p>
+<p>Demo：<br>根据年份和气温对气象数据进行排序，以确保所具有相同年份的行最终都在一个reduce分区中。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">hive (hive)&gt; select * from temperature distribute by year sort by year asc,tempra desc;  </span><br><span class="line">//MapReduce...  </span><br><span class="line">Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 2  </span><br><span class="line">//MapReduce...  </span><br><span class="line">OK  </span><br><span class="line">year    tempra  </span><br><span class="line">2008    35`C  </span><br><span class="line">2008    32.5`C  </span><br><span class="line">2008    31`C  </span><br><span class="line">2008    31.5`C  </span><br><span class="line">2008    30`C  </span><br><span class="line">2015    41`C  </span><br><span class="line">2015    39`C  </span><br><span class="line">2015    37`C  </span><br><span class="line">2015    36`C  </span><br><span class="line">2015    35`C  </span><br><span class="line">2015    33`C  </span><br><span class="line">Time taken: 17.358 seconds</span><br></pre></td></tr></table></figure></p>
 
         
         
@@ -171,13 +123,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Hive/">Hive</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Https/">Https</a>
+  <span></span> <a href="/tags/Hive/">Hive</a>
   </div>
 
 </div>
@@ -205,27 +157,297 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/03/如何定位消耗CPU最多的线程/" title="如何定位消耗CPU最多的线程" itemprop="url">如何定位消耗CPU最多的线程</a>
+      <a href="/2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/" title="Dropwizard--非常棒的Java REST服务器栈" itemprop="url">Dropwizard--非常棒的Java REST服务器栈</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-03T11:24:27.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    <time datetime="2016-08-11T03:57:38.000Z" itemprop="datePublished"> Published 2016-08-11</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p>#如何定位消耗CPU最多的线程</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">                        <span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                        <span class="keyword">try</span>&#123;</span><br><span class="line">                                                Thread.sleep(<span class="number">100000</span>);</span><br><span class="line">                                        &#125;<span class="keyword">catch</span>(Exception e)&#123;&#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;.start();</span><br><span class="line">                &#125;</span><br><span class="line">                Thread t=<span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                <span class="keyword">int</span> i=<span class="number">0</span>;</span><br><span class="line">                                <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                                        i=(i++)/<span class="number">100</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;;</span><br><span class="line">                t.setName(<span class="string">"Busiest Thread"</span>);</span><br><span class="line">                t.start();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个例子里新创建了11个线程，其中10个线程没干什么事，主要是sleep，另外有一个线程在循环里一直跑着，可以想象这个线程是这个进程里最耗cpu的线程了，那怎么把这个线程给抓出来呢？</p>
-<p>首先我们可以通过<figure class="highlight plain"><figcaption><span>-Hp <pid>```来看这个进程里所有线程的cpu消耗情况，得到类似下面的数据</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ top -Hp 18207</span><br><span class="line">top - 19:11:43 up 573 days,  2:43,  2 users,  load average: 3.03, 3.03, 3.02</span><br><span class="line">Tasks:  44 total,   1 running,  43 sleeping,   0 stopped,   0 zombie</span><br><span class="line">Cpu(s): 18.8%us,  0.0%sy,  0.0%ni, 81.1%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st</span><br><span class="line">Mem:  99191752k total, 98683576k used,   508176k free,   128248k buffers</span><br><span class="line">Swap:  1999864k total,   191064k used,  1808800k free, 17413760k cached</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br><span class="line">18207 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18208 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.09 java Test</span><br><span class="line">18209 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18210 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18211 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18212 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18213 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18214 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18215 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18216 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18217 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18218 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18219 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18220 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18221 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18222 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18223 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18224 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18225 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18226 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18227 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br></pre></td></tr></table></figure></p>
-<p>拿到这个结果之后，我们可以看到cpu最高的线程是pid为18250的线程，占了99.8%：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br></pre></td></tr></table></figure></p>
-<p>接着我们可以通过<figure class="highlight plain"><figcaption><span><pid>```的输出来看各个线程栈:</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ jstack 18207</span><br><span class="line">2016-03-30 19:12:23</span><br><span class="line">Full thread dump OpenJDK 64-Bit Server VM (25.66-b60 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;Attach Listener&quot; #30 daemon prio=9 os_prio=0 tid=0x00007fb90be13000 nid=0x47d7 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;DestroyJavaVM&quot; #29 prio=5 os_prio=0 tid=0x00007fb96245b800 nid=0x4720 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br><span class="line"></span><br><span class="line">&quot;Thread-9&quot; #27 prio=5 os_prio=0 tid=0x00007fb91498c800 nid=0x4749 waiting on condition [0x00007fb906bfe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-8&quot; #26 prio=5 os_prio=0 tid=0x00007fb91498b800 nid=0x4748 waiting on condition [0x00007fb906ffe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-7&quot; #25 prio=5 os_prio=0 tid=0x00007fb91498b000 nid=0x4747 waiting on condition [0x00007fb9073fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-6&quot; #24 prio=5 os_prio=0 tid=0x00007fb91498a000 nid=0x4746 waiting on condition [0x00007fb9077fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<p>上面的线程栈我们注意到nid的值其实就是线程ID，它是十六进制的，我们将消耗cpu最高的线程18250，转成十六进制0X47A，然后从上面的线程栈里找到nid=0X47A的线程，其栈为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br></pre></td></tr></table></figure></p>
-<p>即将最耗cpu的线程找出来了，是Businest Thread</p>
+        <h2 id="什么是Dropwizard？"><a href="#什么是Dropwizard？" class="headerlink" title="什么是Dropwizard？"></a>什么是Dropwizard？</h2><p>Dropwizard 是一个开源的Java框架，用于开发OPS友好、高性能的基于REST的后端。它是由Yammer开发的，来驱动基于JVM的后端。</p>
+<p>Dropwizard提供同类最佳的Java库到一个嵌入式应用程序包。它由以下部分组成：</p>
+<ol>
+<li>嵌入式Jetty：每一个应用程序被打包成一个jar（而不是war）文件，并开始自己的嵌入式Jetty容器。没有任何war文件和外部servlet容器。</li>
+<li>JAX-RS：Jersey（JAX-RS的参考实现）是用来写基于REST的Web服务的。</li>
+<li>JSON：REST服务用的是JSON，Jackson库用来做所有的JSON处理。</li>
+<li>日志：使用Logback和SLF4J完成。</li>
+<li>Hibernate验证：Dropwizard使用Hibernate验证API进行声明性验证。</li>
+<li>指标：Dropwizard支持监控使用标准库，它在监控代码方面有无与伦比的洞察力。</li>
+</ol>
+<p>除了上面提到的这几个，Dropwizard还使用了一些其他的库，你可以在这里找到<a href="http://dropwizard.codahale.com/getting-started/" target="_blank" rel="external">完整的列表</a>。</p>
+<h2 id="为什么是Dropwizard？"><a href="#为什么是Dropwizard？" class="headerlink" title="为什么是Dropwizard？"></a>为什么是Dropwizard？</h2><p>我决定学Dropwizard的原因有以下几点：</p>
+<ol>
+<li>快速的项目引导：如果你已经在使用Spring和Java EE，你就会明白开发人员在引导项目时的痛苦。使用Dropwizard，你只需要在你的 pom.xml 文件中添加一个依赖就完成了。</li>
+<li>应用指标：Dropwizard自带应用程序指标的支持。它提供了类似请求/响应时间这种非常有用的信息，只要把@ 定时注解来获取方法的执行时间。</li>
+<li>生产力：每个Dropwizard应用程序有一个启动Jetty容器的主程序。这意味着，完全可以把应用程序作为一个主程序在IDE中运行和调试。所以就没有重新编译或部署war文件。</li>
+</ol>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p><a href="https://segmentfault.com/a/1190000000359827" target="_blank" rel="external">Dropwizard —— 非常棒的Java REST服务器栈</a></p>
+<p><a href="https://github.com/shekhargulati/day13-dropwizard-mongodb-demo-app" target="_blank" rel="external">day13-dropwizard-mongodb-demo-app</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/REST/">REST</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/REST/">REST</a><a href="/tags/Dropwizard/">Dropwizard</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/08/10/scala-mutable和immutable类型转换/" title="scala mutable和immutable类型转换" itemprop="url">scala mutable和immutable类型转换</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-08-10T01:46:12.000Z" itemprop="datePublished"> Published 2016-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>一般而言，from mutable to immutable, 使用 to<em> 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.<br>from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _</em>).</p>
+<blockquote>
+<p>Note that the to* methods like toList, toMap are is performed in constant time.</p>
+</blockquote>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> mutableMap1 = immutableMap.toMap() <span class="comment">// after 2.8</span></span><br><span class="line"><span class="keyword">val</span> mutbaleMap2 = collection.immutable.<span class="type">Map</span>(x.toList: _*) <span class="comment">// before 2.8</span></span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableMap = scala.collection.immutable.<span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="string">"1"</span>, <span class="number">2</span> -&gt; <span class="string">"2"</span>)</span><br><span class="line"><span class="keyword">val</span> mutableMap = scala.collection.mutable.<span class="type">Map</span>(immutableMap: _*)</span><br></pre></td></tr></table></figure>
+<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = mutableListBuffer.toList</span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = scala.collection.immutable.<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> mutableListBuffer = scala.collection.mutable.<span class="type">ListBuffer</span>(immutableList: _*)</span><br></pre></td></tr></table></figure>
+<p><a href="http://qiita.com/visualskyrim/items/1e92fc99fc3eaf004778" target="_blank" rel="external">参考链接</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Scala/">Scala</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/类型转换/">类型转换</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/08/04/Spark性能优化/" title="Spark性能优化" itemprop="url">Spark性能优化</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-08-04T04:33:05.000Z" itemprop="datePublished"> Published 2016-08-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>参考:<br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-1/" target="_blank" rel="external">how-to-tune-your-apache-spark-jobs-part-1</a><br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/" target="_blank" rel="external">how-to-tune-your-apache-spark-jobs-part-2</a><br><a href="http://gitlab.baidu.com/metastore/metastore_doc/blob/master/file/tuning_spark_streaming.md" target="_blank" rel="external">tuning_spark_streaming</a><br><a href="http://www.iteblog.com/archives/1333" target="_blank" rel="external">Spark Streaming性能调优详解</a></p>
+<p><a href="http://www.iteblog.com/archives/1672" target="_blank" rel="external">Spark性能优化：shuffle调优</a><br><a href="http://www.iteblog.com/archives/1671" target="_blank" rel="external">Spark性能优化：数据倾斜调优</a></p>
+<p><a href="http://www.iteblog.com/archives/1657" target="_blank" rel="external">Spark性能优化：开发调优篇</a><br><a href="https://spark-summit.org/east-2016/events/top-5-mistakes-when-writing-spark-applications/" target="_blank" rel="external">top-5-mistakes-when-writing-spark-applications</a>  强力推荐</p>
+<h2 id="一-基础说明"><a href="#一-基础说明" class="headerlink" title="一 基础说明"></a>一 基础说明</h2><ul>
+<li>job–&gt;stage–&gt;task<br>job划分为stage，stage划分为Task，一个Task运行在一个core上</li>
+<li>executor–&gt;core<br>The number of tasks in a stage is the same as the number of partitions in the last RDD in the stage. </li>
+</ul>
+<h2 id="二-Tuning-Resource-Allocation"><a href="#二-Tuning-Resource-Allocation" class="headerlink" title="二 Tuning Resource Allocation"></a>二 Tuning Resource Allocation</h2><p><a href="http://www.infoq.com/cn/presentations/gc-tuning-of-spark-application" target="_blank" rel="external">Spark应用的GC调优</a> –&gt;重点讲解了G1垃圾回收器的调优工作<br><a href="http://www.iteblog.com/archives/1659" target="_blank" rel="external">Spark性能优化：资源调优篇</a><br>Every Spark executor in an application has the same fixed number of cores and same fixed heap size.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--executor-cores/ spark.executor.cores 提交时通过该参数设置每个executor的core数量，决定了<span class="type">Task</span>的并行度</span><br><span class="line">--executor-memory/spark.executor.memory 设置executor的<span class="type">JVM</span> memory</span><br><span class="line">--num-executors/spark.executor.instances 设置executor的数量</span><br><span class="line">spark.dynamicAllocation.enabled 设置动态申请资源(value设为<span class="literal">true</span>)，此时不要设置num-executors</span><br><span class="line">spark.yarn.executor.memoryOverhead 设置堆外的memory大小</span><br></pre></td></tr></table></figure>
+<h3 id="spark-dynamicAllocation-enabled"><a href="#spark-dynamicAllocation-enabled" class="headerlink" title="spark.dynamicAllocation.enabled"></a>spark.dynamicAllocation.enabled</h3><p>executor空闲超时后，会被移除<br>对于Spark Streaming，数据按时间段到达，为了防止executor频繁出现添加移除现象，应该禁用该功能。</p>
+<h3 id="内存格局"><a href="#内存格局" class="headerlink" title="内存格局"></a>内存格局</h3><p><img src="http://blog.cloudera.com/wp-content/uploads/2015/03/spark-tuning2-f1.png" alt="enter image description here"></p>
+<p>说明:</p>
+<ul>
+<li><p>The application master, which is a non-executor container with the special capability of requesting containers from YARN, takes up resources of its own that must be budgeted in. In yarn-client mode, it defaults to a 1024MB and one vcore. In yarn-cluster mode, the application master runs the driver, so it’s often useful to bolster its resources with the –driver-memory and –driver-cores properties.</p>
+</li>
+<li><p>Running executors with too much memory often results in excessive garbage collection delays. 64GB is a rough guess at a good upper limit for a single executor.最多4G内存，防止GC压力过大。</p>
+</li>
+<li><p>I’ve noticed that the HDFS client has trouble with tons of concurrent threads. A rough guess is that at most five tasks per executor can achieve full write throughput, so it’s good to keep the number of cores per executor below that number. 最多5个Task可以同时达到最高的HDFS写入带宽</p>
+</li>
+<li><p>Running tiny executors (with a single core and just enough memory needed to run a single task, for example) throws away the benefits that come from running multiple tasks in a single JVM. For example, broadcast variables need to be replicated once on each executor, so many small executors will result in many more copies of the data.</p>
+</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h3><p>保留内存和core给hadoop ，yarn等系统运行</p>
+<h3 id="Slimming-Down-Your-Data-Structures"><a href="#Slimming-Down-Your-Data-Structures" class="headerlink" title="Slimming Down Your Data Structures"></a>Slimming Down Your Data Structures</h3><p>定制序列化方法,减少序列化后的存储占用<br>spark.serializer=org.apache.spark.serializer.KryoSerializer</p>
+<h2 id="三-Tuning-Parallelism"><a href="#三-Tuning-Parallelism" class="headerlink" title="三 Tuning Parallelism"></a>三 Tuning Parallelism</h2><p>分区过少时，Task数量有限，无法充分利用机器资源。<br>方法:</p>
+<ul>
+<li>Use the repartition transformation, which will trigger a shuffle.</li>
+<li>Configure your InputFormat to create more splits.</li>
+<li>Write the input data out to HDFS with a smaller block size.</li>
+</ul>
+<h3 id="3-1-参数spark-default-parallelism"><a href="#3-1-参数spark-default-parallelism" class="headerlink" title="3.1 参数spark.default.parallelism"></a>3.1 参数spark.default.parallelism</h3><p>参数说明：该参数用于设置每个stage的默认task数量。这个参数极为重要，如果不设置可能会直接影响你的Spark作业性能。</p>
+<p>　　参数调优建议：Spark作业的默认task数量为500~1000个较为合适。很多同学常犯的一个错误就是不去设置这个参数，那么此时就会导致Spark自己根据底层HDFS的block数量来设置task的数量，默认是一个HDFS block对应一个task。通常来说，Spark默认设置的数量是偏少的（比如就几十个task），如果task数量偏少的话，就会导致你前面设置好的Executor的参数都前功尽弃。</p>
+<h2 id="减少shuffle以及shuffle的数据量"><a href="#减少shuffle以及shuffle的数据量" class="headerlink" title="减少shuffle以及shuffle的数据量"></a>减少shuffle以及shuffle的数据量</h2><ul>
+<li><p>操作<strong>repartition</strong> , <strong>join</strong>, <strong>cogroup</strong>, and any of the <strong>*By</strong> or <strong>*ByKey</strong> transformations can result in shuffles. </p>
+</li>
+<li><p>Avoid <strong>groupByKey</strong> when performing an associative reductive operation. For example, <strong>rdd.groupByKey().mapValues(_.sum)</strong> will produce the same results as <strong>rdd.reduceByKey(<em> + </em>)</strong><br>However, the former will transfer the entire dataset across the network, while the latter will compute local sums for each key in each partition and combine those local sums into larger sums after shuffling.<br><img src="http://www.iteblog.com/pic/reduce_by.png" alt="enter image description here"><br><img src="http://www.iteblog.com/pic/group_by.png" alt="enter image description here"><br>以下函数应该优先于 groupByKey ：</p>
+</li>
+</ul>
+<ol>
+<li>combineByKey组合数据，但是组合之后的数据类型与输入时值的类型不一样。</li>
+<li>foldByKey 合并每一个 key 的所有值，在级联函数和“零值”中使用。</li>
+</ol>
+<ul>
+<li>Avoid <strong>reduceByKey</strong> When the input and output value types are different. <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map(kv =&gt; (kv._1, <span class="keyword">new</span> <span class="type">Set</span>[<span class="type">String</span>]() + kv._2))</span><br><span class="line">    .reduceByKey(_ ++ _)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>This code results in tons of unnecessary object creation because a new set must be allocated for each record. It’s better to use aggregateByKey, which performs the map-side aggregation more efficiently:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> zero = <span class="keyword">new</span> collection.mutable.<span class="type">Set</span>[<span class="type">String</span>]()</span><br><span class="line">rdd.aggregateByKey(zero)(</span><br><span class="line">    (set, v) =&gt; set += v,</span><br><span class="line">    (set1, set2) =&gt; set1 ++= set2)</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>Avoid the <code>flatMap-join-groupBy</code> pattern. When two datasets are already grouped by key and you want to join them and keep them grouped, you can just use <code>cogroup</code>. That avoids all the overhead associated with unpacking and repacking the groups.     join数据源时直接使用<code>cogroup</code></li>
+</ul>
+<h2 id="四-shuffle不发生的情况"><a href="#四-shuffle不发生的情况" class="headerlink" title="四 shuffle不发生的情况"></a>四 shuffle不发生的情况</h2><ul>
+<li>两个数据源进行join时，已经进行group分组后，如果分组时使用的是同样的partitioner，那么进行join时是不需要进行shuffle的。</li>
+<li>当数据量较少时，使用广播变量，不需要shuffle</li>
+</ul>
+<h2 id="When-More-Shuffles-are-Better"><a href="#When-More-Shuffles-are-Better" class="headerlink" title="When More Shuffles are Better"></a>When More Shuffles are Better</h2><p>当数据partition较少，数据量较大时，进行shuffle可以提高partition数量，提高并行度，从而达到提高效率的目的。</p>
+<h2 id="五-RDD"><a href="#五-RDD" class="headerlink" title="五 RDD"></a>五 RDD</h2><p><a href="http://www.iteblog.com/archives/1657" target="_blank" rel="external">Spark性能优化：开发调优篇</a></p>
+<ul>
+<li>原则一：避免创建重复的RDD</li>
+<li>原则二：尽可能复用同一个RDD</li>
+<li>原则三：对多次使用的RDD进行持久化  cache persist</li>
+<li>原则四：尽量避免使用shuffle类算子  广播大变量 </li>
+<li>原则五：使用map-side预聚合的shuffle操作</li>
+<li>原则六：使用高性能的算子<ul>
+<li><strong>使用reduceByKey/aggregateByKey替代groupByKey</strong></li>
+<li><strong>使用mapPartitions替代普通map(mapPartitions类的算子</strong>，一次函数调用会处理一个partition所有的数据，而不是一次函数调用处理一条，性能相对来说会高一些。)</li>
+<li><strong>使用foreachPartitions替代foreach</strong>(一次函数调用处理一个partition的所有数据，而不是一次函数调用处理一条数据)</li>
+<li><strong>使用filter之后进行coalesce操作</strong>(通常对一个RDD执行filter算子过滤掉RDD中较多数据后（比如30%以上的数据），建议使用coalesce算子，手动减少RDD的partition数量，将RDD中的数据压缩到更少的partition中去。)</li>
+</ul>
+</li>
+<li>原则七：广播大变量 </li>
+<li>原则八：使用Kryo优化序列化性能</li>
+<li>原则九：优化数据结构<h2 id="5-1-不要将大型RDD中所有元素发送到Driver端"><a href="#5-1-不要将大型RDD中所有元素发送到Driver端" class="headerlink" title="5.1 不要将大型RDD中所有元素发送到Driver端"></a>5.1 不要将大型RDD中所有元素发送到Driver端</h2>慎重使用<code>collect countByKey countByValue collectAsMap</code>等函数，使用<code>take或者takeSample</code>来限制数据大小的上限</li>
+</ul>
+<h2 id="六-其他"><a href="#六-其他" class="headerlink" title="六 其他"></a>六 其他</h2><h3 id="6-1-Spark优化：禁止应用程序将依赖的Jar包传到HDFS"><a href="#6-1-Spark优化：禁止应用程序将依赖的Jar包传到HDFS" class="headerlink" title="6.1 Spark优化：禁止应用程序将依赖的Jar包传到HDFS"></a>6.1 Spark优化：禁止应用程序将依赖的Jar包传到HDFS</h3><p><a href="http://www.iteblog.com/archives/1173" target="_blank" rel="external">Spark优化：禁止应用程序将依赖的Jar包传到HDFS</a><br>编辑spark-default.conf文件，添加以下内容：<br>spark.yarn.jar=hdfs://my/home/iteblog/spark_lib/spark-assembly-1.1.0-hadoop2.2.0.jar<br>也就是使得spark.yarn.jar指向我们HDFS上的Spark lib库。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/性能优化/">性能优化</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/07/31/Java动态技术/" title="Java动态技术" itemprop="url">Java动态技术</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-07-31T09:35:10.000Z" itemprop="datePublished"> Published 2016-07-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://www.ibm.com/developerworks/cn/java/j-dyn0916/" target="_blank" rel="external">Java 编程的动态性， 第四部分: 用 Javassist 进行类转换</a></p>
 
         
         
@@ -244,7 +466,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/多线程/">多线程</a>
+  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/动态/">动态</a>
   </div>
 
 </div>
@@ -272,52 +494,43 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/Session原理、安全以及最基本的Express和Redis实现/" title="Session原理、安全以及最基本的Express和Redis实现" itemprop="url">Session原理、安全以及最基本的Express和Redis实现</a>
+      <a href="/2016/07/26/Servlet-Listener之ServletContextListener用法/" title="Servlet Listener之ServletContextListener用法" itemprop="url">Servlet Listener之ServletContextListener用法</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-07-26T13:28:46.000Z" itemprop="datePublished"> Published 2016-07-26</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Session原理、安全以及最基本的Express和Redis实现"><a href="#Session原理、安全以及最基本的Express和Redis实现" class="headerlink" title="Session原理、安全以及最基本的Express和Redis实现"></a>Session原理、安全以及最基本的Express和Redis实现</h1><h2 id="Session基础概念"><a href="#Session基础概念" class="headerlink" title="Session基础概念"></a>Session基础概念</h2><hr>
-<p>Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。</p>
-<p>HTTP协议在设计的时候是无状态的。这是一个很关键的概念，意味着服务器在处理请求的时候，并不关注这个请求是谁发来的。这对于以提供内容为核心的Web1.0，例如门户网站，非常适合。然而对于以应用服务为核心的Web 2.0而言，服务器端必须有能力从请求中提取出请求者的身份信息，以在请求者不用反复输入身份的情况下，提供连续的服务。</p>
-<p>实现请求身份验证的方式很多，其中一种广泛接受的方式是使用服务器端产生的Session ID结合浏览器的Cookie实现对Session的管理，一般来说包括以下4个步骤：</p>
+        <p>本文旨在解释JavaEE中的ServletContextListener接口及用法。 </p>
+<p>1.何时需要使用ServletContextListener？ </p>
+<p>通常我们可能有这样的需求：即在web 应用启动之前运行一些代码。例如：我们可能需要创建一个数据库连接以便web应用在任何时候都能使用它执行一些操作，并且当web应用关闭的时候能够关闭数据库连接。 </p>
+<p>2.如何实现这个需求？</p>
+<p>Java EE规范提供了一个叫ServletContextListener的接口，这个接口可以实现我们的需求。ServletContextListener监听servlet context的生命周期事件。当这个listener关联的web应用启动和关闭的时候，这个接口会收到通知。下面是javadoc对这个接口的说明：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Implementations of this interface receive notifications about changes to the servlet context of the web application they are part of. To receive notification events, the implementation class must be configured in the deployment descriptor for the web application.</span><br></pre></td></tr></table></figure></p>
+<p>如果想要监听web应用的启动，可以使用contextInitialized(ServletContextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the web application initialization process is starting. All ServletContextListeners are notified of context initialization before any filter or servlet in the web application is initialized.</span><br></pre></td></tr></table></figure></p>
+<p>如果要监听web应用的停止（关闭），用contextDestroyed(ServletCOntextEvent event)方法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Notification that the servlet context is about to be shut down. All servlets and filters have been destroy()ed before any ServletContextListeners are notified of context destruction.</span><br></pre></td></tr></table></figure></p>
+<p>如下创建一个监听器类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cruise;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextEvent;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContextListener;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyServletContextListener</span> <span class="keyword">implements</span> <span class="title">ServletContextListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextInitialized</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context initialized"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextDestroyed</span><span class="params">(ServletContextEvent event)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"context destroyed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来在web.xml文件中配置listener<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">web-app</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>com.thejavageek.MyServletContextListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>配置完成后，部署应用到tomcat服务器并启动tomcat，将会看到如下的日志。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INFO: Starting service Catalina</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.catalina.core.StandardEngine start</span><br><span class="line">INFO: Starting Servlet Engine: Apache Tomcat/6.0.35</span><br><span class="line">context initialized</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.coyote.http11.Http11Protocol start</span><br><span class="line">INFO: Starting Coyote HTTP/1.1 on http-8080</span><br><span class="line">Oct 24, 2015 10:52:04 AM org.apache.jk.common.ChannelSocket init</span><br></pre></td></tr></table></figure></p>
 <ol>
-<li>服务器端的产生Session ID</li>
-<li>服务器端和客户端存储Session ID</li>
-<li>从HTTP Header中提取Session ID</li>
-<li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
+<li><p>继承thread<br>``` java<br>public class ThreadListener extends Thread implements ServletContextListener {</p>
+<p> public void contextInitialized(ServletContextEvent event) {</p>
+<pre><code>super.start();
+</code></pre><p> }</p>
+<p> public void contextDestroyed(ServletContextEvent event) {</p>
+<pre><code>super.stop();
+</code></pre><p> }</p>
+<p> @override<br> public void run(){</p>
+<p> }</p>
+</li>
 </ol>
-<p><img src="https://segmentfault.com/img/bVlcpM" alt="enter image description here"></p>
-<p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
-<p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
-<h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
-<p>Redis是一个非常适合用于Session管理的数据库。第一，它的结构简单，key-value的形式非常符合SessionID-UserID的存储；第二，读写速度非常快；第三，自身支持数据自动过期和清除；第四，语法、部署非常简单。基于以上原因，很多Session管理都是基于Redis实现的。</p>
-<h2 id="Session的安全问题"><a href="#Session的安全问题" class="headerlink" title="Session的安全问题"></a>Session的安全问题</h2><hr>
-<p>SessionId就如同请求者的身份证，一旦被攻击者恶意获得，攻击者便可以伪装成请求者对服务器发起请求，也就是我们经常听到的会话劫持(Session/Cookie Hijack)<br>关于会话劫持的原理推荐大家去看<a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">这篇文章</a></p>
-<p>基于上述实现方法的Session管理，我认为基本上可以排除</p>
-<ul>
-<li>暴力破解SessionId</li>
-<li>恶意植入固定SessionId</li>
-</ul>
-<p>两种可能，因为uid的库基本上可以保证SessionId的随机性；而传递SessionId则依赖HTTP请求头中的Cookie信息而非URL，同时在用户登录立刻更换SessionId。</p>
-<p>唯一的可能性来源于Session的监听，而对于这种攻击有效的两种防止办法是：</p>
-<ul>
-<li>Https<br>很多网站仅仅在Login的阶段使用Https防止用户的用户名、密码信息被监听者获取，但是随后的SessionId同样有可能被监听者获取而伪造登录者的身份信息。因此更加推荐的方式是所有的信息传递全部使用Https实现，这样即使监听着截获了信息也无法破解其中的内容。关于如何使用NodeJS建立一个HTTPS的server可以参考《HTTPS的原理和NodeJS的实现》 这篇文章</li>
-<li>httpOnly<br>Express在options中提供了httpOnly的属性，此属性默认值为true，这个属性保证了Cookie的信息不能够通过JavaScript脚本获取。</li>
-</ul>
-<p>参考:</p>
-<ol>
-<li><a href="https://segmentfault.com/a/1190000002630691" target="_blank" rel="external">https://segmentfault.com/a/1190000002630691</a></li>
-<li><a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">http://devco.re/blog/2014/06/03/http-session-protection/</a></li>
-</ol>
+<p>}</p>
+<p>``` </p>
 
         
         
@@ -336,7 +549,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -364,34 +577,29 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
+      <a href="/2016/07/22/WebHDFS与HttpFS的使用/" title="WebHDFS与HttpFS的使用" itemprop="url">WebHDFS与HttpFS的使用</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-07-22T13:49:24.000Z" itemprop="datePublished"> Published 2016-07-22</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
-<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
-<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
-<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
-<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
-<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
-<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
-<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
-<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
-<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
-<p>参考：</p>
-<ul>
-<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
-<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
-</ul>
+        <h2 id="WebHDFS与HttpFS的使用"><a href="#WebHDFS与HttpFS的使用" class="headerlink" title="WebHDFS与HttpFS的使用"></a>WebHDFS与HttpFS的使用</h2><h2 id="WebHDFS"><a href="#WebHDFS" class="headerlink" title="WebHDFS"></a>WebHDFS</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>提供HDFS的RESTful接口，可通过此接口进行HDFS文件操作。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>WebHDFS服务内置在HDFS中，不需额外安装、启动。</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>需要在hdfs-site.xml打开WebHDFS开关，此开关默认打开。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.webhdfs.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>连接NameNode的50070端口进行文件操作。</p>
+<p>比如：<figure class="highlight plain"><figcaption><span>"http://ctrl:50070/webhdfs/v1/?op=liststatus&user.name=root" | python -mjson.tool```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 更多操作</span><br><span class="line">参考文档：[官方WebHDFS REST API](https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)</span><br><span class="line"></span><br><span class="line">## HttpFS(Hadoop HDFS over HTTP)</span><br><span class="line"></span><br><span class="line">### 介绍</span><br><span class="line"></span><br><span class="line">HttpFS is a server that provides a REST HTTP gateway supporting all HDFS File System operations (read and write). And it is inteoperable with the webhdfs REST HTTP API.</span><br><span class="line"></span><br><span class="line">### 安装</span><br><span class="line"></span><br><span class="line">Hadoop自带，不需要额外安装。默认服务未启动，需要手工启动。</span><br><span class="line"></span><br><span class="line">### 配置</span><br><span class="line"></span><br><span class="line">- httpfs-site.xml</span><br><span class="line">有配置文件httpfs-site.xml，此配置文件一般保存默认即可，无需修改。</span><br><span class="line"></span><br><span class="line">- hdfs-site.xml</span><br><span class="line">需要增加如下配置，其他两个参数名称中的root代表的是启动hdfs服务的OS用户，应以实际的用户名称代替。</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;  </span><br><span class="line">    &lt;name&gt;hadoop.proxyuser.root.hosts&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;  </span><br><span class="line">&lt;property&gt;  </span><br><span class="line">&lt;name&gt;hadoop.proxyuser.root.groups&lt;/name&gt;  </span><br><span class="line">    &lt;value&gt;*&lt;/value&gt;  </span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sbin/httpfs.sh start</span><br><span class="line">sbin/httpfs.sh stop</span><br></pre></td></tr></table></figure>
+<p>启动后，默认监听14000端口：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@ctrl sbin]<span class="comment"># netstat -antp | grep 14000</span></span><br><span class="line">tcp        <span class="number">0</span>      <span class="number">0</span> :::<span class="number">14000</span>   :::*       LISTEN      <span class="number">7415</span>/java</span><br><span class="line">[root@ctrl sbin]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><p>curl “<a href="http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root" target="_blank" rel="external">http://ctrl:14000/webhdfs/v1/?op=liststatus&amp;user.name=root</a>“ | python -mjson.tool</p>
+<h3 id="更多操作"><a href="#更多操作" class="headerlink" title="更多操作"></a>更多操作</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p>更多操作：<br><a href="https://hadoop.apache.org/docs/r2.4.1/hadoop-project-dist/hadoop-hdfs/WebHDFS.html" target="_blank" rel="external">官方WebHDFS REST API</a><br><a href="http://hadoop.apache.org/docs/r2.4.1/hadoop-hdfs-httpfs/index.html" target="_blank" rel="external">HttpFS官方文档</a></p>
+<h3 id="WebHDFS与HttpFS的关系"><a href="#WebHDFS与HttpFS的关系" class="headerlink" title="WebHDFS与HttpFS的关系"></a>WebHDFS与HttpFS的关系</h3><p>WebHDFS vs HttpFs Major difference between WebHDFS and HttpFs: WebHDFS needs access to all nodes of the cluster and when some data is read it is transmitted from that node directly, whereas in HttpFs, a singe node will act similar to a “gateway” and will be a single point of data transfer to the client node. So, HttpFs could be choked during a large file transfer but the good thing is that we are minimizing the footprint required to access HDFS.</p>
 
         
         
@@ -404,13 +612,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/HDFS/">HDFS</a><a href="/tags/Hadoop/">Hadoop</a>
   </div>
 
 </div>
@@ -438,75 +646,34 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/HTTP Session 攻击与防护/" title="HTTP Session 攻击与防护" itemprop="url">HTTP Session 攻击与防护</a>
+      <a href="/2016/06/14/Spring-scheduled注解执行定时任务/" title="Spring @scheduled注解执行定时任务" itemprop="url">Spring @scheduled注解执行定时任务</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-06-14T02:30:29.000Z" itemprop="datePublished"> Published 2016-06-14</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="HTTP-Session-攻击与防护"><a href="#HTTP-Session-攻击与防护" class="headerlink" title="HTTP Session 攻击与防护"></a>HTTP Session 攻击与防护</h1><h2 id="Cookie的基本概念"><a href="#Cookie的基本概念" class="headerlink" title="Cookie的基本概念"></a>Cookie的基本概念</h2><hr>
-<p>Cookie 是网站在浏览器中存放的資料，內容包括使用者在网站上的偏好設定、或者是登入的 Session ID。网站利用 Session ID 來辨认访客的身份。</p>
-<p>当用户访问某一站点时，浏览器会根据用户访问的站点自动搜索可用的cookie，如果有可用的就随着请求一起发送到了服务端。每次接收到服务端的响应时又会更新本地的cookie信息。</p>
-<p>客户端和服务端的这种联系必然是需要有时间的规定的，所以需要定期清除session。这个问题就需要在两方面考虑了，一个是清除服务端session文件，一个是清除客户端的cookie信息，因为两者都各保存着一半的信息。</p>
-<p>Cookie 既然存放在 Client 端，那就有被窃取的風險。例如透過 <a href="https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29" target="_blank" rel="external">Cross-Site Scripting（跨站腳本共计，又稱 XSS）</a>，攻击者可以輕易窃取受害者的 Cookie。如果 Cookie 被偷走了，你的身份就被窃取了。</p>
-<p>Session 共计手法有三種：</p>
-<ul>
-<li>猜测 Session ID (Session Prediction)</li>
-<li>窃取 Session ID (Session Hijacking)</li>
-<li>固定 Session ID (Session Fixation)</li>
-</ul>
-<h2 id="Session-Prediction-猜测-Session-ID"><a href="#Session-Prediction-猜测-Session-ID" class="headerlink" title="Session Prediction (猜测 Session ID)"></a>Session Prediction (猜测 Session ID)</h2><p>Session ID 如同我們前面所說的，就如同是會員卡的编号。只要知道 Session ID，就可以成為這個使用者。如果 Session ID 的长度、复杂度、杂乱度不夠，就能夠被攻击者猜测。攻击者只要寫程序不斷暴力計算 Session ID，就有機會得到有效的 Session ID 而窃取使用者帳號。</p>
-<p>分析 Session ID 的工具可以用以下幾種</p>
-<p><a href="https://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" target="_blank" rel="external">OWASP WebScarab</a><br><a href="http://lcamtuf.coredump.cx/soft/stompy.tgz" target="_blank" rel="external">Stompy</a><br><a href="http://portswigger.net/burp/" target="_blank" rel="external">Burp Suite</a></p>
-<p>观察 Session ID 的亂數分布，可以了解是否能夠推出規律、猜测有效的 Session ID。</p>
-<h3 id="防护措施"><a href="#防护措施" class="headerlink" title="防护措施"></a>防护措施</h3><p>使用 Session ID 分析程序進行分析，評估是否无法被預測。如果沒有 100% 的把握自己撰寫的 Session ID 產生機制是安全的，不妨使用內建的 Session ID 產生 function，通常都有一定程度的安全。</p>
-<h2 id="Session-Hijacking-窃取-Session-ID"><a href="#Session-Hijacking-窃取-Session-ID" class="headerlink" title="Session Hijacking (窃取 Session ID)"></a>Session Hijacking (窃取 Session ID)</h2><p>窃取 Session ID 是最常見的共计手法。攻击者可以利用多種方式窃取 Cookie 獲取 Session ID：</p>
-<ul>
-<li>跨站腳本攻击 (Cross-Site Scripting (XSS))：利用 XSS 漏洞窃取使用者 Cookie</li>
-<li>网路窃听：使用 ARP Spoofing 等手法窃听网路封包獲取 Cookie<br>透過 Referer 取得：若网站允許 Session ID 使用 URL 传输，便可能從 Referer 取得 Session ID</li>
-</ul>
-<p>窃取利用的方式如下圖：</p>
-<p>受害者已經登入网站伺服器，並且取得 Session ID，在連線過程中攻击者用窃听的方式獲取受害者 Session ID。攻击者直接使用窃取到的 Session ID 送至伺服器，偽造受害者身分。若伺服器沒有檢查 Session ID 的使用者身分，則可以让攻击者得逞。<br><img src="https://lh3.googleusercontent.com/-glmPtR_Erp0/U3VCmo0w9yI/AAAAAAAAAZk/4rP1hOOC5W8/w600-no/2014-05-16-http-session-protection-01-session-id-sniffing.png" alt="enter image description here"></p>
-<p><img src="https://lh3.googleusercontent.com/--Si53ercaV0/U3VCmfP_ZKI/AAAAAAAAAZg/-Dirb4AYKGk/w600/2014-05-16-http-session-protection-02-session-id-spoofing.png" alt="enter image description here"></p>
-<h3 id="防护措施-1"><a href="#防护措施-1" class="headerlink" title="防护措施"></a>防护措施</h3><ul>
-<li>禁止將 Session ID 使用 URL (GET) 方式來传输</li>
-<li>設定加強安全性的 Cookie 属性：HttpOnly (无法被 JavaScript 存取)</li>
-<li>設定加強安全性的 Cookie 属性：Secure (只在 HTTPS 传输，若网站无 HTTPS 請勿設定)<br>在需要權限的頁面請使用者重新輸入密碼</li>
-</ul>
-<h2 id="Session-Fixation-固定-Session-ID"><a href="#Session-Fixation-固定-Session-ID" class="headerlink" title="Session Fixation (固定 Session ID)"></a>Session Fixation (固定 Session ID)</h2><p>攻击者诱使受害者使用特定的 Session ID 登入网站，而攻击者就能取得受害者的身分。</p>
-<ol>
-<li>攻击者從网站取得有效 Session ID</li>
-<li>使用社交工程等手法诱使受害者點選連結，使用該 Session ID 登入网站</li>
-<li>受害者輸入帳號密碼成功登入网站</li>
-<li>攻击者使用該 Session ID，操作受害者的帳號</li>
+        <ol>
+<li>创建spring-task.xml 文件</li>
 </ol>
-<p><img src="https://lh5.googleusercontent.com/-qAizYyaOoRo/U3Vaaw6lqsI/AAAAAAAAAZ4/GNO7z3T6Mjg/s2400/2014-05-16-http-session-protection-04-session-id-fixation.png" alt="enter image description here"></p>
-<h2 id="防护措施-2"><a href="#防护措施-2" class="headerlink" title="防护措施"></a>防护措施</h2><p>在使用者登入成功後，立即更換 Session ID，防止攻击者操控 Session ID 給予受害者。<br>禁止將 Session ID 使用 URL (GET) 方式來传输</p>
-<h2 id="Session-防护"><a href="#Session-防护" class="headerlink" title="Session 防护"></a>Session 防护</h2><p>每個使用者在登入网站的時候，我們可以用每個人特有的識別資訊來確認身分：</p>
-<ul>
-<li>來源 IP 位址</li>
-<li>瀏覽器 User-Agent</li>
-</ul>
-<p>如果在同一個 Session 中，使用者的 IP 或者 User-Agent 改變了，最安全的作法就是把這個 Session 清除，請使用者重新登入。雖然使用者可能因為 IP 更換、Proxy 等因素導致被強制登出，但為了安全性，便利性必須要與之取捨。</p>
-<p>除了檢查個人識別資訊來確認是否盜用之外，也可以增加前述的 Session ID 的防护方式：</p>
-<ul>
-<li>Cookie 設定 Secure Flag (HTTPS)</li>
-<li>Cookie 設定 HTTP Only Flag</li>
-<li>成功登入後立即變更 Session ID</li>
-<li>Session 的清除機制也非常重要。當伺服器偵測到可疑的使用者 Session 行為時，例如攻击者惡意嘗試偽造 Session ID、使用者 Session 可能遭窃、或者逾時等情況，都應該立刻清除該 Session ID 以免被攻击者利用。</li>
-</ul>
-<h3 id="Session-清除机制时机："><a href="#Session-清除机制时机：" class="headerlink" title="Session 清除机制时机："></a>Session 清除机制时机：</h3><ul>
-<li>侦测到恶意尝试 Session ID</li>
-<li>识别咨询无效时</li>
-<li>超时</li>
-</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!---加入：xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">   xsi:schemaLocation="http://www.springframework.org/schema/task</span><br><span class="line">	http://www.springframework.org/schema/task/spring-task-3.1.xsd"</span><br><span class="line">--&gt;</span></span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;  </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>  </span><br><span class="line">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>   </span><br><span class="line">    <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>  </span><br><span class="line">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>  </span><br><span class="line">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span>  </span><br><span class="line">    <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span><br><span class="line">    <span class="attr">xmlns:task</span>=<span class="string">"http://www.springframework.org/schema/task"</span>  </span><br><span class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans     </span><br><span class="line">    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd     </span><br><span class="line">    http://www.springframework.org/schema/tx     </span><br><span class="line">    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/aop  </span><br><span class="line">    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd   </span><br><span class="line">    http://www.springframework.org/schema/context    </span><br><span class="line">    http://www.springframework.org/schema/context/spring-context-3.2.xsd    </span><br><span class="line">    http://www.springframework.org/schema/mvc  </span><br><span class="line">    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span><br><span class="line">    http://www.springframework.org/schema/task  </span><br><span class="line">    http://www.springframework.org/schema/task/spring-task-3.2.xsd</span><br><span class="line">   "</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">task:annotation-driven</span> /&gt;</span> <span class="comment">&lt;!-- 定时器开关--&gt;</span>  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:annotation-config</span>/&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 自动扫描的包名 --&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.spring.task"</span> /&gt;</span> </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>实现接口和实现类，添加注解和说明</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>  <span class="comment">//import org.springframework.stereotype.Component;  </span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTestServiceImpl</span>  <span class="keyword">implements</span> <span class="title">IMyTestService</span> </span>&#123;  </span><br><span class="line">      <span class="meta">@Scheduled</span>(cron=<span class="string">"0/5 * *  * * ? "</span>)   <span class="comment">//每5秒执行一次  </span></span><br><span class="line">      <span class="meta">@Override</span>  </span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myTest</span><span class="params">()</span></span>&#123;  </span><br><span class="line">            System.out.println(<span class="string">"进入测试"</span>);  </span><br><span class="line">      &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>备注：</p>
+<ol>
+<li>spring的@Scheduled注解需要写在实现类上</li>
+<li>定时器的任务方法不能有返回值（如果有返回值，spring初始化的时候会告诉你有个错误、需要设定一个proxytargetclass的某个值为true）</li>
+<li>实现类上要有组件的注解@Component</li>
+</ol>
+<p>参数说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">字段 允许值 允许的特殊字符  </span><br><span class="line">秒 0-59 , - * /  </span><br><span class="line">分 0-59 , - * /  </span><br><span class="line">小时 0-23 , - * /  </span><br><span class="line">日期 1-31 , - * ? / L W C  </span><br><span class="line">月份 1-12 或者 JAN-DEC , - * /  </span><br><span class="line">星期 1-7 或者 SUN-SAT , - * ? / L C #  </span><br><span class="line">年（可选） 留空, 1970-2099 , - * /  </span><br><span class="line">表达式意义  </span><br><span class="line">&quot;0 0 12 * * ?&quot; 每天中午12点触发  </span><br><span class="line">&quot;0 15 10 ? * *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ?&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? *&quot; 每天上午10:15触发  </span><br><span class="line">&quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发  </span><br><span class="line">&quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发  </span><br><span class="line">&quot;0 0/5 14 * * ?&quot; 在每天下午2点到下午2:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0/5 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发  </span><br><span class="line">&quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发  </span><br><span class="line">&quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发  </span><br><span class="line">&quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发  </span><br><span class="line">&quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发  </span><br><span class="line">&quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发  </span><br><span class="line">&quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发  </span><br><span class="line">每天早上6点  </span><br><span class="line">0 6 * * *  </span><br><span class="line">每两个小时  </span><br><span class="line">0 */2 * * *  </span><br><span class="line">晚上11点到早上8点之间每两个小时，早上八点  </span><br><span class="line">0 23-7/2，8 * * *  </span><br><span class="line">每个月的4号和每个礼拜的礼拜一到礼拜三的早上11点  </span><br><span class="line">0 11 4 * 1-3  </span><br><span class="line">1月1日早上4点  </span><br><span class="line">0 4 1 1 *</span><br></pre></td></tr></table></figure></p>
 
         
         
@@ -519,13 +686,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -553,61 +720,63 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
+      <a href="/2016/05/23/Spark-on-yarn/" title="Spark on yarn" itemprop="url">Spark on yarn</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
+    <time datetime="2016-05-23T06:33:43.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Java-IO"><a href="#Java-IO" class="headerlink" title="Java IO"></a>Java IO</h1><h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><p>Java IO流是既可以从中读取，也可以写入到其中的数据流。正如这个系列教程之前提到过的，流通常会与数据源、数据流向目的地相关联，比如文件、网络等等。</p>
-<p>流和数组不一样，不能通过索引读写数据。在流中，你也不能像数组那样前后移动读取数据，除非使用RandomAccessFile 处理文件。流仅仅只是一个连续的数据流。</p>
-<p>某些类似PushbackInputStream 流的实现允许你将数据重新推回到流中，以便重新读取。然而你只能把有限的数据推回流中，并且你不能像操作数组那样随意读取数据。流中的数据只能够顺序访问。</p>
-<p>Java IO流通常是基于字节或者基于字符的。字节流通常以“stream”命名，比如InputStream和OutputStream。除了DataInputStream 和DataOutputStream 还能够读写int, long, float和double类型的值以外，其他流在一个操作时间内只能读取或者写入一个原始字节。</p>
-<p>字符流通常以“Reader”或者“Writer”命名。字符流能够读写字符(比如Latin1或者Unicode字符)。可以浏览Java Readers and Writers获取更多关于字符流输入输出的信息。</p>
-<ul>
-<li>InputStream</li>
+        <h2 id="模式"><a href="#模式" class="headerlink" title="模式:"></a>模式:</h2><ul>
+<li>yarn-cluster：<br>Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。<br><a href="http://www.iteblog.com/archives/1189" target="_blank" rel="external">Spark on YARN集群模式作业运行全过程分析</a></li>
+<li>yarn-client：<br>Spark的driver运行在client进程中，而application master只用来向YARN申请资源。<br><a href="http://www.iteblog.com/archives/1191" target="_blank" rel="external">Spark on YARN客户端模式作业运行全过程分析</a></li>
 </ul>
-<p>java.io.InputStream类是所有Java IO输入流的基类。如果你正在开发一个从流中读取数据的组件，请尝试用InputStream替代任何它的子类(比如FileInputStream)进行开发。这么做能够让你的代码兼容任何类型而非某种确定类型的输入流。</p>
-<p>然而仅仅依靠InputStream并不总是可行。如果你需要将读过的数据推回到流中，你必须使用PushbackInputStream，这意味着你的流变量只能是这个类型，否则在代码中就不能调用PushbackInputStream的unread()方法。</p>
-<p>通常使用输入流中的read()方法读取数据。read()方法返回一个整数，代表了读取到的字节的内容(译者注：0 ~ 255)。当达到流末尾没有更多数据可以读取的时候，read()方法返回-1。</p>
-<ul>
-<li>OutputStream</li>
-</ul>
-<p>java.io.OutputStream是Java IO中所有输出流的基类。如果你正在开发一个能够将数据写入流中的组件，请尝试使用OutputStream替代它的所有子类。<br>-组合流</p>
-<p>你可以将流整合起来以便实现更高级的输入和输出操作。比如，一次读取一个字节是很慢的，所以可以从磁盘中一次读取一大块数据，然后从读到的数据块中获取字节。为了实现缓冲，可以把InputStream包装到BufferedInputStream中。</p>
-<h2 id="字节和字符数组"><a href="#字节和字符数组" class="headerlink" title="字节和字符数组"></a>字节和字符数组</h2><p>Java中的字节和字符数组，经常被用于临时存储应用程序内部的数据，所以数组也是常见的数据来源以及数据流目的地。如果你在程序执行过程中需要频繁访问文件的内容，你可能会愿意将文件加载到数组中去。当然你可以通过索引直接访问这些数组。但是如果你有一个组件的设计初衷是从InputStream或者Reader而非数组中读取某些数据呢？</p>
-<ul>
-<li>通过InputStream或者Reader读取数组</li>
-</ul>
-<p>为了让你的组件能够从数组中读取数据，你需要把字节或者字符数组包装到一个ByteArrayInputStream或者CharArrayReader中。这种方式允许通过包装好的stream或者reader读取数组中的字节或者字符数据。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>]; </span><br><span class="line"><span class="comment">//write data into byte array...  </span></span><br><span class="line">InputStream input = <span class="keyword">new</span> ByteArrayInputStream(bytes);  </span><br><span class="line"><span class="comment">//read first byte </span></span><br><span class="line"><span class="keyword">int</span> data = input.read(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(data != -<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">//do something with data</span></span><br><span class="line">    <span class="comment">//read next byte      </span></span><br><span class="line">    data = input.read(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>通过InputStream或者Reader写入数组</li>
-</ul>
-<p>同样可以将数据写入到ByteArrayOutputStream或者CharArrayWriter中。你所需要做的是创建一个ByteArrayOutputStream或者CharArrayWriter，然后写入数据，就像你操作其他类型的stream或者writer一样。当所有的数据都写入完毕，只需调用toByteArray()或者toCharArray()，即可得到写入数据的数组形式。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">output.write(<span class="string">"This text is converted to bytes"</span>.toBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line"><span class="keyword">byte</span>[] bytes = output.toByteArray();</span><br></pre></td></tr></table></figure></p>
-<p>操作一个字符数组的代码也与本例类似，只需要将字符数组包装到CharArrayWriter中。</p>
-<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>Java IO中的管道为运行在同一个JVM中的两个线程提供了通信的能力。所以管道也可以作为数据源以及目标媒介。</p>
-<p>你不能利用管道与不同的JVM中的线程通信(不同的进程)。在概念上，Java的管道不同于Unix/Linux系统中的管道。在Unix/Linux中，运行在不同地址空间的两个进程可以通过管道通信。在Java中，通信的双方应该是运行在同一进程中的不同线程。</p>
-<ul>
-<li>通过Java IO创建管道</li>
-</ul>
-<p>可以通过Java IO中的PipedOutputStream和PipedInputStream创建管道。一个PipedInputStream流应该和一个PipedOutputStream流相关联。一个线程通过PipedOutputStream写入的数据可以被另一个线程通过相关联的PipedInputStream读取出来。<br>你也可以使用两个管道共有的connect()方法使之相关联。PipedInputStream和PipedOutputStream都拥有一个可以互相关联的connect()方法。</p>
-<ul>
-<li>管道和线程</li>
-</ul>
-<p>请记得，当使用两个相关联的管道流时，务必将它们分配给不同的线程。read()方法和write()方法调用时会导致流阻塞，这意味着如果你尝试在一个线程中同时进行读和写，可能会导致线程死锁。</p>
-<ul>
-<li>管道的替代</li>
-</ul>
-<p>除了管道之外，一个JVM中不同线程之间还有许多通信的方式。实际上，线程在大多数情况下会传递完整的对象信息而非原始的字节数据。但是，如果你需要在线程之间传递字节数据，Java IO的管道是一个不错的选择。</p>
+<h3 id="Deployment-Mode-Summary"><a href="#Deployment-Mode-Summary" class="headerlink" title="Deployment Mode Summary"></a>Deployment Mode Summary</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>YARN Client Mode</th>
+<th>YARN Cluster Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Driver runs in</td>
+<td>Client</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Requests resources</td>
+<td>ApplicationMaster</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Starts executor processes</td>
+<td>YARN NodeManager</td>
+<td>YARN NodeManager</td>
+</tr>
+<tr>
+<td>Persistent services</td>
+<td>YARN ResourceManager and NodeManagers</td>
+<td>YARN ResourceManager and NodeManagers</td>
+</tr>
+<tr>
+<td>Supports Spark Shell</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>参考:<br><a href="http://www.iteblog.com/archives/1223" target="_blank" rel="external">Spark:Yarn-cluster和Yarn-client区别与联系</a><br><a href="http://www.cloudera.com/documentation/enterprise/5-5-x/topics/cdh_ig_running_spark_on_yarn.html" target="_blank" rel="external">Running Spark Applications on YARN</a></p>
+<h2 id="启动App"><a href="#启动App" class="headerlink" title="启动App"></a>启动App</h2><p>在yarn-cluster模式中启动一个application：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit --class path.to.your.Class --master yarn-cluster [options] &lt;app jar&gt; [app options]</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line"></span><br><span class="line">SPARK_JAR=hdfs://hansight/libs/spark-assembly-<span class="number">1.0</span>.<span class="number">2</span>-hadoop2.<span class="number">4.0</span>.<span class="number">2.1</span>.<span class="number">4.0</span>-<span class="number">632</span>.jar \</span><br><span class="line">./bin/spark-submit --class org.apache.spark.examples.SparkPI \</span><br><span class="line">    --master yarn-cluster \</span><br><span class="line">    --num-executors <span class="number">3</span> \</span><br><span class="line">    --driver-memory <span class="number">4</span>g \</span><br><span class="line">    --executor-memory <span class="number">2</span>g \</span><br><span class="line">    --executor-cores <span class="number">1</span> \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    <span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="yarn的资源调度"><a href="#yarn的资源调度" class="headerlink" title="yarn的资源调度"></a>yarn的资源调度</h2><p><a href="http://debugo.com/yarn-scheduler/" target="_blank" rel="external">YARN Capacity Scheduler 简介</a><br>YARN Independent RM 指标:  Weight, Virtual Cores, Min and Max Memory, Max Running Apps, and Scheduling Policy</p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><p><a href="http://wuchong.me/blog/2015/04/04/spark-on-yarn-cluster-deploy/" target="_blank" rel="external">Spark On YARN 集群安装部署</a></p>
 
         
         
@@ -620,13 +789,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/IO/">IO</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Yarn/">Yarn</a>
   </div>
 
 </div>
@@ -654,20 +823,39 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
+      <a href="/2016/05/23/Spark和MySQL交互/" title=" Spark和MySQL交互" itemprop="url"> Spark和MySQL交互</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
+    <time datetime="2016-05-23T06:32:22.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Java中一个线程可以多次start吗"><a href="#Java中一个线程可以多次start吗" class="headerlink" title="Java中一个线程可以多次start吗?"></a>Java中一个线程可以多次start吗?</h1><p><strong>不可以</strong><br>通过Thread实例的start()，一个Thread的实例只能产生一个线程。一个Thread的实例一旦调用start()方法，这个实例的started标记就标记为true，事实中不管这个线程后来有没有执行到底，只要调用了一次start()就再也没有机会运行了。<br>一个线程对象只能调用一次start方法.从new到等待运行是单行道,所以如果你对一个已经启动的线程对象再调用一次start方法的话,会产生:IllegalThreadStateException异常. 可以被重复调用的是run()方法。<br>Thread类中run()和start()方法的区别如下:<br>run()方法: 在本线程内调用该Runnable对象的run()方法，可以重复多次调用；<br>start()方法: 启动一个线程，调用该Runnable对象的run()方法，不能多次启动一个线程</p>
+        <h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="external">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="external">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="external">改写Spark JdbcRDD，支持自己定义分区查询条件</a><br><a href="http://lswyyy.github.io/2015/12/16/%E6%8F%90%E9%AB%98spark-jdbc%E6%93%8D%E4%BD%9C%E5%B9%B6%E5%8F%91%E5%BA%A6/" target="_blank" rel="external">spark jdbc(mysql) 操作并发度优化</a></p>
+<h3 id="一、不指定查询条件"><a href="#一、不指定查询条件" class="headerlink" title="一、不指定查询条件"></a>一、不指定查询条件</h3><p>　　这个方式链接MySql的函数原型是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(url: <span class="type">String</span>, table: <span class="type">String</span>, properties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure></p>
+<p>我们只需要提供Driver的url，需要查询的表名，以及连接表相关属性properties。下面是具体例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, prop )</span><br><span class="line">println(df.count())</span><br><span class="line">println(df.rdd.partitions.size)</span><br></pre></td></tr></table></figure></p>
+<p>我们运行上面的程序，可以看到df.rdd.partitions.size输出结果是1，这个结果的含义是iteblog表的所有数据都是由RDD的一个分区处理的，所以说，如果你这个表很大，很可能会出现OOM<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSetManager: Lost task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">1.0</span> (TID <span class="number">14</span>, spark047219):</span><br><span class="line"> java.lang.OutOfMemoryError: GC overhead limit exceeded at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:<span class="number">3380</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这种方式在数据量大的时候不建议使用。</p>
+<h3 id="二、指定数据库字段的范围"><a href="#二、指定数据库字段的范围" class="headerlink" title="二、指定数据库字段的范围"></a>二、指定数据库字段的范围</h3><p>　　这种方式就是通过指定数据库中某个字段的范围，但是遗憾的是，这个字段必须是数字，来看看这个函数的函数原型：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    columnName: <span class="type">String</span>,</span><br><span class="line">    lowerBound: <span class="type">Long</span>,</span><br><span class="line">    upperBound: <span class="type">Long</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span>,</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>　　前两个字段的含义和方法一类似。columnName就是需要分区的字段，这个字段在数据库中的类型必须是数字；lowerBound就是分区的下界；upperBound就是分区的上界；numPartitions是分区的个数。同样，我们也来看看如何使用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lowerBound = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> upperBound = <span class="number">100000</span></span><br><span class="line"><span class="keyword">val</span> numPartitions = <span class="number">5</span></span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, <span class="string">"id"</span>, lowerBound, upperBound, numPartitions, prop)</span><br></pre></td></tr></table></figure>
+<p>这个方法可以将iteblog表的数据分布到RDD的几个分区中，分区的数量由numPartitions参数决定，在理想情况下，每个分区处理相同数量的数据，我们在使用的时候不建议将这个值设置的比较大，因为这可能导致数据库挂掉！但是根据前面介绍，这个函数的缺点就是只能使用整形数据字段作为分区关键字。</p>
+<p>　　这个函数在极端情况下，也就是设置将numPartitions设置为1，其含义和第一种方式一致。</p>
+<h3 id="三、根据任意字段进行分区"><a href="#三、根据任意字段进行分区" class="headerlink" title="三、根据任意字段进行分区"></a>三、根据任意字段进行分区</h3><p>　　基于前面两种方法的限制，Spark还提供了根据任意字段进行分区的方法，函数原型如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    predicates: <span class="type">Array</span>[<span class="type">String</span>],</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>这个函数相比第一种方式多了predicates参数，我们可以通过这个参数设置分区的依据，来看看例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> predicates = <span class="type">Array</span>[<span class="type">String</span>](<span class="string">"reportDate &lt;= '2014-12-31'"</span>, </span><br><span class="line">	<span class="string">"reportDate &gt; '2014-12-31' and reportDate &lt;= '2015-12-31'"</span>)</span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, predicates, prop)</span><br></pre></td></tr></table></figure>
+<p>最后rdd的分区数量就等于predicates.length。</p>
+<h3 id="四、通过load获取"><a href="#四、通过load获取" class="headerlink" title="四、通过load获取"></a>四、通过load获取</h3><p>Spark还提供通过load的方式来读取数据。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span>,</span><br><span class="line">    <span class="string">"dbtable"</span> -&gt; <span class="string">"iteblog"</span>)).load()</span><br></pre></td></tr></table></figure>
+<p>options函数支持url、driver、dbtable、partitionColumn、lowerBound、upperBound以及numPartitions选项，细心的同学肯定发现这个和方法二的参数一致。是的，其内部实现原理部分和方法二大体一致。同时load方法还支持json、orc等数据源的读取。</p>
+<h2 id="Spark-写入MySQL"><a href="#Spark-写入MySQL" class="headerlink" title="Spark 写入MySQL"></a>Spark 写入MySQL</h2><p><a href="http://www.iteblog.com/archives/1275" target="_blank" rel="external">Spark将计算结果写入到Mysql中</a><br><a href="http://www.iteblog.com/archives/1290" target="_blank" rel="external">Spark RDD写入RMDB(Mysql)方法二</a></p>
 
         
         
@@ -680,13 +868,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/多线程/">多线程</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/MySQL/">MySQL</a>
   </div>
 
 </div>
@@ -710,7 +898,7 @@
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
+    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
   </nav>
 
 </div>
@@ -736,15 +924,19 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>3</sup></a></li>
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>7</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
 		  
 		
 		  
@@ -752,15 +944,15 @@
 		  
 		
 		  
-			<li><a href="/categories/Scala/" title="Scala">Scala<sup>2</sup></a></li>
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>10</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>4</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
 		  
 		
 		  
@@ -769,6 +961,14 @@
 		
 		  
 			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
 		  
 		
 		</ul>
@@ -781,19 +981,31 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>11</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Web/" title="Web">Web<sup>8</sup></a></li>
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>6</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
 			
 		
 			
@@ -805,19 +1017,15 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -825,27 +1033,15 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>1</sup></a></li>
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Dropwizard/" title="Dropwizard">Dropwizard<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/类型转换/" title="类型转换">类型转换<sup>1</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
@@ -853,11 +1049,15 @@
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>1</sup></a></li>
+				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -926,7 +1126,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
 		
 		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
 		

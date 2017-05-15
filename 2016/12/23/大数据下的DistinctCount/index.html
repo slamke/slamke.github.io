@@ -1,0 +1,630 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>大数据下的DistinctCount | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：123select course, count(distinct sid)from stu_tablegroup by course;
+Hive在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大数据下的DistinctCount">
+<meta property="og:url" content="slamke.github.io/2016/12/23/大数据下的DistinctCount/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：123select course, count(distinct sid)from stu_tablegroup by course;
+Hive在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：123">
+<meta property="og:updated_time" content="2016-12-23T07:00:41.796Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大数据下的DistinctCount">
+<meta name="twitter:description" content="在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：123select course, count(distinct sid)from stu_tablegroup by course;
+Hive在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：123">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/12/23/大数据下的DistinctCount/" title="大数据下的DistinctCount" itemprop="url">大数据下的DistinctCount</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-12-23T03:53:53.000Z" itemprop="datePublished"> Published 2016-12-23</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive"><span class="toc-number">1.</span> <span class="toc-text">Hive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pig"><span class="toc-number">2.</span> <span class="toc-text">Pig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark"><span class="toc-number">3.</span> <span class="toc-text">Spark</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitmap"><span class="toc-number">4.</span> <span class="toc-text">Bitmap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitmap介绍"><span class="toc-number">4.1.</span> <span class="toc-text">Bitmap介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Distinct-Count优化"><span class="toc-number">4.2.</span> <span class="toc-text">Distinct Count优化</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p>在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> course, <span class="keyword">count</span>(<span class="keyword">distinct</span> <span class="keyword">sid</span>)</span><br><span class="line"><span class="keyword">from</span> stu_table</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> course;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h2><p>在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> app, <span class="keyword">count</span>(<span class="keyword">distinct</span> uid) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span> log_table</span><br><span class="line"><span class="keyword">where</span> week_cal = <span class="string">'2016-03-27'</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> uv <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">20</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Pig"><a href="#Pig" class="headerlink" title="Pig"></a>Pig</h2><p>大部分情况下，Hive的执行效率偏低，我更为偏爱Pig：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-- all users define DISTINCT_COUNT(A, a) returns dist &#123;</span><br><span class="line">    B = foreach $A generate $a;</span><br><span class="line">    unique_B = distinct B;</span><br><span class="line">    C = group unique_B all;</span><br><span class="line">    $dist = foreach C generate SIZE(unique_B);</span><br><span class="line">&#125;</span><br><span class="line">A = load '/path/to/data' using PigStorage() as (app, uid);</span><br><span class="line">B = DISTINCT_COUNT(A, uid);</span><br><span class="line"></span><br><span class="line">-- &lt;app, users&gt;</span><br><span class="line">A = load '/path/to/data' using PigStorage() as (app, uid);</span><br><span class="line">B = distinct A;</span><br><span class="line">C = group B by app;</span><br><span class="line">D = foreach C generate group as app, COUNT($1) as uv;</span><br><span class="line">-- or</span><br><span class="line">D = foreach C generate group as app, SIZE($1) as uv;</span><br></pre></td></tr></table></figure></p>
+<p>DataFu 为pig提供基数估计的UDF <figure class="highlight plain"><figcaption><span>Count：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">```sql</span><br><span class="line">define HyperLogLogPlusPlus datafu.pig.stats.HyperLogLogPlusPlus();</span><br><span class="line">A = load &apos;/path/to/data&apos; using PigStorage() as (app, uid);</span><br><span class="line">B = group A by app;</span><br><span class="line">C = foreach B generate group as app, HyperLogLogPlusPlus($1) as uv;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h2><p>在Spark中，Load数据后通过RDD一系列的转换——map、distinct、reduceByKey进行Distinct Count：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map &#123; line =&gt; (line._1, <span class="number">1</span>) &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .mapValues&#123; _ =&gt; <span class="number">1</span> &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or </span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map(_._1)</span><br><span class="line">  .countByValue()</span><br></pre></td></tr></table></figure></p>
+<p>同时，Spark提供近似Distinct Count的API：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">    .countApproxDistinctByKey(<span class="number">0.001</span>)</span><br></pre></td></tr></table></figure></p>
+<p>实现是基于HyperLogLog算法：</p>
+<blockquote>
+<p>The algorithm used is based on streamlib’s implementation of “HyperLogLog in Practice: Algorithmic Engineering of a State of The Art Cardinality Estimation Algorithm”, available here.</p>
+</blockquote>
+<p>或者，将Schema化的RDD转成DataFrame后，registerTempTable然后执行sql命令亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> df = rdd.toDF()</span><br><span class="line">df.registerTempTable(<span class="string">"app_table"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> appUsers = sqlContext.sql(<span class="string">"select app, count(distinct uid) as uv from app_table group by app"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Bitmap"><a href="#Bitmap" class="headerlink" title="Bitmap"></a>Bitmap</h2><h3 id="Bitmap介绍"><a href="#Bitmap介绍" class="headerlink" title="Bitmap介绍"></a>Bitmap介绍</h3><p>《编程珠玑》上是这样介绍bitmap的：</p>
+<blockquote>
+<p>Bitmap是一个十分有用的数据结构。所谓的Bitmap就是用一个bit位来标记某个元素对应的Value，而Key即是该元素。由于采用了Bit为单位来存储数据，因此在内存占用方面，可以大大节省。</p>
+</blockquote>
+<p>简而言之——用一个bit（0或1）表示某元素是否出现过，其在bitmap的位置对应于其index。《编程珠玑》给出了一个用bitmap做排序的例子：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1999 Lucent Technologies */</span></span><br><span class="line"><span class="comment">/* From 'Programming Pearls' by Jon Bentley */</span></span><br><span class="line"><span class="comment">/* bitsort.c -- bitmap sort from Column 1 * Sort distinct integers in the range [0..N-1] */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BITSPERWORD 32</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SHIFT 5</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MASK 0x1F</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> N 10000000</span></span><br><span class="line"><span class="keyword">int</span> a[<span class="number">1</span> + N / BITSPERWORD];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] |= (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clr</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] &amp;= ~(<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; <span class="keyword">return</span> a[i &gt;&gt; SHIFT] &amp; (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        clr(i);</span><br><span class="line">    <span class="comment">/* Replace above 2 lines with below 3 for word-parallel init  int top = 1 + N/BITSPERWORD;  for (i = 0; i &lt; top; i++)  a[i] = 0;  */</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;i) != EOF)</span><br><span class="line">        <span class="built_in">set</span>(i);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        <span class="keyword">if</span> (test(i))</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, i);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，用int的数组存储bitmap，对于每一个待排序的int数，其对应的index为其int值。</p>
+<h3 id="Distinct-Count优化"><a href="#Distinct-Count优化" class="headerlink" title="Distinct Count优化"></a>Distinct Count优化</h3><ol>
+<li>index生成</li>
+</ol>
+<p>为了使用bitmap做Distinct Count，首先需得到每个用户（uid）对应（在bitmap中）的index。有两种办法可以得到从1开始编号index表（与uid一一对应）：</p>
+<ul>
+<li>hash，但是要找到无碰撞且hash值均匀分布[1, +∞)区间的hash函数是非常困难的；<br>维护一张uid与index之间的映射表，并增量更新</li>
+<li>比较两种方法，第二种方法更为简单可行。</li>
+</ul>
+<ol>
+<li>UV计算</li>
+</ol>
+<p>在index生成完成后，RDD[(uid, V)]与RDD[(uid, index)]join得到index化的RDD。bitmap的开源实现有EWAH，采用RLE（Run Length Encoding）压缩，很好地解决了存储空间的浪费。Distinct Count计算转变成了求bitmap中1的个数：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// distinct count for rdd(not pair) and the rdd must be sorted in each partition</span></span><br><span class="line"><span class="comment">// 计算独立值的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">distinctCount</span></span>(rdd: <span class="type">RDD</span>[<span class="type">Int</span>]): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> bitmap = rdd.aggregate[<span class="type">EWAHCompressedBitmap</span>](<span class="keyword">new</span> <span class="type">EWAHCompressedBitmap</span>())(</span><br><span class="line">      (u: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        u.set(v)</span><br><span class="line">        u</span><br><span class="line">      &#125;,</span><br><span class="line">      (u1: <span class="type">EWAHCompressedBitmap</span>, u2: <span class="type">EWAHCompressedBitmap</span>) =&gt; u1.or(u2)</span><br><span class="line">    )</span><br><span class="line">    bitmap.cardinality()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// the tuple_2 is the index</span></span><br><span class="line"><span class="comment">// 计算每个值对应的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">groupCount</span></span>[<span class="type">K</span>: <span class="type">ClassTag</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    <span class="keyword">val</span> grouped: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">EWAHCompressedBitmap</span>)] = rdd.combineByKey[<span class="type">EWAHCompressedBitmap</span>](</span><br><span class="line">      (v: <span class="type">Int</span>) =&gt; <span class="type">EWAHCompressedBitmap</span>.bitmapOf(v),</span><br><span class="line">      (c: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        c.set(v)</span><br><span class="line">        c</span><br><span class="line">      &#125;,</span><br><span class="line">      (c1: <span class="type">EWAHCompressedBitmap</span>, c2: <span class="type">EWAHCompressedBitmap</span>) =&gt; c1.or(c2))</span><br><span class="line">    grouped.map(t =&gt; (t._1, t._2.cardinality()))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>但是，在上述计算中，由于EWAHCompressedBitmap的set方法要求int值是升序的，也就是说RDD的每一个partition的index应是升序排列：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sort pair RDD by value</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortPairRDD</span></span>[<span class="type">K</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    rdd.mapPartitions(iter =&gt; &#123;</span><br><span class="line">      iter.toArray.sortWith((x, y) =&gt; x._2.compare(y._2) &lt; <span class="number">0</span>).iterator</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>为了避免排序，可以为每一个uid生成一个bitmap，然后在Distinct Count时将bitmap进行or运算亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.reduceByKey(_ or _)</span><br><span class="line">    .mapValues(_._2.cardinality())</span><br></pre></td></tr></table></figure></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2016/12/23/大数据下的DistinctCount/" data-title="大数据下的DistinctCount | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/12/23/使用RCU技术实现读写线程无锁/" title="使用RCU技术实现读写线程无锁">
+  <strong>上一篇：</strong><br/>
+  <span>
+  使用RCU技术实现读写线程无锁</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/11/29/scala的类型和反射机制/"  title="scala的类型和反射机制">
+ <strong>下一篇：</strong><br/> 
+ <span>scala的类型和反射机制
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hive"><span class="toc-number">1.</span> <span class="toc-text">Hive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pig"><span class="toc-number">2.</span> <span class="toc-text">Pig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark"><span class="toc-number">3.</span> <span class="toc-text">Spark</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitmap"><span class="toc-number">4.</span> <span class="toc-text">Bitmap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitmap介绍"><span class="toc-number">4.1.</span> <span class="toc-text">Bitmap介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Distinct-Count优化"><span class="toc-number">4.2.</span> <span class="toc-text">Distinct Count优化</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

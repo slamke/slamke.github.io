@@ -1,0 +1,653 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>如何重构箭头型代码 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="转载自： http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;amp;utm_medium=toutiao.io&amp;amp;utm_source=toutiao.io
+本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何重构箭头型代码">
+<meta property="og:url" content="slamke.github.io/2017/04/13/如何重构箭头型代码/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="转载自： http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;amp;utm_medium=toutiao.io&amp;amp;utm_source=toutiao.io
+本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文">
+<meta property="og:image" content="http://coolshell.cn//wp-content/uploads/2017/04/IMG_7411.jpg">
+<meta property="og:updated_time" content="2017-04-13T02:58:44.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何重构箭头型代码">
+<meta name="twitter:description" content="转载自： http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;amp;utm_medium=toutiao.io&amp;amp;utm_source=toutiao.io
+本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文">
+<meta name="twitter:image" content="http://coolshell.cn//wp-content/uploads/2017/04/IMG_7411.jpg">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/04/13/如何重构箭头型代码/" title="如何重构箭头型代码" itemprop="url">如何重构箭头型代码</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-13T02:37:03.000Z" itemprop="datePublished"> Published 2017-04-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#抽取成函数"><span class="toc-number">1.</span> <span class="toc-text">抽取成函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#嵌套的-if-外的代码"><span class="toc-number">2.</span> <span class="toc-text">嵌套的 if 外的代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#状态检查嵌套"><span class="toc-number">3.</span> <span class="toc-text">状态检查嵌套</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#延伸思考"><span class="toc-number">4.</span> <span class="toc-text">延伸思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<p>转载自： <a href="http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io" target="_blank" rel="external">http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io</a></p>
+<p>本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文章，不过我觉得很多东西可以从一个简单的东西出发，到达本质，所以，我觉得有必要在这里写一篇的文章。不一定全对，只希望得到更多的讨论，因为有了更深入的讨论才能进步。</p>
+<p>文章有点长，我在文章最后会给出相关的思考和总结陈词，你可以跳到结尾。</p>
+<p>所谓箭头型代码，基本上来说就是下面这个图片所示的情况。</p>
+<p><img src="http://coolshell.cn//wp-content/uploads/2017/04/IMG_7411.jpg" alt=""></p>
+<p>那么，这样“箭头型”的代码有什么问题呢？看上去也挺好看的，有对称美。但是……</p>
+<p>关于箭头型代码的问题有如下几个：</p>
+<p>1）我的显示器不够宽，箭头型代码缩进太狠了，需要我来回拉水平滚动条，这让我在读代码的时候，相当的不舒服。</p>
+<p>2）除了宽度外还有长度，有的代码的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">总而言之，**“箭头型代码”如果嵌套太多，代码太长的话，会相当容易让维护代码的人（包括自己）迷失在代码中，因为看到最内层的代码时，你已经不知道前面的那一层一层的条件判断是什么样的，代码是怎么运行到这里的，所以，箭头型代码是非常难以维护和Debug的**。</span><br><span class="line"></span><br><span class="line">## 微博上的案例 与 Guard Clauses</span><br><span class="line">OK，我们先来看一下微博上的那个示例，代码量如果再大一点，嵌套再多一点，你很容易会在条件中迷失掉（下面这个示例只是那个“大箭头”下的一个小箭头）</span><br><span class="line">``` java</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    int index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    if (index != -1) &#123;</span><br><span class="line">        auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">        if (! types.Contains(type.Obj())) &#123;</span><br><span class="line">            types.Add(type.Obj());</span><br><span class="line">            if (auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L&quot;CastResult&quot;, true)) &#123;</span><br><span class="line">                int count = group-&gt;GetMethodCount();</span><br><span class="line">                for (int i = 0; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">                    if (method-&gt;IsStatic()) &#123;</span><br><span class="line">                        if (method-&gt;GetParameterCount() == 1 &amp;&amp;</span><br><span class="line">                            method-&gt;GetParameter(0)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">                            method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;void&gt;() ) &#123;</span><br><span class="line">                            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码，可以把条件反过来写，然后就可以把箭头型的代码解掉了，重构的代码如下所示：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>)  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj()))  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line"> </span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> (! method-&gt;IsStatic()) <span class="keyword">continue</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">               method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">               method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种代码的重构方式叫 Guard Clauses</p>
+<p>Martin Fowler 的 Refactoring 的网站上有相应的说明《Replace Nested Conditional with Guard Clauses》。<br>Coding Horror 上也有一篇文章讲了这种重构的方式 —— 《Flattening Arrow Code》<br>StackOverflow 上也有相关的问题说了这种方式 —— 《Refactor nested IF statement for clarity》<br>这里的思路其实就是，<strong>让出错的代码先返回，前面把所有的错误判断全判断掉，然后就剩下的就是正常的代码了</strong>。</p>
+<h2 id="抽取成函数"><a href="#抽取成函数" class="headerlink" title="抽取成函数"></a>抽取成函数</h2><p>微博上有些人说，continue 语句破坏了阅读代码的通畅，我觉得他们一定没有好好读这里面的代码，其实，我们可以看到，所有的 if 语句都是在判断是否出错的情况，所以，在维护代码的时候，你可以完全不理会这些 if 语句，因为都是出错处理的，而剩下的代码都是正常的功能代码，反而更容易阅读了。当然，一定有不是上面代码里的这种情况，那么，不用continue ，我们还能不能重构呢？</p>
+<p>当然可以，抽成函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">CopyMethodTypeInfo</span><span class="params">(auto &amp;method, auto &amp;group, auto &amp;symbol)</span> </span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! method-&gt;IsStatic()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">           method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">           method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">        symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ExpressionResolvings</span><span class="params">(auto &amp;manager, auto &amp;argument, auto &amp;symbol)</span> </span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj())) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> ( ! CopyMethodTypeInfo(method, group, symbol) ) <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    ExpressionResolvings(manager, arguments, symbol)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>你发出现，抽成函数后，代码比之前变得更容易读和更容易维护了。不是吗？</p>
+<p>有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护。这才是函数的作用。</p>
+<h2 id="嵌套的-if-外的代码"><a href="#嵌套的-if-外的代码" class="headerlink" title="嵌套的 if 外的代码"></a>嵌套的 if 外的代码</h2><p>微博上还有人问，原来的代码如果在各个 if 语句后还有要执行的代码，那么应该如何重构。比如下面这样的代码。</p>
+<p>原版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1()</span><br><span class="line">    <span class="keyword">if</span> (cond1) &#123;</span><br><span class="line">        do_before_cond2();</span><br><span class="line">        <span class="keyword">if</span> (cond2) &#123;</span><br><span class="line">            do_before_cond3();</span><br><span class="line">            <span class="keyword">if</span> (cond3) &#123;</span><br><span class="line">                do_something();</span><br><span class="line">            &#125;</span><br><span class="line">            do_after_cond3();</span><br><span class="line">        &#125;</span><br><span class="line">        do_after_cond2();</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond1();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码中的那些 <strong>do_after_condX()</strong> 是无论条件成功与否都要执行的。所以，我们拉平后的代码如下所示：</p>
+<p>重构第一版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) &#123;</span><br><span class="line">        do_after_cond1();</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    &#125; </span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) &#123; </span><br><span class="line">        do_after_cond2();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) &#123;</span><br><span class="line">        do_after_cond3();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>你会发现，上面的 do_after_condX 出现了两份。<strong>如果 if 语句块中的代码改变了某些do_after_condX依赖的状态，那么这是最终版本</strong>。</p>
+<p>但是，如果它们之前没有依赖关系的话，根据 DRY 原则，我们就可以只保留一份，那么直接掉到 if 条件前就好了，如下所示：</p>
+<p>重构第二版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时，你会说，我靠，居然，改变了执行的顺序，把条件放到 do_after_condX() 后面去了。这会不会有问题啊？</p>
+<p>其实，你再分析一下之前的代码，你会发现，本来，cond1 是判断 do_before_cond1() 是否出错的，如果有成功了，才会往下执行。而 do_after_cond1() 是无论如何都要执行的。从逻辑上来说，do_after_cond1()其实和do_before_cond1()的执行结果无关，而 cond1 却和是否去执行 do_before_cond2() 相关了。如果我把断行变成下面这样，反而代码逻辑更清楚了。</p>
+<p>重构第三版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line"> </span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;  <span class="comment">// &lt;-- cond1 成了是否做第二个语句块的条件</span></span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>; <span class="comment">// &lt;-- cond2 成了是否做第三个语句块的条件</span></span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>; <span class="comment">//&lt;-- cond3 成了是否做第四个语句块的条件</span></span><br><span class="line">    do_something(); </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>于是乎，在未来维护代码的时候，维护人一眼看上去就明白，代码在什么时候会执行到哪里。 这个时候，你会发现，把这些语句块抽成函数，代码会干净的更多，再重构一版：</p>
+<p>重构第四版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">do_func3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond3;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond2;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond1();</span><br><span class="line">   do_after_cond1();</span><br><span class="line">   <span class="keyword">return</span> cond1;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 你可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    bool cond = do_func1();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func2();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func3();</span><br><span class="line">    <span class="keyword">if</span> (cond) do_something();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 也可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func1() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func2() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func3() ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">   do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面，我给出了两个版本的for-loop，你喜欢哪个？我喜欢第二个。这个时候，因为for-loop里的代码非常简单，就算你不喜欢 continue ，这样的代码阅读成本已经很低了。</p>
+<h2 id="状态检查嵌套"><a href="#状态检查嵌套" class="headerlink" title="状态检查嵌套"></a>状态检查嵌套</h2><p>接下来，我们再来看另一个示例。下面的代码的伪造了一个场景——把两个人拉到一个一对一的聊天室中，因为要检查双方的状态，所以，代码可能会写成了“箭头型”。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare(pB);</span><br><span class="line">            <span class="keyword">if</span> ( manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">                pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                <span class="keyword">return</span> S_OK;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> S_ERROR;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            pA-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare();</span><br><span class="line">            pB-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            pA-&gt;Close();</span><br><span class="line">            pB-&gt;Close();</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Shouldn't be here!</span></span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重构上面的代码，我们可以先分析一下上面的代码，说明了，上面的代码就是对 PeerA 和 PeerB 的两个状态 “连上”， “未连上” 做组合 “状态” （注：实际中的状态应该比这个还要复杂，可能还会有“断开”、“错误”……等等状态）， 于是，我们可以把代码写成下面这样，合并上面的嵌套条件，对于每一种组合都做出判断。这样一来，逻辑就会非常的干净和清楚。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pB);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = NO</span></span><br><span class="line">    <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; ! pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        pA-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = NO &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> ( !pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected() ) &#123;</span><br><span class="line">        pB-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        <span class="keyword">if</span> ( ! manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">        pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_OK;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = NO, pB = NO</span></span><br><span class="line">    pA-&gt;Close();</span><br><span class="line">    pB-&gt;Close();</span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="延伸思考"><a href="#延伸思考" class="headerlink" title="延伸思考"></a>延伸思考</h2><p>对于<strong> if-else</strong> 语句来说，一般来说，就是检查两件事：<strong>错误</strong> 和 <strong>状态</strong>。</p>
+<p>检查错误</p>
+<p>对于检查错误来说，使用 Guard Clauses 会是一种标准解，但我们还需要注意下面几件事：</p>
+<p>1）当然，出现错误的时候，还会出现需要释放资源的情况。你可以使用 <code>goto fail</code>; 这样的方式，但是最优雅的方式应该是C++面向对象式的 RAII 方式。</p>
+<p>2）以错误码返回是一种比较简单的方式，这种方式有很一些问题，比如，如果错误码太多，判断出错的代码会非常复杂，另外，正常的代码和错误的代码会混在一起，影响可读性。所以，在更为高组的语言中，使用<code>try-catch</code>异常捕捉的方式，会让代码更为易读一些。</p>
+<p><strong>检查状态</strong></p>
+<p>对于检查状态来说，实际中一定有更为复杂的情况，比如下面几种情况：</p>
+<p>1）像TCP协议中的两端的状态变化。</p>
+<p>2）像shell各个命令的命令选项的各种组合。</p>
+<p>3）像游戏中的状态变化（一棵非常复杂的状态树）。</p>
+<p>4）像语法分析那样的状态变化。</p>
+<p>对于这些复杂的状态变化，其本上来说，你需要先定义一个状态机，或是一个子状态的组合状态的查询表，或是一个状态查询分析树。</p>
+<p><strong>写代码时，代码的运行中的控制状态或业务状态是会让你的代码流程变得混乱的一个重要原因，重构“箭头型”代码的一个很重要的工作就是重新梳理和描述这些状态的变迁关系。</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>好了，下面总结一下，把“箭头型”代码重构掉的几个手段如下：</p>
+<p>1）<strong>使用 Guard Clauses</strong> 。 尽可能的让出错的先返回， 这样后面就会得到干净的代码。</p>
+<p>2）<strong>把条件中的语句块抽取成函数</strong>。 有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护，<strong>写出让人易读易维护的代码才是重构代码的初衷</strong>！</p>
+<p>3）<strong>对于出错处理，使用try-catch异常处理和RAII机制</strong>。返回码的出错处理有很多问题，比如：A) 返回码可以被忽略，B) 出错处理的代码和正常处理的代码混在一起，C) 造成函数接口污染，比如像atoi()这种错误码和返回值共用的糟糕的函数。</p>
+<p>4）对于多个状态的判断和组合，如果复杂了，可以使用“组合状态表”，或是状态机加Observer的状态订阅的设计模式。这样的代码即解了耦，也干净简单，同样有很强的扩展性。</p>
+<p>5） 重构“箭头型”代码其实是在帮你重新梳理所有的代码和逻辑，这个过程非常值得为之付出。重新整思路去想尽一切办法简化代码的过程本身就可以让人成长。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/重构/">重构</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/重构/">重构</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2017/04/13/如何重构箭头型代码/" data-title="如何重构箭头型代码 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/05/04/谈谈Spark的计算本地性/" title="谈谈Spark的计算本地性">
+  <strong>上一篇：</strong><br/>
+  <span>
+  谈谈Spark的计算本地性</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/04/10/流式计算概述和Spark-Streaming-tips/"  title="流式计算概述和Spark Streaming tips">
+ <strong>下一篇：</strong><br/> 
+ <span>流式计算概述和Spark Streaming tips
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#抽取成函数"><span class="toc-number">1.</span> <span class="toc-text">抽取成函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#嵌套的-if-外的代码"><span class="toc-number">2.</span> <span class="toc-text">嵌套的 if 外的代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#状态检查嵌套"><span class="toc-number">3.</span> <span class="toc-text">状态检查嵌套</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#延伸思考"><span class="toc-number">4.</span> <span class="toc-text">延伸思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

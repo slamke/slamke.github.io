@@ -1,0 +1,631 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>谈谈Spark的计算本地性 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="转载：http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7
+Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈Spark的计算本地性">
+<meta property="og:url" content="slamke.github.io/2017/05/04/谈谈Spark的计算本地性/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="转载：http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7
+Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据，">
+<meta property="og:image" content="http://7xim8y.com1.z0.glb.clouddn.com/local1.jpg">
+<meta property="og:image" content="http://7xim8y.com1.z0.glb.clouddn.com/local2.jpg">
+<meta property="og:image" content="http://7xim8y.com1.z0.glb.clouddn.com/local3.jpg">
+<meta property="og:updated_time" content="2017-05-04T02:55:52.999Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈Spark的计算本地性">
+<meta name="twitter:description" content="转载：http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7
+Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据，">
+<meta name="twitter:image" content="http://7xim8y.com1.z0.glb.clouddn.com/local1.jpg">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/04/谈谈Spark的计算本地性/" title="谈谈Spark的计算本地性" itemprop="url">谈谈Spark的计算本地性</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-04T02:51:46.000Z" itemprop="datePublished"> Published 2017-05-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#不同的-Locality-Level"><span class="toc-number">1.</span> <span class="toc-text">不同的 Locality Level</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Task-自己想在哪里执行"><span class="toc-number">2.</span> <span class="toc-text">Task 自己想在哪里执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#怎么能最大程度的满足-task-的本地性"><span class="toc-number">3.</span> <span class="toc-text">怎么能最大程度的满足 task 的本地性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark的延迟调度"><span class="toc-number">4.</span> <span class="toc-text">Spark的延迟调度</span></a></li></ol>
+		
+		</div>
+		
+		<p>转载：<a href="http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7" target="_blank" rel="external">http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7</a></p>
+<p>Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据， 就会碰到很大的带宽占用和性能下降， 这个时候就比较适合让计算去找数据.</p>
+<p>但是在计算找数据的过程中， 是怎么让计算找到数据呢， 这个就是这篇文章谈的， spark 的计算本地性</p>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local1.jpg" alt=""></p>
+<h2 id="不同的-Locality-Level"><a href="#不同的-Locality-Level" class="headerlink" title="不同的 Locality Level"></a>不同的 Locality Level</h2><ul>
+<li>PROCESS_LOCAL: 数据和 task 在同一个executor jvm 中，最好的就是这种 locality。</li>
+<li>NODE_LOCAL: 数据在同一个节点上。比如数据在同一个节点的另一个 executor上；或在 HDFS 上，恰好有 block 在同一个节点上。速度比 PROCESS_LOCAL 稍慢，因为数据需要在不同进程之间传递或从文件中读取</li>
+<li>NO_PREF: 数据从哪里访问都一样快，不需要位置优先</li>
+<li>RACK_LOCAL: 数据在同一机架的不同节点上。需要通过网络传输数据及文件 IO，比 NODE_LOCAL 慢</li>
+<li>ANY: 数据在非同一机架的网络上，速度最慢</li>
+</ul>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local2.jpg" alt=""></p>
+<h2 id="Task-自己想在哪里执行"><a href="#Task-自己想在哪里执行" class="headerlink" title="Task 自己想在哪里执行"></a>Task 自己想在哪里执行</h2><p>我们来看下 task 自己想在哪里执行， 这要根据 task 处理的数据是否缓存， task 的数据所在的 host 和 rack来判断， 在 DAGScheduler 中， 每个分区每个 stage 会成为一个task， 每个 task 会根据自己分区的数据的情况，进行判断自己的 本地性Level，</p>
+<p>getPreferredLocs -&gt; getPreferredLocsInternal</p>
+<p>函数中， 会先判断是否rdd 本分区的数据是否已经缓存在 blockManager， 如果已经缓存， 获取到数据所在的 host 和 executorId， 然后设置本 task 的数据本地性 Level 为 PROCESS_LOCAL， 偏好某个 host 上的某个 executor 去执行，</p>
+<p>如果没有缓存， 那么就不能是PROCESS_LOCAL ， 最多也就是个 NODE_LOCAL，会根据不同的RDD类型，来调用具体的 getPreferredLocations 来判断数据本地性 Level， 和数据本地性偏好</p>
+<p>假如这里是HadoopRDD， 那么每个 task 处理的数据就是一个 HadoopPartition， 其实代表 hdfs 中的一份数据 InputSplit， 它定义了分割的长度及位置。分割长度 是指分割数据的大小（以字节为单位），而分割位置 是分割所在的机器结点名称组成的列表， 分割位置中就能获取到 数据所在的 host 和 rack，</p>
+<p>如果数据源头是 kafka， 那么每个 task 处理的数据就是 KafkaRDDPartition， 其实对应每一个topic的每一个partition， preferredHosts 中记录着每个 topic 中每个 partition 所在的 host， 就直接可以当做 偏好的 host， 如果kafka中broker和Spark在同一个集群中，此时getPreferredLocations获取本地性就可以极大提高效率，因为没有了数据网络传输的成本。</p>
+<p>以上两种都偏好某个 host 去执行</p>
+<p>这里需要注意的是，这里找的数据源头是 rdd的顺着窄依赖， 往上找父依赖， 直到找到第一个窄依赖， 也就找到了数据读取源头， 来决定数据本地性</p>
+<p>如果读取的是 shuffle 的数据， 就不用考虑那么多了， 因为shuffle中的read task 是需要去所有的write task的disk上拉取数据的。</p>
+<h2 id="怎么能最大程度的满足-task-的本地性"><a href="#怎么能最大程度的满足-task-的本地性" class="headerlink" title="怎么能最大程度的满足 task 的本地性"></a>怎么能最大程度的满足 task 的本地性</h2><p>我们都知道， 数据传输对内网带宽和性能有极大的损耗，所以要千方百计的最大程度的满足 更高级别的本地性，从优到差排， PROCESS_LOCAL &gt; NODE_LOCAL &gt; NO_PREF &gt; RACK_LOCAL</p>
+<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task， 如果对应需要是用到的 executor 正在使用中（跑别的task），满足不了， 就等一会（等待时间是有spark.locality.wait.process或spark.locality.wait.node或spark.locality.wait.rack来控制的）， 看看过一会这个忙线的host 或者 executor是不是解脱了， 如果已经空闲了，我就可以把 task 放在它最期望的 host 或者 executor 上去运行了， 这里赌的就是一般来说，task 执行耗时相对于网络传输/文件IO 要小得多，调度器多等待1 2秒可能就可以以更好的本地性执行 task，避免了更耗时的网络传输或文件IO， 也是极棒的。</p>
+<h2 id="Spark的延迟调度"><a href="#Spark的延迟调度" class="headerlink" title="Spark的延迟调度"></a>Spark的延迟调度</h2><p>我们来看下 spark 的延迟调度的策略，</p>
+<p>有时候 task 自己偏好某个 executor 中，</p>
+<p>可以看下面的图直观理解一下</p>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local3.jpg" alt=""></p>
+<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task，<br>我举个例子， 假如 一个 task 要处理的数据，在上一个 stage 中缓存下来了， 这个 task 期望的 就是以 PROCESS_LOCAL 来运行， 这个时候缓存数据的executor 不巧正在执行 其他的task， 那么我就等一会， 等多长时间呢， spark.locality.wait.process这么长时间， 如果时间超了， executor 还是没有空闲下来， 那么我没有办法， 我就以NODE_LOCAL 来运行 task， 这个时候我想到 同一台机器上其他 executor 上跨jvm 去拉取数据， 如果同一台机器上有其他空闲的 executor 可以满足， 就这么干， 如果没有， 等待 spark.locality.wait.node 时间， 还没有就以更低的 Locality Level 去执行这个 task。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2017/05/04/谈谈Spark的计算本地性/" data-title="谈谈Spark的计算本地性 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/05/12/Spark如何处理异常/" title="Spark如何处理异常">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Spark如何处理异常</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/04/13/如何重构箭头型代码/"  title="如何重构箭头型代码">
+ <strong>下一篇：</strong><br/> 
+ <span>如何重构箭头型代码
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#不同的-Locality-Level"><span class="toc-number">1.</span> <span class="toc-text">不同的 Locality Level</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Task-自己想在哪里执行"><span class="toc-number">2.</span> <span class="toc-text">Task 自己想在哪里执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#怎么能最大程度的满足-task-的本地性"><span class="toc-number">3.</span> <span class="toc-text">怎么能最大程度的满足 task 的本地性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark的延迟调度"><span class="toc-number">4.</span> <span class="toc-text">Spark的延迟调度</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
