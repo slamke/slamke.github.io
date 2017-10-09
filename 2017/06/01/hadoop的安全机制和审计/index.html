@@ -1,0 +1,658 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>hadoop的安全机制和审计 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="Hadoop的安全机制Hadoop安全机制介绍
+Hadoop安全机制现状Hadoop 一直缺乏安全机制，主要表现在以下几个方面：
+(1) User to Service
+[1] Namenode或者jobtracker缺乏安全认证机制  Client的用户名和用户组名由自己指定。
+[2] DataNode缺乏安全授权机制用户只要知道某个block的blockID，便可以绕过namenode直接从d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hadoop的安全机制和审计">
+<meta property="og:url" content="slamke.github.io/2017/06/01/hadoop的安全机制和审计/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="Hadoop的安全机制Hadoop安全机制介绍
+Hadoop安全机制现状Hadoop 一直缺乏安全机制，主要表现在以下几个方面：
+(1) User to Service
+[1] Namenode或者jobtracker缺乏安全认证机制  Client的用户名和用户组名由自己指定。
+[2] DataNode缺乏安全授权机制用户只要知道某个block的blockID，便可以绕过namenode直接从d">
+<meta property="og:image" content="http://dongxicheng.org/wp-content/uploads/2012/03/kerbores_work_process.jpg">
+<meta property="og:updated_time" content="2017-06-05T07:29:50.862Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hadoop的安全机制和审计">
+<meta name="twitter:description" content="Hadoop的安全机制Hadoop安全机制介绍
+Hadoop安全机制现状Hadoop 一直缺乏安全机制，主要表现在以下几个方面：
+(1) User to Service
+[1] Namenode或者jobtracker缺乏安全认证机制  Client的用户名和用户组名由自己指定。
+[2] DataNode缺乏安全授权机制用户只要知道某个block的blockID，便可以绕过namenode直接从d">
+<meta name="twitter:image" content="http://dongxicheng.org/wp-content/uploads/2012/03/kerbores_work_process.jpg">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/06/01/hadoop的安全机制和审计/" title="hadoop的安全机制和审计" itemprop="url">hadoop的安全机制和审计</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-06-01T06:33:09.000Z" itemprop="datePublished"> Published 2017-06-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop的安全机制"><span class="toc-number">1.</span> <span class="toc-text">Hadoop的安全机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop-2-0授权机制"><span class="toc-number">2.</span> <span class="toc-text">Hadoop 2.0授权机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop的安全管理"><span class="toc-number">3.</span> <span class="toc-text">Hadoop的安全管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebUI保护"><span class="toc-number">4.</span> <span class="toc-text">WebUI保护</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="Hadoop的安全机制"><a href="#Hadoop的安全机制" class="headerlink" title="Hadoop的安全机制"></a>Hadoop的安全机制</h2><p><a href="http://dongxicheng.org/mapreduce/hadoop-security/" target="_blank" rel="external">Hadoop安全机制介绍</a></p>
+<p>Hadoop安全机制现状<br>Hadoop 一直缺乏安全机制，主要表现在以下几个方面：</p>
+<p>(1) User to Service</p>
+<p>[1] Namenode或者jobtracker缺乏安全认证机制  Client的用户名和用户组名由自己指定。</p>
+<p>[2] DataNode缺乏安全授权机制<br>用户只要知道某个block的blockID，便可以绕过namenode直接从datanode上读取该block；用户可以向任意datanode上写block。</p>
+<p>[3] JobTracker缺乏安全授权机制<br>用户可以修改或者杀掉任意其他用户的作业；用户可以修改JobTracker的持久化状态。</p>
+<p>(2) Service to service安全认证<br>Datanode与TaskTracker缺乏安全授权机制，这使得用户可以随意启动假的datanode和tasktracker，如：你可以直接到已经启动的某个TaskTracker上启动另外一个tasktracker：<br>./hadoop-daemon.sh start datanode</p>
+<p>（3）磁盘或者通信连接没有经过加密</p>
+<p><a href="http://dongxicheng.org/mapreduce/hadoop-kerberos-introduction/?replytocom=41615" target="_blank" rel="external">Hadoop Kerberos安全机制介绍</a><br><img src="http://dongxicheng.org/wp-content/uploads/2012/03/kerbores_work_process.jpg" alt=""></p>
+<p><a href="http://dongxicheng.org/mapreduce-nextgen/hadoop-yarn-security/" target="_blank" rel="external">Hadoop 2.0 (YARN)中的安全机制概述</a></p>
+<p>一般而言，系统安全机制由认证(authentication)和授权(authorization)两大部分构成。认证就是简单地对一个实体的身份进行判断；而授权则是向实体授予对数据资源和信息访问权限的决策过程。同Hadoop 1.0一样，Hadoop 2.0中的认证机制采用Kerbero和Token两种方案，而授权则是通过引入访问控制列表（Access Control List，ACL）实现的。</p>
+<h2 id="Hadoop-2-0授权机制"><a href="#Hadoop-2-0授权机制" class="headerlink" title="Hadoop 2.0授权机制"></a>Hadoop 2.0授权机制</h2><ul>
+<li>队列访问控制列表，例如提交程序和管理程序</li>
+<li>应用程序访问控制列表</li>
+<li>服务访问控制列表，例如查看和修改app</li>
+</ul>
+<h2 id="Hadoop的安全管理"><a href="#Hadoop的安全管理" class="headerlink" title="Hadoop的安全管理"></a>Hadoop的安全管理</h2><p>Hadoop生态安全管理框架Apache Ranger</p>
+<p>Ranger是一个框架，用于Hadoop平台上的监控和全面的数据安全管理。</p>
+<p>Apache Ranger有以下目标：</p>
+<ul>
+<li>集中安全管理，在中央UI中或使用REST API来管理所有与安全相关的任务。</li>
+<li>使用Hadoop组件/工具执行特定行为（或操作）并通过中央管理工具来进行细粒度的授权管理。</li>
+<li>标准化所有Hadoop组件的授权方法。</li>
+<li>增强对不同授权方法的支持  如：基于角色的访问控制，基于属性的访问控制等。</li>
+<li>在Hadoop的所有组件中集中审核用户访问和（与安全相关的）管理操作。</li>
+</ul>
+<p>Ranger的功能还包括动态策略（Dynamic Policies），当访问依赖于时间等动态因素时。它可以基于每天的不同时刻、IP地址或是地理位置对访问资源进行限制。</p>
+<p>对于受支持的Hadoop组件，Ranger通过访问控制策略提供了一种标准的授权方法。作为标准，Ranger提供了一种集中式的组件，用于审计用户的访问行为和管理组件间的安全交互行为。</p>
+<p>Ranger使用了一种基于属性的方法定义和强制实施安全策略。当与Apache Hadoop的数据治理解决方案和元数据仓储组件Apache Atlas一起使用时，它可以定义一种基于标签的安全服务，通过使用标签对文件和数据资产进行分类，并控制用户和用户组对一系列标签的访问。Ranger的功能还包括动态策略（Dynamic Policies），当访问依赖于时间等动态因素时。它可以基于每天的不同时刻、IP地址或是地理位置对访问资源进行限制。</p>
+<p>参考：<br><a href="http://www.lpnote.com/2017/04/11/best-practices-in-hdfs-authorization-with-apache-ranger/" target="_blank" rel="external">Apache Ranger在HDFS中的最佳实践</a><br><a href="http://www.datastart.cn/tech/2016/05/12/ranger.html" target="_blank" rel="external"></a></p>
+<h2 id="WebUI保护"><a href="#WebUI保护" class="headerlink" title="WebUI保护"></a>WebUI保护</h2><p>Apache Knox Gateway是一个用于hadoop安全的RESTful API Gateway，为Spark/Hadoop集群提供唯一的REST入口。Knox以类似防火墙的形式挡在Spark集群之前，接管所有用户请求（如WEB UI访问、HDFS内容查看、Hive/HBase数据操作等）。从拓扑上来说这种做法更清爽（相对Kerberos），但对内部集群的保护要求很高，因为一旦攻破了Knox层，不管资源还是数据都是光着屁股的。</p>
+<p>Spark、HDFS等等都提供了Story Web UI，用户可以从Web上查看当前JOB的执行情况，也可以kill掉JOB。那么这个Web UI不应该所有人都可以访问，而应该只开放给管理员使用。默认Spark没有认证，能连接到这个集群上就可以访问Web UI，但通过Knox，可以在打开Web UI的时候先做认证，限制只有某些用户可以访问。 类似的，Knox还可以保护HDFS NN UI、Yarn UI等</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hadoop/">Hadoop</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2017/06/01/hadoop的安全机制和审计/" data-title="hadoop的安全机制和审计 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/06/09/Spark-Dataframe使用教程和Tips/" title="Spark Dataframe使用教程和Tips">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Spark Dataframe使用教程和Tips</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/05/26/Hive-Metadata存MySQL注释中文乱码的问题/"  title="Hive Metadata存MySQL注释中文乱码的问题">
+ <strong>下一篇：</strong><br/> 
+ <span>Hive Metadata存MySQL注释中文乱码的问题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop的安全机制"><span class="toc-number">1.</span> <span class="toc-text">Hadoop的安全机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop-2-0授权机制"><span class="toc-number">2.</span> <span class="toc-text">Hadoop 2.0授权机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hadoop的安全管理"><span class="toc-number">3.</span> <span class="toc-text">Hadoop的安全管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebUI保护"><span class="toc-number">4.</span> <span class="toc-text">WebUI保护</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>9</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>23</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/安全机制/" title="安全机制">安全机制<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

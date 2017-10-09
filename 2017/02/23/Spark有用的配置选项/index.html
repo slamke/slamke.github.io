@@ -14,9 +14,7 @@
     <meta name="description" content="任务提交
 spark任务对应的Jar，配置该选项后，每次提交任务不用上传该assembly.jar,减少了任务启动时间12``` shellspark.yarn.jar hdfs://****:****/path/spark/spark-assembly-***.jar
 
-spark.blacklist    yarn提交任务时的黑名单
-Shuffle
-spark.shuffle.file.buf">
+yarn提交任务时的黑名单123456789101112131415## Shuffle- ```spark.shuffle.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark有用的配置选项">
 <meta property="og:url" content="slamke.github.io/2017/02/23/Spark有用的配置选项/index.html">
@@ -24,18 +22,14 @@ spark.shuffle.file.buf">
 <meta property="og:description" content="任务提交
 spark任务对应的Jar，配置该选项后，每次提交任务不用上传该assembly.jar,减少了任务启动时间12``` shellspark.yarn.jar hdfs://****:****/path/spark/spark-assembly-***.jar
 
-spark.blacklist    yarn提交任务时的黑名单
-Shuffle
-spark.shuffle.file.buf">
-<meta property="og:updated_time" content="2017-04-01T08:08:59.929Z">
+yarn提交任务时的黑名单123456789101112131415## Shuffle- ```spark.shuffle.">
+<meta property="og:updated_time" content="2017-06-30T14:58:53.257Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark有用的配置选项">
 <meta name="twitter:description" content="任务提交
 spark任务对应的Jar，配置该选项后，每次提交任务不用上传该assembly.jar,减少了任务启动时间12``` shellspark.yarn.jar hdfs://****:****/path/spark/spark-assembly-***.jar
 
-spark.blacklist    yarn提交任务时的黑名单
-Shuffle
-spark.shuffle.file.buf">
+yarn提交任务时的黑名单123456789101112131415## Shuffle- ```spark.shuffle.">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -111,21 +105,19 @@ spark.shuffle.file.buf">
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#任务提交"><span class="toc-number">1.</span> <span class="toc-text">任务提交</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shuffle"><span class="toc-number">2.</span> <span class="toc-text">Shuffle</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory"><span class="toc-number">3.</span> <span class="toc-text">Memory</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#任务提交"><span class="toc-number">1.</span> <span class="toc-text">任务提交</span></a></li></ol>
 		
 		</div>
 		
 		<h2 id="任务提交"><a href="#任务提交" class="headerlink" title="任务提交"></a>任务提交</h2><ul>
 <li><figure class="highlight plain"><figcaption><span>spark任务对应的Jar，配置该选项后，每次提交任务不用上传该assembly.jar,减少了任务启动时间</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">spark.yarn.jar hdfs://****:****/path/spark/spark-assembly-***.jar</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><code>spark.blacklist</code>    yarn提交任务时的黑名单</p>
-<h2 id="Shuffle"><a href="#Shuffle" class="headerlink" title="Shuffle"></a>Shuffle</h2></li>
-<li><p><code>spark.shuffle.file.buffer</code> </p>
+<li><figure class="highlight plain"><figcaption><span>yarn提交任务时的黑名单</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">## Shuffle</span><br><span class="line"></span><br><span class="line">- ```spark.shuffle.file.buffer``` </span><br><span class="line"></span><br><span class="line">Size of the in-memory buffer for each shuffle file output stream. These buffers reduce the number of disk seeks and system calls made in creating intermediate shuffle files.</span><br><span class="line"></span><br><span class="line">## Memory</span><br><span class="line"></span><br><span class="line">- ```spark.yarn.executor.memoryOverhead``` </span><br><span class="line">The amount of off-heap memory (in megabytes) to be allocated per executor. This is memory that accounts for things like VM overheads, interned strings, other native overheads, etc. This tends to grow with the executor size (typically 6-10%).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Spark SQL</span><br><span class="line"></span><br><span class="line">- ``` spark.sql.shuffle.partitions</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>Size of the in-memory buffer for each shuffle file output stream. These buffers reduce the number of disk seeks and system calls made in creating intermediate shuffle files.</p>
-<h2 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h2><ul>
-<li><code>spark.yarn.executor.memoryOverhead</code><br>The amount of off-heap memory (in megabytes) to be allocated per executor. This is memory that accounts for things like VM overheads, interned strings, other native overheads, etc. This tends to grow with the executor size (typically 6-10%).</li>
+<p>Spark SQL 2.0版本之前，reduce的个数是通过spark.default.parallelism和spark.sql.shuffle.partitions两个参数进行配置。如果配置过大，将会导致下游产生很多碎片化的Task，或者下游HDFS产生很多小文件。如果设置过小，将会导致单个ReduceTask计算负载过大。</p>
+<ul>
+<li><figure class="highlight plain"><figcaption><span>```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Spark SQL 2.0+支持通过spark.sql.adaptive.enabled来设置reduce大小自适应</span><br><span class="line">- ```spark.sql.files.ignoreCorruptFiles</span><br></pre></td></tr></table></figure></li>
 </ul>
   
 	</div>
@@ -179,7 +171,7 @@ spark.shuffle.file.buf">
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#任务提交"><span class="toc-number">1.</span> <span class="toc-text">任务提交</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shuffle"><span class="toc-number">2.</span> <span class="toc-text">Shuffle</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Memory"><span class="toc-number">3.</span> <span class="toc-text">Memory</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#任务提交"><span class="toc-number">1.</span> <span class="toc-text">任务提交</span></a></li></ol>
  
   </div>
 
@@ -207,11 +199,11 @@ spark.shuffle.file.buf">
 		  
 		
 		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
 		  
 		
 		  
@@ -219,7 +211,19 @@ spark.shuffle.file.buf">
 		  
 		
 		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
 		  
 		
 		  
@@ -227,7 +231,7 @@ spark.shuffle.file.buf">
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>23</sup></a></li>
 		  
 		
 		  
@@ -247,6 +251,10 @@ spark.shuffle.file.buf">
 		  
 		
 		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>3</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
 		  
 		
@@ -260,7 +268,7 @@ spark.shuffle.file.buf">
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>20</sup></a></li>
 			
 		
 			
@@ -276,19 +284,23 @@ spark.shuffle.file.buf">
 			
 		
 			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -300,11 +312,19 @@ spark.shuffle.file.buf">
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>2</sup></a></li>
 			
 		
 			
@@ -316,27 +336,15 @@ spark.shuffle.file.buf">
 			
 		
 			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/安全机制/" title="安全机制">安全机制<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
 			
 		
 		</ul>

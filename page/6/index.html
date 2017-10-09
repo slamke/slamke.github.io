@@ -81,25 +81,39 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/10/Tomcat系统架构和设计模式/" title="Tomcat系统架构和设计模式" itemprop="url">Tomcat系统架构和设计模式</a>
+      <a href="/2016/05/23/Spark和MySQL交互/" title=" Spark和MySQL交互" itemprop="url"> Spark和MySQL交互</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-10T14:02:09.000Z" itemprop="datePublished"> Published 2016-04-10</time>
+    <time datetime="2016-05-23T06:32:22.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h2 id="Tomcat-的总体结构"><a href="#Tomcat-的总体结构" class="headerlink" title="Tomcat 的总体结构"></a>Tomcat 的总体结构</h2><p><img src="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/image001.gif" alt="Tomcat 的总体结构"></p>
-<p>从上图中可以看出 Tomcat 的心脏是两个组件：Connector 和 Container，关于这两个组件将在后面详细介绍。Connector 组件是可以被替换，这样可以提供给服务器设计者更多的选择，因为这个组件是如此重要，不仅跟服务器的设计的本身，而且和不同的应用场景也十分相关，所以一个 Container 可以选择对应多个 Connector。多个 Connector 和一个 Container 就形成了一个 Service，Service 的概念大家都很熟悉了，有了 Service 就可以对外提供服务了，但是 Service 还要一个生存的环境，必须要有人能够给她生命、掌握其生死大权，那就非 Server 莫属了。所以整个 Tomcat 的生命周期由 Server 控制。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 1 部分: 工作原理</a></li>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 2 部分: 设计模式分析</a></li>
-</ul>
+        <h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="external">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="external">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="external">改写Spark JdbcRDD，支持自己定义分区查询条件</a><br><a href="http://lswyyy.github.io/2015/12/16/%E6%8F%90%E9%AB%98spark-jdbc%E6%93%8D%E4%BD%9C%E5%B9%B6%E5%8F%91%E5%BA%A6/" target="_blank" rel="external">spark jdbc(mysql) 操作并发度优化</a></p>
+<h3 id="一、不指定查询条件"><a href="#一、不指定查询条件" class="headerlink" title="一、不指定查询条件"></a>一、不指定查询条件</h3><p>　　这个方式链接MySql的函数原型是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(url: <span class="type">String</span>, table: <span class="type">String</span>, properties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure></p>
+<p>我们只需要提供Driver的url，需要查询的表名，以及连接表相关属性properties。下面是具体例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, prop )</span><br><span class="line">println(df.count())</span><br><span class="line">println(df.rdd.partitions.size)</span><br></pre></td></tr></table></figure></p>
+<p>我们运行上面的程序，可以看到df.rdd.partitions.size输出结果是1，这个结果的含义是iteblog表的所有数据都是由RDD的一个分区处理的，所以说，如果你这个表很大，很可能会出现OOM<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSetManager: Lost task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">1.0</span> (TID <span class="number">14</span>, spark047219):</span><br><span class="line"> java.lang.OutOfMemoryError: GC overhead limit exceeded at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:<span class="number">3380</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这种方式在数据量大的时候不建议使用。</p>
+<h3 id="二、指定数据库字段的范围"><a href="#二、指定数据库字段的范围" class="headerlink" title="二、指定数据库字段的范围"></a>二、指定数据库字段的范围</h3><p>　　这种方式就是通过指定数据库中某个字段的范围，但是遗憾的是，这个字段必须是数字，来看看这个函数的函数原型：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    columnName: <span class="type">String</span>,</span><br><span class="line">    lowerBound: <span class="type">Long</span>,</span><br><span class="line">    upperBound: <span class="type">Long</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span>,</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>　　前两个字段的含义和方法一类似。columnName就是需要分区的字段，这个字段在数据库中的类型必须是数字；lowerBound就是分区的下界；upperBound就是分区的上界；numPartitions是分区的个数。同样，我们也来看看如何使用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lowerBound = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> upperBound = <span class="number">100000</span></span><br><span class="line"><span class="keyword">val</span> numPartitions = <span class="number">5</span></span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, <span class="string">"id"</span>, lowerBound, upperBound, numPartitions, prop)</span><br></pre></td></tr></table></figure>
+<p>这个方法可以将iteblog表的数据分布到RDD的几个分区中，分区的数量由numPartitions参数决定，在理想情况下，每个分区处理相同数量的数据，我们在使用的时候不建议将这个值设置的比较大，因为这可能导致数据库挂掉！但是根据前面介绍，这个函数的缺点就是只能使用整形数据字段作为分区关键字。</p>
+<p>　　这个函数在极端情况下，也就是设置将numPartitions设置为1，其含义和第一种方式一致。</p>
+<h3 id="三、根据任意字段进行分区"><a href="#三、根据任意字段进行分区" class="headerlink" title="三、根据任意字段进行分区"></a>三、根据任意字段进行分区</h3><p>　　基于前面两种方法的限制，Spark还提供了根据任意字段进行分区的方法，函数原型如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    predicates: <span class="type">Array</span>[<span class="type">String</span>],</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>这个函数相比第一种方式多了predicates参数，我们可以通过这个参数设置分区的依据，来看看例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> predicates = <span class="type">Array</span>[<span class="type">String</span>](<span class="string">"reportDate &lt;= '2014-12-31'"</span>, </span><br><span class="line">	<span class="string">"reportDate &gt; '2014-12-31' and reportDate &lt;= '2015-12-31'"</span>)</span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, predicates, prop)</span><br></pre></td></tr></table></figure>
+<p>最后rdd的分区数量就等于predicates.length。</p>
+<h3 id="四、通过load获取"><a href="#四、通过load获取" class="headerlink" title="四、通过load获取"></a>四、通过load获取</h3><p>Spark还提供通过load的方式来读取数据。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span>,</span><br><span class="line">    <span class="string">"dbtable"</span> -&gt; <span class="string">"iteblog"</span>)).load()</span><br></pre></td></tr></table></figure>
+<p>options函数支持url、driver、dbtable、partitionColumn、lowerBound、upperBound以及numPartitions选项，细心的同学肯定发现这个和方法二的参数一致。是的，其内部实现原理部分和方法二大体一致。同时load方法还支持json、orc等数据源的读取。</p>
+<h2 id="Spark-写入MySQL"><a href="#Spark-写入MySQL" class="headerlink" title="Spark 写入MySQL"></a>Spark 写入MySQL</h2><p><a href="http://www.iteblog.com/archives/1275" target="_blank" rel="external">Spark将计算结果写入到Mysql中</a><br><a href="http://www.iteblog.com/archives/1290" target="_blank" rel="external">Spark RDD写入RMDB(Mysql)方法二</a></p>
 
         
         
@@ -112,13 +126,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Tomcat/">Tomcat</a>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Tomcat/">Tomcat</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/MySQL/">MySQL</a>
   </div>
 
 </div>
@@ -146,156 +160,49 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/07/Spring实现数据库读写分离/" title="Spring实现数据库读写分离" itemprop="url">Spring实现数据库读写分离</a>
+      <a href="/2016/05/23/Spark-资料整理/" title="Spark 资料整理" itemprop="url">Spark 资料整理</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-07T01:53:26.000Z" itemprop="datePublished"> Published 2016-04-07</time>
+    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p><a href="https://github.com/slamke/spring_read_write" target="_blank" rel="external">Github</a></p>
-<p>参考：<br><a href="http://wiki.xby1993.net/doku.php?id=spring:spring%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB" target="_blank" rel="external">spring实现数据库读写分离</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spring/">Spring</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/07/hadoop相关记录/" title="hadoop相关记录" itemprop="url">hadoop相关记录</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-07T01:28:09.000Z" itemprop="datePublished"> Published 2016-04-07</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://jiangbo.me/blog/2012/10/23/mount-hdfs-with-fuse-dfs/" target="_blank" rel="external">使用FUSE-DFS mount HDFS</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/Hdfs/">Hdfs</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/06/SpringMVC记录/" title="SpringMVC记录" itemprop="url">SpringMVC记录</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-06T13:08:18.000Z" itemprop="datePublished"> Published 2016-04-06</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://neoremind.com/2016/02/springmvc%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" target="_blank" rel="external">springmvc的一些常用最佳实践</a><br>内容概要：</p>
+        <h2 id="一-快速入门"><a href="#一-快速入门" class="headerlink" title="一 快速入门"></a>一 快速入门</h2><p><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="external">Apache Spark快速入门：基本概念和例子(1)</a><br><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="external">Apache Spark快速入门：基本概念和例子(2)</a><br><a href="">Spark Streaming整体执行流程</a><a href="http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/" target="_blank" rel="external">http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/</a></p>
+<h2 id="二-应用调试"><a href="#二-应用调试" class="headerlink" title="二 应用调试"></a>二 应用调试</h2><h3 id="2-1-Spark应用程序运行的日志存在哪里"><a href="#2-1-Spark应用程序运行的日志存在哪里" class="headerlink" title="2.1 Spark应用程序运行的日志存在哪里"></a>2.1 Spark应用程序运行的日志存在哪里</h3><p><a href="http://www.iteblog.com/archives/1353" target="_blank" rel="external">Spark应用程序运行的日志存在哪里</a><br>Spark日志确切的存放路径和部署模式相关：</p>
+<ol>
+<li>如果是Spark Standalone模式，我们可以直接在Master UI界面查看应用程序的日志，在默认情况下这些日志是存储在worker节点的work目录下，这个目录可以通过SPARK_WORKER_DIR参数进行配置。</li>
+<li>如果是Mesos模式，我们同样可以通过Mesos的Master UI界面上看到相关应用程序的日志，这些日志是存储在Mesos slave的work目录下。</li>
+<li>如果是YARN模式，最简单地收集日志的方式是使用YARN的日志收集工具（<figure class="highlight plain"><figcaption><span>logs -applicationId``` ），这个工具可以收集你应用程序相关的运行日志，但是这个工具是有限制的：**应用程序必须运行完**，因为YARN必须首先聚合这些日志；而且你必须开启日志聚合功能（yarn.log-aggregation-enable，在默认情况下，这个参数是false）。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">``` powershell</span><br><span class="line">./bin/yarn logs -applicationId application_1452073024926_19404</span><br><span class="line">or</span><br><span class="line">Tracking UI --&gt; ApplicationMaster --&gt; Executors菜单 --&gt; Logs</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-2-通过可视化途径理解你的Spark应用程序"><a href="#2-2-通过可视化途径理解你的Spark应用程序" class="headerlink" title="2.2 通过可视化途径理解你的Spark应用程序"></a>2.2 通过可视化途径理解你的Spark应用程序</h3><p><a href="http://www.iteblog.com/archives/1405" target="_blank" rel="external">通过可视化途径理解你的Spark应用程序</a><br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Tracking UI --&gt; ApplicationMaster --&gt;Jobs菜单/Stages菜单</span><br><span class="line">分析shuffle的时间</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-3-Spark作业代码-源码-IDE远程调试"><a href="#2-3-Spark作业代码-源码-IDE远程调试" class="headerlink" title="2.3 Spark作业代码(源码)IDE远程调试"></a>2.3 Spark作业代码(源码)IDE远程调试</h3><p><a href="tp://www.iteblog.com/archives/1192" target="_blank" rel="external">Spark作业代码(源码)IDE远程调试</a></p>
+<h3 id="2-4-不要直接继承scala-App来提交代码"><a href="#2-4-不要直接继承scala-App来提交代码" class="headerlink" title="2.4 不要直接继承scala.App来提交代码"></a>2.4 不要直接继承scala.App来提交代码</h3><p>如果你继承了App trait，那么里面的变量被当作了单例类的field了；而如果是main方法，则当作是局部变量了。而且trait App是继承了DelayedInit，所以里面的变量只有用到了main方法的时候才会被初始化。<br><a href="http://www.iteblog.com/archives/1543" target="_blank" rel="external">Spark程序编写：继承App的问题</a> </p>
+<h2 id="三-REST-API"><a href="#三-REST-API" class="headerlink" title="三 REST API"></a>三 REST API</h2><p><a href="http://www.iteblog.com/archives/1386" target="_blank" rel="external">Spark 1.4中REST API介绍</a><br>目前这个API支持正在运行的应用程序，也支持历史服务器。在请求URL都有/api/v1。比如，对于历史服务器来说，我们可以通过<a href="http://:18080/api/v1来获取一些信息；对于正在运行的Spark应用程序，我们可以通过http://www.iteblog.com:4040/api/v1来获取一些信息。" target="_blank" rel="external">http://:18080/api/v1来获取一些信息；对于正在运行的Spark应用程序，我们可以通过http://www.iteblog.com:4040/api/v1来获取一些信息。</a></p>
+<h2 id="四-文件操作"><a href="#四-文件操作" class="headerlink" title="四 文件操作"></a>四 文件操作</h2><h3 id="4-1-Spark多文件输出-MultipleOutputFormat"><a href="#4-1-Spark多文件输出-MultipleOutputFormat" class="headerlink" title="4.1 Spark多文件输出(MultipleOutputFormat)"></a>4.1 Spark多文件输出(MultipleOutputFormat)</h3><p><a href="http://www.iteblog.com/archives/1281" target="_blank" rel="external">Spark多文件输出(MultipleOutputFormat)</a></p>
+<h3 id="4-2-Json"><a href="#4-2-Json" class="headerlink" title="4.2 Json"></a>4.2 Json</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> people = sqlContext.jsonFile(<span class="string">"[the path to file people]"</span>)</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line">people.printSchema()</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLE</span> people</span><br><span class="line"><span class="keyword">USING</span> org.apache.spark.<span class="keyword">sql</span>.<span class="keyword">json</span></span><br><span class="line">OPTIONS (<span class="keyword">path</span> <span class="string">'[the path to the JSON dataset]'</span>)</span><br></pre></td></tr></table></figure>
+<p><a href="http://www.iteblog.com/archives/1260" target="_blank" rel="external">Spark SQL中对Json支持的详细介绍</a></p>
+<h2 id="五-shuffle"><a href="#五-shuffle" class="headerlink" title="五 shuffle"></a>五 shuffle</h2><p><a href="http://www.iteblog.com/archives/1138" target="_blank" rel="external">Spark shuffle：hash和sort性能对比</a><br>随着mapper数量或者Reduce数量的增加，基于hash的shuffle实现的表现比基于sort的shuffle实现的表现越来越糟糕。基于这个事实，在Spark 1.2版本，默认的shuffle将选用基于sort的。在MLlib下，基于sort的Shuffle并不一定比基于hash的Shuffle表现好，所以程序选择哪个Shuffle实现是需要考虑到具体的场景，如果内置的Shuffle实现不能满足自己的需求，我们完全可以自己实现一个Shuffle。用户自定义的Shuffle必须继承ShuffleManager类，重写里面的一些方法。</p>
+<h2 id="六-partition"><a href="#六-partition" class="headerlink" title="六 partition"></a>六 partition</h2><p><a href="http://www.iteblog.com/archives/1522" target="_blank" rel="external">Spark分区器HashPartitioner和RangePartitioner代码详解</a><br><a href="http://www.iteblog.com/archives/1368" target="_blank" rel="external">Spark自定义分区(Partitioner)</a><br>Spark提供了相应的接口，我们只需要扩展Partitioner抽象类，然后实现里面的三个方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.spark</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * An object that defines how the elements in a key-value pair RDD are partitioned by key.</span><br><span class="line"> * Maps each key to a partition ID, from 0 to `numPartitions - 1`.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Partitioner</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">numPartitions</span></span>: <span class="type">Int</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getPartition</span></span>(key: <span class="type">Any</span>): <span class="type">Int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
-<li>SpringMVC的源代码执行流程</li>
-<li>使用WebDataBinder进行参数的个性化绑定和验证<ul>
-<li>基于annotation进行参数验证，<a href="http://www.cnblogs.com/HD/p/4123146.html" target="_blank" rel="external">地址</a></li>
-<li>基于@InitBinder进行参数验证，<a href="http://www.cnblogs.com/HD/p/4123686.html" target="_blank" rel="external">地址</a></li>
+<li>def numPartitions: Int：这个方法需要返回你想要创建分区的个数；</li>
+<li>def getPartition(key: Any): Int：这个函数需要对输入的key做计算，然后返回该key的分区ID，范围一定是0到numPartitions-1；</li>
+<li>equals()：这个是Java标准的判断相等的函数，之所以要求用户实现这个函数是因为Spark内部会比较两个RDD的分区是否一样。</li>
 </ul>
-</li>
-<li>使用高级的HandlerMethodArgumentResolver来实现参数的个性化解析</li>
-<li>使用aspectj拦截器进行全局参数校验</li>
-<li>全局错误处理，隐藏后端异常以及友好提示</li>
-<li>使用Spring自带拦截器HandlerInterceptor进行权限控制</li>
-</ul>
-<h2 id="数据验证"><a href="#数据验证" class="headerlink" title="数据验证"></a>数据验证</h2><p><a href="http://www.cnblogs.com/HD/p/4123686.html" target="_blank" rel="external">InitBinder验证</a><br><a href="http://www.cnblogs.com/HD/p/4123146.html" target="_blank" rel="external">Annotation验证</a></p>
-<h2 id="Filter实现"><a href="#Filter实现" class="headerlink" title="Filter实现"></a>Filter实现</h2><p><a href="http://blog.csdn.net/liuwenbo0920/article/details/7283757" target="_blank" rel="external">Spring MVC 中 HandlerInterceptorAdapter的使用</a></p>
-<h2 id="参数提取"><a href="#参数提取" class="headerlink" title="参数提取"></a>参数提取</h2><p><a href="http://stackoverflow.com/questions/12393937/spring-mvc-implementation-of-webargumentresolver" target="_blank" rel="external">自定义WebArgumentResolver/HandlerMethodArgumentResolver从session中提取参数</a></p>
+<h2 id="七-序列化"><a href="#七-序列化" class="headerlink" title="七 序列化"></a>七 序列化</h2><p><a href="http://www.iteblog.com/archives/1531" target="_blank" rel="external">Spark Task序列化代码分析</a><br><a href="http://www.iteblog.com/archives/1328" target="_blank" rel="external">在Spark中自定义Kryo序列化输入输出API</a><br><a href="http://stackoverflow.com/questions/31394140/require-kryo-serialization-in-spark-scala" target="_blank" rel="external">require-kryo-serialization-in-spark-scala</a></p>
+<p>解决序列化问题:</p>
+<ol>
+<li>使用lazy引用（Lazy Reference）来实现<br>lazy val pool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, redisTimeout)</li>
+<li>把对需要序列化对象的管理放在操作DStream的Output操作范围之内，因为我们知道它是在特定的Executor中进行初始化的，使用一个单例的对象来管理</li>
+</ol>
+<h2 id="八-RDD"><a href="#八-RDD" class="headerlink" title="八 RDD"></a>八 RDD</h2><p><a href="http://www.iteblog.com/archives/1298" target="_blank" rel="external">Spark RDD API扩展开发(1): 自定义函数</a><br><a href="http://www.iteblog.com/archives/1299" target="_blank" rel="external">Spark RDD API扩展开发(2):自定义RDD</a></p>
+<h2 id="九-kafka"><a href="#九-kafka" class="headerlink" title="九 kafka"></a>九 kafka</h2><p><a href="http://www.iteblog.com/archives/1322" target="_blank" rel="external">Spark Streaming和Kafka整合开发指南(一)</a><br><a href="http://www.iteblog.com/archives/1326" target="_blank" rel="external">Spark Streaming和Kafka整合开发指南(二)</a><br><a href="http://www.iteblog.com/archives/1381" target="_blank" rel="external">Spark+Kafka的Direct方式将偏移量发送到Zookeeper实现</a><br><a href="http://www.iteblog.com/archives/1591" target="_blank" rel="external">Spark Streaming和Kafka整合是如何保证数据零丢失</a><br><a href="http://www.iteblog.com/archives/1378" target="_blank" rel="external">Kafka+Spark Streaming+Redis实时系统实践</a></p>
 
         
         
@@ -308,13 +215,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
+  <span></span> <a href="/tags/Spark/">Spark</a>
   </div>
 
 </div>
@@ -342,21 +249,59 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/05/Http-Servlet汇总/" title="Http Servlet汇总" itemprop="url">Http Servlet汇总</a>
+      <a href="/2016/05/18/Spark函数讲解/" title="Spark函数讲解" itemprop="url">Spark函数讲解</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> Published 2016-04-05</time>
+    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> Published 2016-05-18</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-servlet/" title="Servlet 工作原理解析" target="_blank" rel="external">Servlet 工作原理解析</a></p>
-<p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-jetty/" title="Jetty 的工作原理以及与 Tomcat 的比较" target="_blank" rel="external">Jetty 的工作原理以及与 Tomcat 的比较</a></p>
+        <h2 id="cogroup"><a href="#cogroup" class="headerlink" title="cogroup"></a>cogroup</h2><p>将多个RDD中同一个Key对应的Value组合到一起。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], numPartitions: <span class="type">Int</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)],</span><br><span class="line">       partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], </span><br><span class="line">      numPartitions: <span class="type">Int</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br></pre></td></tr></table></figure></p>
+<p>cogroup函数原型一共有九个（真多）！最多可以组合四个RDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data1 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>)))</span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">3</span>, <span class="string">"very"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> data3 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data1.cogroup(data2, data3)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">------------------------------------</span><br><span class="line">(<span class="number">2</span>,(<span class="type">CompactBuffer</span>(bbs),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">1</span>,(<span class="type">CompactBuffer</span>(www),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">3</span>,(<span class="type">CompactBuffer</span>(),<span class="type">CompactBuffer</span>(very, good),<span class="type">CompactBuffer</span>(good)))</span><br></pre></td></tr></table></figure></p>
+<h2 id="combineByKey"><a href="#combineByKey" class="headerlink" title="combineByKey"></a>combineByKey</h2><p>使用用户设置好的聚合函数对每个Key中的Value进行组合(combine)。可以将输入类型为RDD[(K, V)]转成成RDD[(K, C)]。</p>
+<h3 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>) : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, partitioner: <span class="type">Partitioner</span>, mapSideCombine: </span><br><span class="line">    <span class="type">Boolean</span> = <span class="literal">true</span>, serializer: <span class="type">Serializer</span> = <span class="literal">null</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br></pre></td></tr></table></figure>
+<p>　　第一个和第二个函数都是基于第三个函数实现的，使用的是HashPartitioner，Serializer为null。而第三个函数我们可以指定分区，如果需要使用Serializer的话也可以指定。combineByKey函数比较重要，我们熟悉地诸如aggregateByKey、foldByKey、reduceByKey等函数都是基于该函数实现的。<strong>默认情况会在Map端进行组合操作</strong>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>),(<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data.combineByKey(<span class="type">List</span>(_), (x: <span class="type">List</span> [<span class="type">String</span>], y: <span class="type">String</span>) =&gt; y :: x, (x: <span class="type">List</span>[<span class="type">String</span>],y:<span class="type">List</span>[<span class="type">String</span>]) =&gt; x ::: y)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>,<span class="type">List</span>(com, iteblog, bbs))</span><br><span class="line">(<span class="number">1</span>,<span class="type">List</span>(com, iteblog, www))</span><br><span class="line">(<span class="number">3</span>,<span class="type">List</span>(good))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="string">"iteblog"</span>, <span class="number">1</span>), (<span class="string">"bbs"</span>, <span class="number">1</span>), (<span class="string">"iteblog"</span>, <span class="number">3</span>)))</span><br><span class="line"><span class="keyword">val</span> result2 = data2.combineByKey(x =&gt; x,(x: <span class="type">Int</span>, y:<span class="type">Int</span>) =&gt; x + y, (x:<span class="type">Int</span>, y: <span class="type">Int</span>) =&gt; x + y)</span><br><span class="line">result2.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(iteblog,<span class="number">4</span>)</span><br><span class="line">(bbs,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="coalesce"><a href="#coalesce" class="headerlink" title="coalesce"></a>coalesce</h2><p>对RDD中的分区重新进行合并。</p>
+<h3 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coalesce</span></span>(numPartitions: <span class="type">Int</span>, shuffle: <span class="type">Boolean</span> = <span class="literal">false</span>)</span><br><span class="line">　　　　(<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">T</span>] = <span class="literal">null</span>): <span class="type">RDD</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+<p>返回一个新的RDD，且该RDD的分区个数等于numPartitions个数。如果shuffle设置为true，则会进行shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>))</span><br><span class="line"><span class="keyword">val</span> result = data.coalesce(<span class="number">2</span>, <span class="literal">false</span>)</span><br><span class="line">println(result.partitions.length)</span><br><span class="line">println(result.toDebugString)</span><br><span class="line"><span class="keyword">val</span> result1 = data.coalesce(<span class="number">2</span>, <span class="literal">true</span>)</span><br><span class="line">println(result1.toDebugString)</span><br><span class="line"></span><br><span class="line"><span class="number">2</span></span><br><span class="line">(<span class="number">2</span>) <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">16</span> []</span><br><span class="line"> |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br><span class="line"> </span><br><span class="line">(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">5</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">CoalescedRDD</span>[<span class="number">4</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">ShuffledRDD</span>[<span class="number">3</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> +-(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line">    |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看出shuffle为false的时候并不进行shuffle操作；而为true的时候会进行shuffle操作。RDD.partitions.length可以获取相关RDD的分区数。</p>
+<h2 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h2><p>为当前RDD设置检查点。该函数将会创建一个二进制的文件，并存储到checkpoint目录中，该目录是用SparkContext.setCheckpointDir()设置的。在checkpoint的过程中，该RDD的所有依赖于父RDD中的信息将全部被移出。<strong>对RDD进行checkpoint操作并不会马上被执行，必须执行Action操作才能触发</strong>。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checkpoint</span></span>()</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt;val data = sc.parallelize(1 to 100000 , 15)<br>scala&gt; sc.setCheckpointDir(“/app/ecom/cm/ods/tmp/sunke/spark/checkpoint”)<br>scala&gt; data.checkpoint<br>scala&gt; data.count<br>res3: Long = 100000</p>
+</blockquote>
+<p>结果：</p>
+<blockquote>
+<p>[work@yq01-cm-m32-201502nova228.yq01.baidu.com ~]$ hadoop fs -ls /app/ecom/cm/ods/tmp/sunke/spark/checkpoint<br>16/05/18 11:27:20 INFO common.UpdateService: ZkstatusUpdater to yq01-wutai-hdfs.dmop.baidu.com:54310 started<br>Found 1 items<br>drwxr-xr-x   3 ods ods          0 2016-05-18 11:26 /app/ecom/cm/ods/tmp/sunke/spark/checkpoint/590a5e9b-26de-416f-aecb-22ea5e29d893<br>执行完count之后，会在checkpoint目录下产生出多个（数量和你分区个数有关）二进制的文件。</p>
+</blockquote>
+<h2 id="cartesian"><a href="#cartesian" class="headerlink" title="cartesian"></a>cartesian</h2><p>从名字就可以看出这是笛卡儿的意思，就是对给的两个RDD进行笛卡儿计算。官方文档说明：Return the Cartesian product of this RDD and another one, that is, the RDD of all pairs of elements (a, b) where a is in <code>this</code> and b is in <code>other</code>.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cartesian</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](other: <span class="type">RDD</span>[<span class="type">U</span>]): <span class="type">RDD</span>[(<span class="type">T</span>, <span class="type">U</span>)]</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的是Pair类型的RDD，计算结果是当前RDD和other RDD中每个元素进行笛卡儿计算的结果。最后返回的是CartesianRDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line"><span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>))</span><br><span class="line"><span class="keyword">val</span> result = a.cartesian(b)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">1</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">6</span>)</span><br></pre></td></tr></table></figure></p>
+<p>笛卡儿计算是很恐怖的，它会迅速消耗大量的内存，所以在使用这个函数的时候请小心。</p>
+<h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2><p>使用MEMORY_ONLY储存级别对RDD进行缓存，其内部实现是调用persist()函数的。官方文档定义：Persist this RDD with the default storage level (<code>MEMORY_ONLY</code>).<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cache</span></span>() : <span class="keyword">this</span>.<span class="keyword">type</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt; var data = sc.parallelize(List(1,2,3,4))<br>data: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res65: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, false, false, false, 1)<br>scala&gt; data.cache<br>res66: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res67: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, true, false, true, 1)<br>我们先是定义了一个RDD，然后通过getStorageLevel函数得到该RDD的默认存储级别，这里是NONE。然后我们调用cache函数，将RDD的存储级别改成了MEMORY_ONLY(看StorageLevel的第二个参数)。关于StorageLevel的其他的几种存储级别介绍请参照StorageLevel类进行了解。</console></console></p>
+</blockquote>
+<h2 id="aggregate"><a href="#aggregate" class="headerlink" title="aggregate"></a>aggregate</h2><p>Aggregate the elements of each partition, and then the results for all the partitions, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of this RDD, T. Thus, we need one operation for merging a T into an U and one operation for merging two U’s, as in scala.TraversableOnce. Both of these functions are allowed to modify and return their first argument instead of creating a new U to avoid memory allocation.<br>　　aggregate函数将每个分区里面的元素进行聚合，然后用combine函数将每个分区的结果和初始值(zeroValue)进行combine操作。这个函数最终返回的类型不需要和RDD中元素类型一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregate</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)(seqOp: (<span class="type">U</span>, <span class="type">T</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">U</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seqOP</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"seqOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">combOp</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"combOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> z1 = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>), <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">val</span> result1 = z1.aggregate(<span class="number">3</span>)(seqOP, combOp)</span><br><span class="line">    println(<span class="string">"result1: "</span>+result1)</span><br><span class="line"></span><br><span class="line">计算过程为:  </span><br><span class="line">partition内部聚合：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">1</span>+<span class="number">2</span>+<span class="number">3</span>=<span class="number">9</span></span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">4</span>+<span class="number">5</span>+<span class="number">6</span>=<span class="number">18</span></span><br><span class="line">combine：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">9</span>+<span class="number">18</span></span><br><span class="line"></span><br><span class="line">result1: <span class="number">30</span></span><br></pre></td></tr></table></figure>
+<p>1、reduce函数和combine函数必须满足<strong>交换律(commutative)和结合律(associative)</strong><br>2、从aggregate 函数的定义可知，combine函数的输出类型必须和输入的类型一致</p>
+<h2 id="aggregateByKey"><a href="#aggregateByKey" class="headerlink" title="aggregateByKey"></a>aggregateByKey</h2><p>该函数和aggregate类似，但操作的RDD是Pair类型的。<br>Aggregate the values of each key, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of the values in this RDD, V. Thus, we need one operation for merging a V into a U and one operation for merging two U’s, as in scala.TraversableOnce. The former operation is used for merging values within a partition, and the latter is used for merging values between partitions. To avoid memory allocation, both of these functions are allowed to modify and return their first argument instead of creating a new U.<br>aggregateByKey函数对PairRDD中相同Key的值进行聚合操作，在聚合过程中同样使用了一个中立的初始值。和aggregate函数类似，aggregateByKey返回值的类型不需要和RDD中value的类型一致。因为aggregateByKey是对相同Key中的值进行聚合操作，所以aggregateByKey函数最终返回的类型还是Pair RDD，对应的结果是Key和聚合好的值；而aggregate函数直接是返回非RDD的结果，这点需要注意。在实现过程中，定义了三个aggregateByKey函数原型，但最终调用的aggregateByKey函数都一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第一个aggregateByKey函数我们可以自定义<span class="type">Partitioner</span>。除了这个参数之外，其函数声明和aggregate很类似；其他的aggregateByKey函数实现最终都是调用这个。</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, numPartitions: <span class="type">Int</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第二个aggregateByKey函数可以设置分区的个数(numPartitions)，最终用的是<span class="type">HashPartitioner</span>。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">最后一个aggregateByKey实现先会判断当前<span class="type">RDD</span>是否定义了分区函数，如果定义了则用当前<span class="type">RDD</span>的分区；如果当前<span class="type">RDD</span>并未定义分区 ，则使用<span class="type">HashPartitioner</span>。</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>,<span class="number">3</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>, <span class="number">4</span>),(<span class="number">2</span>,<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seq</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"seq: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">comb</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"comb: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = data.aggregateByKey(<span class="number">1</span>)(seq, comb)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line">计算过程:</span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span>+<span class="number">2</span> <span class="number">1</span>(初始值)+<span class="number">4</span></span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span> </span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">11</span>)</span><br></pre></td></tr></table></figure>
+<p>aggregateByKey和aggregate结果有点不一样。如果用aggregate函数对含有3、2、4三个元素的RDD进行计算，初始值为1的时候，计算的结果应该是10，而这里是9，这是因为aggregate函数中的初始值需要和reduce函数以及combine函数结合计算，而aggregateByKey中的初始值只需要和reduce函数计算，不需要和combine函数结合计算，所以导致结果有点不一样。</p>
+<h2 id="sortBy和sortByKey"><a href="#sortBy和sortByKey" class="headerlink" title="sortBy和sortByKey"></a>sortBy和sortByKey</h2><p>在很多应用场景都需要对结果数据进行排序，Spark中有时也不例外。在Spark中存在两种对RDD进行排序的函数，分别是 sortBy和sortByKey函数。sortBy是对标准的RDD进行排序，它是从Spark 0.9.0之后才引入的（可以参见SPARK-1063）。而sortByKey函数是对PairRDD进行排序，也就是有Key和Value的RDD。下面将分别对这两个函数的实现以及使用进行说明。</p>
+<h3 id="sortBy"><a href="#sortBy" class="headerlink" title="sortBy"></a>sortBy</h3><p>sortBy函数是在org.apache.spark.rdd.RDD类中实现的，它的实现如下：<br>该函数最多可以传三个参数：<br>　　第一个参数是一个函数，该函数的也有一个带T泛型的参数，返回类型和RDD中元素的类型是一致的；<br>　　第二个参数是ascending，从字面的意思大家应该可以猜到，是的，这参数决定排序后RDD中的元素是升序还是降序，默认是true，也就是升序；<br>　　第三个参数是numPartitions，该参数决定排序后的RDD的分区个数，默认排序后的分区个数和排序之前的个数相等，即为this.partitions.size。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Return this RDD sorted by the given key function.</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortBy</span></span>[<span class="type">K</span>](</span><br><span class="line">    f: (<span class="type">T</span>) =&gt; <span class="type">K</span>,</span><br><span class="line">    ascending: <span class="type">Boolean</span> = <span class="literal">true</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span> = <span class="keyword">this</span>.partitions.size)</span><br><span class="line">    (<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">K</span>], ctag: <span class="type">ClassTag</span>[<span class="type">K</span>]): <span class="type">RDD</span>[<span class="type">T</span>] =</span><br><span class="line">  <span class="keyword">this</span>.keyBy[<span class="type">K</span>](f)</span><br><span class="line">      .sortByKey(ascending, numPartitions)</span><br><span class="line">      .values</span><br></pre></td></tr></table></figure></p>
+<p>从sortBy函数的实现可以看出，第一个参数是必须传入的，而后面的两个参数可以不传入。而且sortBy函数函数的实现依赖于sortByKey函数，关于sortByKey函数后面会进行说明。keyBy函数也是RDD类中进行实现的，它的主要作用就是将将传进来的每个元素作用于f(x)中，并返回tuples类型的元素，也就变成了Key-Value类型的RDD了，它的实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line">* Creates tuples of the elements in this RDD by applying `f`.</span><br><span class="line">*/</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">keyBy</span></span>[<span class="type">K</span>](f: <span class="type">T</span> =&gt; <span class="type">K</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">T</span>)] = &#123;</span><br><span class="line">    map(x =&gt; (f(x), x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Demo:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = <span class="type">List</span>(<span class="number">3</span>,<span class="number">1</span>,<span class="number">90</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">12</span>)</span><br><span class="line"><span class="keyword">val</span> rdd = sc.parallelize(data)</span><br><span class="line"><span class="keyword">val</span> result = rdd.sortBy(x =&gt; x, <span class="literal">false</span>)</span><br><span class="line">result.collect.foreach(println)</span><br></pre></td></tr></table></figure></p>
+<h3 id="sortByKey函数"><a href="#sortByKey函数" class="headerlink" title="sortByKey函数"></a>sortByKey函数</h3><p>sortByKey函数作用于Key-Value形式的RDD，并对Key进行排序。它是在org.apache.spark.rdd.OrderedRDDFunctions中实现的，实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortByKey</span></span>(ascending: <span class="type">Boolean</span> = <span class="literal">true</span>, numPartitions: <span class="type">Int</span> = self.partitions.size)</span><br><span class="line">    : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> part = <span class="keyword">new</span> <span class="type">RangePartitioner</span>(numPartitions, self, ascending)</span><br><span class="line">  <span class="keyword">new</span> <span class="type">ShuffledRDD</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">V</span>](self, part)</span><br><span class="line">    .setKeyOrdering(<span class="keyword">if</span> (ascending) ordering <span class="keyword">else</span> ordering.reverse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的RDD一定是ShuffledRDD类型的，因为对源RDD进行排序，必须进行Shuffle操作，而Shuffle操作的结果RDD就是ShuffledRDD。其实这个函数的实现很优雅，里面用到了<strong>RangePartitioner，它可以使得相应的范围Key数据分到同一个partition中，然后内部用到了mapPartitions对每个partition中的数据进行排序</strong>，而每个partition中数据的排序用到了标准的sort机制，避免了大量数据的shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="string">"wyp"</span>, <span class="string">"iteblog"</span>, <span class="string">"com"</span>, <span class="string">"397090770"</span>, <span class="string">"test"</span>), <span class="number">2</span>)</span><br><span class="line">   <span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">3</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">4</span>))</span><br><span class="line">   <span class="keyword">val</span> c = b.zip(a)</span><br><span class="line">   c.sortByKey().collect</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 修改默认的排序规则</span></span><br><span class="line">   <span class="keyword">implicit</span> <span class="keyword">val</span> sortIntegersByString = <span class="keyword">new</span> <span class="type">Ordering</span>[<span class="type">Int</span>] &#123;</span><br><span class="line">     <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">compare</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>) =</span><br><span class="line">       a.toString.compare(b.toString)</span><br><span class="line">   &#125;</span><br><span class="line">   c.sortByKey().collect</span><br></pre></td></tr></table></figure></p>
+<h2 id="collectAsMap"><a href="#collectAsMap" class="headerlink" title="collectAsMap"></a>collectAsMap</h2><p>功能和collect函数类似。该函数用于Pair RDD，最终返回Map类型的结果。官方文档说明：<br>Return the key-value pairs in this RDD to the master as a Map.<br>Warning: this doesn’t return a multimap (so if you have multiple values to the same key, <strong>only one value per key is preserved in the map returned</strong><br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">collectAsMap</span></span>(): <span class="type">Map</span>[<span class="type">K</span>, <span class="type">V</span>]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line">    data.collectAsMap.foreach(print)</span><br><span class="line">(<span class="number">2</span>,com)(<span class="number">1</span>,com)(<span class="number">3</span>,good)</span><br></pre></td></tr></table></figure>
+<p>从结果我们可以看出，如果RDD中同一个Key中存在多个Value，那么后面的Value将会把前面的Value覆盖，最终得到的结果就是Key唯一，而且对应一个Value。</p>
 
         
         
@@ -367,6 +312,16 @@
     <footer class="article-footer clearfix">
 <div class="article-catetags">
 
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
 
 </div>
 
@@ -393,33 +348,20 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/03/https是如何确保安全的/" title="https是如何确保安全的" itemprop="url">https是如何确保安全的</a>
+      <a href="/2016/05/05/常见Web容器的ClassLoader机制/" title="常见Web容器的ClassLoader机制" itemprop="url">常见Web容器的ClassLoader机制</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> Published 2016-05-05</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="https是如何确保安全的"><a href="#https是如何确保安全的" class="headerlink" title="https是如何确保安全的"></a>https是如何确保安全的</h1><h2 id="什么是Https"><a href="#什么是Https" class="headerlink" title="什么是Https"></a>什么是Https</h2><p>HTTPS（全称：Hypertext Transfer Protocol over Secure Socket Layer），是以安全为目标的HTTP通道，简单讲是HTTP的安全版。即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL</p>
-<h2 id="Https的作用"><a href="#Https的作用" class="headerlink" title="Https的作用"></a>Https的作用</h2><p>内容加密 建立一个信息安全通道，来保证数据传输的安全；<br>身份认证 确认网站的真实性<br>数据完整性 防止内容被第三方冒充或者篡改</p>
-<h2 id="Https的劣势"><a href="#Https的劣势" class="headerlink" title="Https的劣势"></a>Https的劣势</h2><p>对数据进行加解密决定了它比http慢<br>需要进行非对称的加解密，且需要三次握手。首次连接比较慢点，当然现在也有很多的优化。</p>
-<p>出于安全考虑，浏览器不会在本地保存HTTPS缓存。实际上，只要在HTTP头中使用特定命令，HTTPS是可以缓存的。Firefox默认只在内存中缓存HTTPS。但是，只要头命令中有Cache-Control: Public，缓存就会被写到硬盘上。 IE只要http头允许就可以缓存https内容，缓存策略与是否使用HTTPS协议无关。</p>
-<h2 id="HTTPS和HTTP的区别"><a href="#HTTPS和HTTP的区别" class="headerlink" title="HTTPS和HTTP的区别"></a>HTTPS和HTTP的区别</h2><p>https协议需要到CA申请证书。<br>http是超文本传输协议，信息是明文传输；https 则是具有安全性的ssl加密传输协议。<br>http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。<br>http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
-<h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><ul>
-<li>为什么要有数字证书？</li>
-</ul>
-<p>对于请求方来说，它怎么能确定它所得到的公钥一定是从目标主机那里发布的，而且没有被篡改过呢？亦或者请求的目标主机本本身就从事窃取用户信息的不正当行为呢？这时候，我们需要有一个权威的值得信赖的第三方机构(一般是由政府审核并授权的机构)来统一对外发放主机机构的公钥，只要请求方这种机构获取公钥，就避免了上述问题的发生。</p>
-<h2 id="SSL、TLS的握手过程"><a href="#SSL、TLS的握手过程" class="headerlink" title="SSL、TLS的握手过程"></a>SSL、TLS的握手过程</h2><p>SSL与TLS握手整个过程如下图所示，下面会详细介绍每一步的具体内容：<br><img src="https://segmentfault.com/image?src=http://sean-images.qiniudn.com/tls-ssl.svg&amp;objectId=1190000002554673&amp;token=ec9df05ae1ad4ca98daa795a168ea462" alt="握手"></p>
-<p>现在的https基本都使用TLS了，因为更加安全.</p>
-<p>SSL协议在握手阶段使用的是非对称加密，在传输阶段使用的是对称加密，也就是说在SSL上传送的数据是使用对称密钥加密的！因为非对称加密的速度缓慢，耗费资源。其实当客户端和主机使用非对称加密方式建立连接后，客户端和主机已经决定好了在传输过程使用的对称加密算法和关键的对称加密密钥，由于这个过程本身是安全可靠的，也即对称加密密钥是不可能被窃取盗用的，因此，保证了在传输过程中对数据进行对称加密也是安全可靠的，因为除了客户端和主机之外，不可能有第三方窃取并解密出对称加密密钥！如果有人窃听通信，他可以知道双方选择的加密方法，以及三个随机数中的两个。整个通话的安全，只取决于第三个随机数（Premaster secret）能不能被破解。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>https实际就是在TCP层与http层之间加入了SSL/TLS来为上层的安全保驾护航，主要用到对称加密、非对称加密、证书，等技术进行客户端与服务器的数据加密传输，最终达到保证整个通信的安全性。</p>
-<p>流程:<br>前提：CA证书<br>握手阶段: 生成随机数 + 数据摘要 + 数字签名 + 非对称加密算法 ==&gt; 对称机密的密钥<br>数据传输阶段： 基于对称加密密钥的交流</p>
+        <p><a href="http://jm.taobao.org/2013/11/24/3217/" target="_blank" rel="external">流web容器(jetty,tomcat,jboss)的classloader机制对比和相关问题分析</a></p>
 
         
         
@@ -438,7 +380,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Https/">Https</a>
+  <span></span> <a href="/tags/Web/">Web</a>
   </div>
 
 </div>
@@ -466,27 +408,342 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/03/如何定位消耗CPU最多的线程/" title="如何定位消耗CPU最多的线程" itemprop="url">如何定位消耗CPU最多的线程</a>
+      <a href="/2016/05/04/SpringTest整合JUnit4使用总结/" title="SpringTest整合JUnit4使用总结" itemprop="url">SpringTest整合JUnit4使用总结</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-03T11:24:27.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> Published 2016-05-04</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p>#如何定位消耗CPU最多的线程</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">                        <span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                        <span class="keyword">try</span>&#123;</span><br><span class="line">                                                Thread.sleep(<span class="number">100000</span>);</span><br><span class="line">                                        &#125;<span class="keyword">catch</span>(Exception e)&#123;&#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;.start();</span><br><span class="line">                &#125;</span><br><span class="line">                Thread t=<span class="keyword">new</span> Thread()&#123;</span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">                                <span class="keyword">int</span> i=<span class="number">0</span>;</span><br><span class="line">                                <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                                        i=(i++)/<span class="number">100</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;;</span><br><span class="line">                t.setName(<span class="string">"Busiest Thread"</span>);</span><br><span class="line">                t.start();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个例子里新创建了11个线程，其中10个线程没干什么事，主要是sleep，另外有一个线程在循环里一直跑着，可以想象这个线程是这个进程里最耗cpu的线程了，那怎么把这个线程给抓出来呢？</p>
-<p>首先我们可以通过<figure class="highlight plain"><figcaption><span>-Hp <pid>```来看这个进程里所有线程的cpu消耗情况，得到类似下面的数据</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ top -Hp 18207</span><br><span class="line">top - 19:11:43 up 573 days,  2:43,  2 users,  load average: 3.03, 3.03, 3.02</span><br><span class="line">Tasks:  44 total,   1 running,  43 sleeping,   0 stopped,   0 zombie</span><br><span class="line">Cpu(s): 18.8%us,  0.0%sy,  0.0%ni, 81.1%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st</span><br><span class="line">Mem:  99191752k total, 98683576k used,   508176k free,   128248k buffers</span><br><span class="line">Swap:  1999864k total,   191064k used,  1808800k free, 17413760k cached</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br><span class="line">18207 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18208 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.09 java Test</span><br><span class="line">18209 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18210 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18211 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18212 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18213 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18214 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18215 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18216 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18217 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18218 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18219 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18220 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18221 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18222 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18223 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18224 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18225 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18226 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br><span class="line">18227 admin     20   0 26.1g  28m  10m S  0.0  0.0   0:00.00 java Test</span><br></pre></td></tr></table></figure></p>
-<p>拿到这个结果之后，我们可以看到cpu最高的线程是pid为18250的线程，占了99.8%：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND</span><br><span class="line">18250 admin     20   0 26.1g  28m  10m R 99.9  0.0   0:19.50 java Test</span><br></pre></td></tr></table></figure></p>
-<p>接着我们可以通过<figure class="highlight plain"><figcaption><span><pid>```的输出来看各个线程栈:</pid></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">$ jstack 18207</span><br><span class="line">2016-03-30 19:12:23</span><br><span class="line">Full thread dump OpenJDK 64-Bit Server VM (25.66-b60 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;Attach Listener&quot; #30 daemon prio=9 os_prio=0 tid=0x00007fb90be13000 nid=0x47d7 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;DestroyJavaVM&quot; #29 prio=5 os_prio=0 tid=0x00007fb96245b800 nid=0x4720 waiting on condition [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br><span class="line"></span><br><span class="line">&quot;Thread-9&quot; #27 prio=5 os_prio=0 tid=0x00007fb91498c800 nid=0x4749 waiting on condition [0x00007fb906bfe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-8&quot; #26 prio=5 os_prio=0 tid=0x00007fb91498b800 nid=0x4748 waiting on condition [0x00007fb906ffe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-7&quot; #25 prio=5 os_prio=0 tid=0x00007fb91498b000 nid=0x4747 waiting on condition [0x00007fb9073fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line"></span><br><span class="line">&quot;Thread-6&quot; #24 prio=5 os_prio=0 tid=0x00007fb91498a000 nid=0x4746 waiting on condition [0x00007fb9077fe000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at Test$1.run(Test.java:9)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<p>上面的线程栈我们注意到nid的值其实就是线程ID，它是十六进制的，我们将消耗cpu最高的线程18250，转成十六进制0X47A，然后从上面的线程栈里找到nid=0X47A的线程，其栈为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;Busiest Thread&quot; #28 prio=5 os_prio=0 tid=0x00007fb91498d000 nid=0x474a runnable [0x00007fb9065fe000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">    at Test$2.run(Test.java:18)</span><br></pre></td></tr></table></figure></p>
-<p>即将最耗cpu的线程找出来了，是Businest Thread</p>
+        <h1 id="一-加入依赖包"><a href="#一-加入依赖包" class="headerlink" title="一 加入依赖包"></a>一 加入依赖包</h1><p>使用Spring的测试框架需要加入以下依赖包：</p>
+<ul>
+<li>JUnit 4 （官方下载：<a href="http://www.junit.org/）" target="_blank" rel="external">http://www.junit.org/）</a></li>
+<li>Spring Test （Spring框架中的test包）</li>
+<li>Spring 相关其他依赖包（不再赘述了，就是context等包）<h1 id="二-创建测试源目录和包"><a href="#二-创建测试源目录和包" class="headerlink" title="二 创建测试源目录和包"></a>二 创建测试源目录和包</h1>在此，推荐创建一个和src平级的源文件目录，因为src内的类都是为日后产品准备的，而此处的类仅仅用于测试。而包的名称可以和src中的目录同名，这样由于在test源目录中，所以不会有冲突，而且名称又一模一样，更方便检索。<h1 id="三-创建测试类"><a href="#三-创建测试类" class="headerlink" title="三 创建测试类"></a>三 创建测试类</h1>创建一个测试用的类，推荐名称为 “被测试类名称 + Test”。<br>测试类应该继承与 <figure class="highlight plain"><figcaption><span>```AbstractTransactionalJUnit4SpringContextTests```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">对于 AbstractJUnit4springcontextTests 和 AbstractTransactionalJUnit4SpringContextTests 类的选择：</span><br><span class="line">如果再你的测试类中，需要用到事务管理（比如要在测试结果出来之后回滚测试内容），就可以使用AbstractTransactionalJUnit4SpringTests类。事务管理的使用方法和正常使用Spring事务管理是一样的。再此需要注意的是，如果想要使用声明式事务管理，即使用AbstractTransactionalJUnitSpringContextTests类，请在applicationContext.xml文件中加入transactionManager bean：</span><br><span class="line">``` xml</span><br><span class="line">&lt;bean id=&quot;transactionManager&quot;</span><br><span class="line">    class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>如果没有添加上述bean，将会抛出NoSuchBeanDefinitionException，指明 No bean named ‘transactionManager’ is definded.</p>
+<h1 id="四-配置测试类"><a href="#四-配置测试类" class="headerlink" title="四 配置测试类"></a>四 配置测试类</h1><p>添加如下内容在class前，用于配置applicationContext.xml文件的位置。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="五-创建测试方法"><a href="#五-创建测试方法" class="headerlink" title="五 创建测试方法"></a>五 创建测试方法</h1><p>创建测试用方法，推荐名称为 “被测方法名称+ Test”。<br>测试方法上方加入 @Test</p>
+<h1 id="六-通过JUnit-4-执行"><a href="#六-通过JUnit-4-执行" class="headerlink" title="六 通过JUnit 4 执行"></a>六 通过JUnit 4 执行</h1><p>右键方法名，选择则“Run As”→“JUnit Test”即可</p>
+<p>附录1：整体测试类文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @(#) UserDaoTest.java</span><br><span class="line"> * </span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">package</span> com.phj.dao;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.phj.entity.User;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoTest</span> <span class="keyword">extends</span> <span class="title">AbstractJUnit4SpringContextTests</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> UserDaoInterface userDao;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saveTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        User user1 = <span class="keyword">new</span> User();</span><br><span class="line">        user1.setUsername(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user1.setNickName(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setEmail(<span class="string">"tom@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user2 = <span class="keyword">new</span> User();</span><br><span class="line">        user2.setUsername(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user2.setNickName(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setEmail(<span class="string">"admin@admin.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user3 = <span class="keyword">new</span> User();</span><br><span class="line">        user3.setUsername(<span class="string">"feihong"</span>);</span><br><span class="line">        user3.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user3.setNickName(<span class="string">"phj"</span>);</span><br><span class="line">        user3.setEmail(<span class="string">"test@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        userDao.save(user1);</span><br><span class="line">        userDao.save(user2);</span><br><span class="line">        userDao.save(user3);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spring/">Spring</a><a href="/tags/Junit/">Junit</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/03/hive的Transform和MR/" title="Hive的Transform和UDF" itemprop="url">Hive的Transform和UDF</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> Published 2016-05-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="UDTF"><a href="#UDTF" class="headerlink" title="UDTF"></a>UDTF</h2><ul>
+<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888819.html" target="_blank" rel="external">Hive中UDTF编写和使用</a></li>
+</ul>
+<h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><ul>
+<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html" target="_blank" rel="external">Hive udaf开发入门和运行过程详解</a></li>
+<li><a href="http://blog.csdn.net/desilting/article/details/45505121" target="_blank" rel="external">Hive通用型自定义聚合函数（UDAF）</a></li>
+</ul>
+<h2 id="Hive中的TRANSFORM：使用脚本完成Map-Reduce"><a href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：使用脚本完成Map/Reduce"></a>Hive中的TRANSFORM：使用脚本完成Map/Reduce</h2><p>转自: <a href="http://www.coder4.com/archives/4052" target="_blank" rel="external">http://www.coder4.com/archives/4052</a></p>
+<p>首先来看一下数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; select * from test;</span><br><span class="line">OK</span><br><span class="line">1       3</span><br><span class="line">2       2</span><br><span class="line">3       1</span><br></pre></td></tr></table></figure></p>
+<p>假设，我们要输出每一列的md5值。在目前的hive中是没有这个udf的。</p>
+<p>我们看一下Python的代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/home/tops/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    line = line.strip()</span><br><span class="line">    arr = line.split()</span><br><span class="line">    md5_arr = []</span><br><span class="line">    <span class="keyword">for</span> a <span class="keyword">in</span> arr:</span><br><span class="line">        md5_arr.append(hashlib.md5(a).hexdigest())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"\t"</span>.join(md5_arr)</span><br></pre></td></tr></table></figure></p>
+<p>在Hive中，使用脚本，首先要将他们加入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add file /xxxx/test.py</span><br></pre></td></tr></table></figure>
+<p>然后，在调用时，使用TRANSFORM语法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    TRANSFORM (col1, col2) </span><br><span class="line">    USING &apos;./test.py&apos; </span><br><span class="line">    AS (new1, new2) </span><br><span class="line">FORM </span><br><span class="line">    test;</span><br></pre></td></tr></table></figure>
+<p>这里，我们使用了AS，指定输出的若干个列，分别对应到哪个列名。如果省略这句，则Hive会将第1个tab前的结果作为key，后面其余作为value。</p>
+<p>这里有一个小坑：有时候，我们结合INSERT OVERWRITE使用上述TRANSFORM，而目标表，其分割副可能不是\t。但是请牢记：TRANSFORM的分割符号，传入、传出脚本的，永远是\t。不要考虑外面其他的分割符号！</p>
+<p>最后，解释一下MAP、REDUCE。</p>
+<p>在有的Hive语句中，大家可能会看到SELECT MAP (…)  USING ‘xx.py’这样的语法。</p>
+<p>然而，在Hive中，MAP、REDUCE只不过是TRANSFORM的别名，Hive不保证一定会在map/reduce中调用脚本。看看官方文档是怎么说的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Formally, MAP ... and REDUCE ... are syntactic transformations of SELECT TRANSFORM ( ... ). In other words, they serve as comments or notes to the reader of the query. BEWARE: Use of these keywords may be dangerous as (e.g.) typing &quot;REDUCE&quot; does not force a reduce phase to occur and typing &quot;MAP&quot; does not force a new map phase!</span><br></pre></td></tr></table></figure>
+<p>所以、混用map reduce语法关键字，甚至会引起混淆，所以建议大家还是都用TRANSFORM吧。</p>
+<p>友情提示：如果脚本不是Python，而是awk、sed等系统内置命令，可以直接使用，而不用add file。</p>
+<p>如果表中有MAP，ARRAY等复杂类型，怎么用TRANSFORM生成？</p>
+<p>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> features</span><br><span class="line">(</span><br><span class="line">    <span class="keyword">id</span> <span class="built_in">BIGINT</span>,</span><br><span class="line">    norm_features <span class="keyword">MAP</span>&lt;<span class="keyword">STRING</span>, <span class="built_in">FLOAT</span>&gt; </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>答案是，要在脚本的输出中，对特殊字段按照HDFS文件中的格式输出即可。</p>
+<p>例如，以上面的表结构为例，每行输出应为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1^Ifeature1^C1.0^Bfeature2^C2.0</span><br></pre></td></tr></table></figure>
+<p>其中^I是tab键，这是TRANSFORM要求的分割符号。^B和^C是Hive存储时MAP类型的KV分割符。</p>
+<p>另外，在Hive的TRANSFORM语句的时候，要注意AS中加上类型声明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT TRANSFORM(stuff)</span><br><span class="line">USING &apos;script&apos;</span><br><span class="line">AS (thing1 INT, thing2 MAP&lt;STRING, FLOAT&gt;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><a href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce"></a>Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Mapper.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Mapper</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Maps a single row into an intermediate rows.</span><br><span class="line">   * </span><br><span class="line">   * <span class="doctag">@param</span> record</span><br><span class="line">   *          input record</span><br><span class="line">   * <span class="doctag">@param</span> output</span><br><span class="line">   *          collect mapped rows.</span><br><span class="line">   * <span class="doctag">@throws</span> Exception</span><br><span class="line">   *           on error</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(String[] record, Output output)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以将一列拆分为多列</p>
+<p>使用样例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExecuteMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String FULL_PATH_CLASS = <span class="string">"com.***.dpop.ods.mr.impl."</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Mapper&gt; mappers = <span class="keyword">new</span> HashMap&lt;String, Mapper&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Process class must be given"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> GenericMR().map(System.in, System.out,</span><br><span class="line">                getMapper(args[<span class="number">0</span>], Arrays.copyOfRange(args, <span class="number">1</span>, args.length)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Mapper <span class="title">getMapper</span><span class="params">(String parserClass, String[] args)</span></span><br><span class="line">            <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mappers.containsKey(parserClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> mappers.get(parserClass);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class[] classes = <span class="keyword">new</span> Class[args.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; classes.length; ++i) &#123;</span><br><span class="line">            classes[i] = String.class;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Mapper mapper = (Mapper) Class.forName(FULL_PATH_CLASS + parserClass).getConstructor(classes).newInstance(args);</span><br><span class="line">            mappers.put(parserClass, mapper);</span><br><span class="line">            <span class="keyword">return</span> mapper;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"Unknown MapperClass:"</span> + parserClass, e);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span>  ClassNotFoundException(<span class="string">"Error Constructing processor"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MR_USING=" USING 'java -Xmx512m -Xms512m -cp ods-mr-1.0.jar:hive-contrib-2.3.33.jar com.***.dpop.ods.mr.api.ExecuteMap "</span><br><span class="line"></span><br><span class="line">COMMAND="FROM dw_rtb.event_fact_adx_auction "</span><br><span class="line">COMMAND="$&#123;COMMAND&#125; INSERT overwrite TABLE dw_rtb.event_fact_mid_adx_auction_ad PARTITION(yymmdd=$&#123;CURRENT_DATE&#125;) SELECT transform(search_id, print_time, pthread_id, ad_s) $&#123;MR_USING&#125; EventFactMidAdxAuctionAdMapper' as search_id, print_time, pthread_id, ad_s, ssp_id WHERE $INSERT_PARTITION and original = 'exinternal' "</span><br></pre></td></tr></table></figure>
+<h2 id="Hive-Python-Streaming的原理及写法"><a href="#Hive-Python-Streaming的原理及写法" class="headerlink" title="Hive Python Streaming的原理及写法"></a>Hive Python Streaming的原理及写法</h2><p><a href="http://www.tuicool.com/articles/vmumUjA" target="_blank" rel="external">http://www.tuicool.com/articles/vmumUjA</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hive/">Hive</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hive/">Hive</a><a href="/tags/MR/">MR</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/02/REST-API-设计最佳实践/" title="REST API 设计最佳实践" itemprop="url">REST API 设计最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://waylau.com/best-practices-for-better-restful-api/" target="_blank" rel="external">RESTful API 设计最佳实践</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/REST/">REST</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/REST/">REST</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/02/Spark-SQL汇总/" title="Spark SQL汇总" itemprop="url">Spark SQL汇总</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://www.iteblog.com/archives/1491" target="_blank" rel="external">使用Spark SQL读取Hive上的数据</a></p>
+<p><a href="http://blog.csdn.net/oopsoom/article/details/39401391" target="_blank" rel="external">Spark 注册UDF-Scala实现</a></p>
+<p><a href="http://www.cnblogs.com/luogankun/p/3970153.html" target="_blank" rel="external">Spark SQL使用Hive的UDF</a></p>
+<p><a href="http://www.jianshu.com/p/b81d3f3961b7" target="_blank" rel="external">spark-sql thriftserver 方式使用hive udf函数</a></p>
+<p><a href="https://community.hortonworks.com/articles/768/using-hive-udfudafudtf-with-sparksql.html" target="_blank" rel="external">Spark SQL使用Hive的UDF并且注册临时表</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-SQL/">Spark SQL</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/24/Java基础-Object类中的方法解析/" title="Java基础:Object类中的方法解析" itemprop="url">Java基础:Object类中的方法解析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> Published 2016-04-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。</p>
+<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg" alt="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg"></p>
+<h1 id="Object类中的方法"><a href="#Object类中的方法" class="headerlink" title="Object类中的方法"></a>Object类中的方法</h1><p>Java中的每个类都具有定义在Object类中的这些方法。</p>
+<h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><figure class="highlight plain"><figcaption><span>Object()```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，Java中通过形如 new A(args..)形式创建一个属于该类型的对象。其中A即是类名，A(args..)即此类定义中相对应的构造函数。通过此种形式创建的对象都是通过类中的构造函数完成。为体现此特性，Java中规定：在类定义过程中，对于未定义构造函数的类，默认会有一个无参数的构造函数，作为所有类的基类，Object类自然要反映出此特性，在源码中，未给出Object类构造函数定义，但实际上，此构造函数是存在的。</span><br><span class="line"> </span><br><span class="line">当然，并不是所有的类都是通过此种方式去构建，也自然的，并不是所有的类构造函数都是public。</span><br><span class="line"></span><br><span class="line">## private static native void registerNatives();</span><br><span class="line"> </span><br><span class="line">registerNatives函数前面有native关键字修饰，Java中，用native关键字修饰的函数表明该方法的实现并不是在Java中去完成，而是由C/C++去完成，并被编译成了.dll，由Java去调用。方法的具体实现体在dll文件中，对于不同平台，其具体实现应该有所不同。用native修饰，即表示操作系统，需要提供此方法，Java本身需要使用。具体到registerNatives()方法本身，其主要作用是将C/C++中的方法映射到Java中的native方法，实现方法命名的解耦。</span><br><span class="line"></span><br><span class="line">## protected Object clone()</span><br><span class="line"></span><br><span class="line">Creates and returns a copy of this object.</span><br><span class="line"></span><br><span class="line">Object类中的说明是：</span><br><span class="line">``` java</span><br><span class="line">　　protected Object clone() throws CloneNotSupportedException</span><br></pre></td></tr></table></figure>
+<p>这个方法比较特殊：<br>首先，使用这个方法的类必须实现java.lang.Cloneable接口，否则会抛出CloneNotSupportedException异常。<br>Cloneable接口中不包含任何方法，所以实现它时只要在类声明中加上implements语句即可。</p>
+<p>第二个比较特殊的地方在于这个方法是protected修饰的，覆写clone()方法的时候需要写成public，才能让类外部的代码调用。</p>
+<h2 id="public-final-native-Class-lt-gt-getClass"><a href="#public-final-native-Class-lt-gt-getClass" class="headerlink" title="public final native Class&lt;?&gt; getClass();"></a>public final native Class&lt;?&gt; getClass();</h2><p>getClass()也是一个native方法，返回的是此Object对象的类对象/运行时类对象Class&lt;?&gt;。效果与Object.class相同。</p>
+<p>首先解释下”类对象”的概念：在Java中，类是是对具有一组相同特征或行为的实例的抽象并进行描述，对象则是此类所描述的特征或行为的具体实例。作为概念层次的类，其本身也具有某些共同的特性，如都具有类名称、由类加载器去加载，都具有包，具有父类，属性和方法等。于是，Java中有专门定义了一个类，Class，去描述其他类所具有的这些特性，因此，从此角度去看，类本身也都是属于Class类的对象。为与经常意义上的对象相区分，在此称之为”类对象”。</p>
+<h2 id="boolean-equals-Object-obj"><a href="#boolean-equals-Object-obj" class="headerlink" title="boolean equals(Object obj)"></a>boolean equals(Object obj)</h2><p>Indicates whether some other object is “equal to” this one.<br>“==”运算符判断两个引用是否指向同一个对象。==表示的是变量值完成相同（对于基础类型，地址中存储的是值，引用类型则存储指向实际对象的地址）；<br>equals表示的是对象的内容完全相同，此处的内容多指对象的特征/属性。</p>
+<p>对于Object类的equals()方法来说，它判断调用equals()方法的引用于传进来的引用是否一致，即这两个引用是否指向的是同一个对象。</p>
+<p>Object类中的equals()方法如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">this</span> == obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>即Object类中的equals()方法等价于==。</p>
+<p>只有当继承Object的类覆写（override）了equals()方法之后，继承类实现了用equals()方法比较两个对象是否相等，才可以说equals()方法与==的不同。</p>
+<p>equals()方法需要具有如下特点：</p>
+<ul>
+<li>自反性（reflexive）：任何非空引用x，x.equals(x)返回为true。</li>
+<li>对称性（symmetric）：任何非空引用x和y，x.equals(y)返回true当且仅当y.equals(x)返回true。</li>
+<li>传递性（transitive）：任何非空引用x和y，如果x.equals(y)返回true，并且y.equals(z)返回true，那么x.equals(z)返回true。</li>
+<li>一致性（consistent）：两个非空引用x和y，x.equals(y)的多次调用应该保持一致的结果，（前提条件是在多次比较之间没有修改x和y用于比较的相关信息）。</li>
+<li>约定：对于任何非空引用x，x.equals(null)应该返回为false。</li>
+<li><strong>并且覆写equals()方法时，应该同时覆写hashCode()方法，反之亦然。</strong></li>
+</ul>
+<h2 id="int-hashCode"><a href="#int-hashCode" class="headerlink" title="int hashCode()"></a>int hashCode()</h2><p>Returns a hash code value for the object.</p>
+<p>当你覆写（override）了equals()方法之后，必须也覆写hashCode()方法，反之亦然。</p>
+<p>这个方法返回一个整型值（hash code value），如果两个对象被equals()方法判断为相等，那么它们就应该拥有同样的hash code。</p>
+<p>Object类的hashCode()方法为不同的对象返回不同的值，Object类的hashCode值表示的是对象的地址。</p>
+<p>hashCode的一般性契约（需要满足的条件）如下：</p>
+<p>1.在Java应用的一次执行过程中，如果对象用于equals比较的信息没有被修改，那么同一个对象多次调用hashCode()方法应该返回同一个整型值。应用的多次执行中，这个值不需要保持一致，即每次执行都是保持着各自不同的值。<br>2.如果equals()判断两个对象相等，那么它们的hashCode()方法应该返回同样的值。<br>3.并没有强制要求如果equals()判断两个对象不相等，那么它们的hashCode()方法就应该返回不同的值。即，两个对象用equals()方法比较返回false，它们的hashCode可以相同也可以不同。但是，应该意识到，为两个不相等的对象产生两个不同的hashCode可以改善哈希表的性能。</p>
+<p><strong>WHY?</strong><br>其实，这主要体现在hashCode()方法的作用上，其主要用于增强哈希表的性能。</p>
+<p>以集合类中，以Set为例，当新加一个对象时，需要判断现有集合中是否已经存在与此对象相等的对象，如果没有hashCode()方法，需要将Set进行一次遍历，并逐一用equals()方法判断两个对象是否相等，此种算法时间复杂度为o(n)。通过借助于hasCode方法，先计算出即将新加入对象的哈希码，然后根据哈希算法计算出此对象的位置，直接判断此位置上是否已有对象即可。（注：Set的底层用的是Map的原理实现）</p>
+<h2 id="String-toString"><a href="#String-toString" class="headerlink" title="String toString()"></a>String toString()</h2><p>Returns a string representation of the object.<br>当打印引用，如调用System.out.println()时，会自动调用对象的toString()方法，打印出引用所指的对象的toString()方法的返回值，因为每个类都直接或间接地继承自Object，因此每个类都有toString()方法。</p>
+<p>Object类中的toString()方法定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getClass().getName() + <span class="string">"@"</span> + Integer.toHexString(hashCode());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="wait-…-notify-notifyAll"><a href="#wait-…-notify-notifyAll" class="headerlink" title="wait(…) / notify() / notifyAll()"></a>wait(…) / notify() / notifyAll()</h2><h2 id="protected-void-finalize"><a href="#protected-void-finalize" class="headerlink" title="protected void finalize()"></a>protected void finalize()</h2><p>finalize方法主要与Java垃圾回收机制有关。</p>
 
         
         
@@ -505,7 +762,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/多线程/">多线程</a>
+  <span></span> <a href="/tags/Java/">Java</a>
   </div>
 
 </div>
@@ -533,52 +790,20 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/Session原理、安全以及最基本的Express和Redis实现/" title="Session原理、安全以及最基本的Express和Redis实现" itemprop="url">Session原理、安全以及最基本的Express和Redis实现</a>
+      <a href="/2016/04/24/Spring-Session学习笔记/" title="Spring Session学习笔记" itemprop="url">Spring Session学习笔记</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> Published 2016-04-24</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Session原理、安全以及最基本的Express和Redis实现"><a href="#Session原理、安全以及最基本的Express和Redis实现" class="headerlink" title="Session原理、安全以及最基本的Express和Redis实现"></a>Session原理、安全以及最基本的Express和Redis实现</h1><h2 id="Session基础概念"><a href="#Session基础概念" class="headerlink" title="Session基础概念"></a>Session基础概念</h2><hr>
-<p>Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。</p>
-<p>HTTP协议在设计的时候是无状态的。这是一个很关键的概念，意味着服务器在处理请求的时候，并不关注这个请求是谁发来的。这对于以提供内容为核心的Web1.0，例如门户网站，非常适合。然而对于以应用服务为核心的Web 2.0而言，服务器端必须有能力从请求中提取出请求者的身份信息，以在请求者不用反复输入身份的情况下，提供连续的服务。</p>
-<p>实现请求身份验证的方式很多，其中一种广泛接受的方式是使用服务器端产生的Session ID结合浏览器的Cookie实现对Session的管理，一般来说包括以下4个步骤：</p>
-<ol>
-<li>服务器端的产生Session ID</li>
-<li>服务器端和客户端存储Session ID</li>
-<li>从HTTP Header中提取Session ID</li>
-<li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
-</ol>
-<p><img src="https://segmentfault.com/img/bVlcpM" alt="enter image description here"></p>
-<p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
-<p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
-<h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
-<p>Redis是一个非常适合用于Session管理的数据库。第一，它的结构简单，key-value的形式非常符合SessionID-UserID的存储；第二，读写速度非常快；第三，自身支持数据自动过期和清除；第四，语法、部署非常简单。基于以上原因，很多Session管理都是基于Redis实现的。</p>
-<h2 id="Session的安全问题"><a href="#Session的安全问题" class="headerlink" title="Session的安全问题"></a>Session的安全问题</h2><hr>
-<p>SessionId就如同请求者的身份证，一旦被攻击者恶意获得，攻击者便可以伪装成请求者对服务器发起请求，也就是我们经常听到的会话劫持(Session/Cookie Hijack)<br>关于会话劫持的原理推荐大家去看<a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">这篇文章</a></p>
-<p>基于上述实现方法的Session管理，我认为基本上可以排除</p>
-<ul>
-<li>暴力破解SessionId</li>
-<li>恶意植入固定SessionId</li>
-</ul>
-<p>两种可能，因为uid的库基本上可以保证SessionId的随机性；而传递SessionId则依赖HTTP请求头中的Cookie信息而非URL，同时在用户登录立刻更换SessionId。</p>
-<p>唯一的可能性来源于Session的监听，而对于这种攻击有效的两种防止办法是：</p>
-<ul>
-<li>Https<br>很多网站仅仅在Login的阶段使用Https防止用户的用户名、密码信息被监听者获取，但是随后的SessionId同样有可能被监听者获取而伪造登录者的身份信息。因此更加推荐的方式是所有的信息传递全部使用Https实现，这样即使监听着截获了信息也无法破解其中的内容。关于如何使用NodeJS建立一个HTTPS的server可以参考《HTTPS的原理和NodeJS的实现》 这篇文章</li>
-<li>httpOnly<br>Express在options中提供了httpOnly的属性，此属性默认值为true，这个属性保证了Cookie的信息不能够通过JavaScript脚本获取。</li>
-</ul>
-<p>参考:</p>
-<ol>
-<li><a href="https://segmentfault.com/a/1190000002630691" target="_blank" rel="external">https://segmentfault.com/a/1190000002630691</a></li>
-<li><a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">http://devco.re/blog/2014/06/03/http-session-protection/</a></li>
-</ol>
+        <p><a href="http://www.iflym.com/index.php/code/201503170001.html" target="_blank" rel="external">分布式cookie-session的实现(spring-session)</a></p>
 
         
         
@@ -591,202 +816,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/01/HTTP Session 攻击与防护/" title="HTTP Session 攻击与防护" itemprop="url">HTTP Session 攻击与防护</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="HTTP-Session-攻击与防护"><a href="#HTTP-Session-攻击与防护" class="headerlink" title="HTTP Session 攻击与防护"></a>HTTP Session 攻击与防护</h1><h2 id="Cookie的基本概念"><a href="#Cookie的基本概念" class="headerlink" title="Cookie的基本概念"></a>Cookie的基本概念</h2><hr>
-<p>Cookie 是网站在浏览器中存放的資料，內容包括使用者在网站上的偏好設定、或者是登入的 Session ID。网站利用 Session ID 來辨认访客的身份。</p>
-<p>当用户访问某一站点时，浏览器会根据用户访问的站点自动搜索可用的cookie，如果有可用的就随着请求一起发送到了服务端。每次接收到服务端的响应时又会更新本地的cookie信息。</p>
-<p>客户端和服务端的这种联系必然是需要有时间的规定的，所以需要定期清除session。这个问题就需要在两方面考虑了，一个是清除服务端session文件，一个是清除客户端的cookie信息，因为两者都各保存着一半的信息。</p>
-<p>Cookie 既然存放在 Client 端，那就有被窃取的風險。例如透過 <a href="https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29" target="_blank" rel="external">Cross-Site Scripting（跨站腳本共计，又稱 XSS）</a>，攻击者可以輕易窃取受害者的 Cookie。如果 Cookie 被偷走了，你的身份就被窃取了。</p>
-<p>Session 共计手法有三種：</p>
-<ul>
-<li>猜测 Session ID (Session Prediction)</li>
-<li>窃取 Session ID (Session Hijacking)</li>
-<li>固定 Session ID (Session Fixation)</li>
-</ul>
-<h2 id="Session-Prediction-猜测-Session-ID"><a href="#Session-Prediction-猜测-Session-ID" class="headerlink" title="Session Prediction (猜测 Session ID)"></a>Session Prediction (猜测 Session ID)</h2><p>Session ID 如同我們前面所說的，就如同是會員卡的编号。只要知道 Session ID，就可以成為這個使用者。如果 Session ID 的长度、复杂度、杂乱度不夠，就能夠被攻击者猜测。攻击者只要寫程序不斷暴力計算 Session ID，就有機會得到有效的 Session ID 而窃取使用者帳號。</p>
-<p>分析 Session ID 的工具可以用以下幾種</p>
-<p><a href="https://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" target="_blank" rel="external">OWASP WebScarab</a><br><a href="http://lcamtuf.coredump.cx/soft/stompy.tgz" target="_blank" rel="external">Stompy</a><br><a href="http://portswigger.net/burp/" target="_blank" rel="external">Burp Suite</a></p>
-<p>观察 Session ID 的亂數分布，可以了解是否能夠推出規律、猜测有效的 Session ID。</p>
-<h3 id="防护措施"><a href="#防护措施" class="headerlink" title="防护措施"></a>防护措施</h3><p>使用 Session ID 分析程序進行分析，評估是否无法被預測。如果沒有 100% 的把握自己撰寫的 Session ID 產生機制是安全的，不妨使用內建的 Session ID 產生 function，通常都有一定程度的安全。</p>
-<h2 id="Session-Hijacking-窃取-Session-ID"><a href="#Session-Hijacking-窃取-Session-ID" class="headerlink" title="Session Hijacking (窃取 Session ID)"></a>Session Hijacking (窃取 Session ID)</h2><p>窃取 Session ID 是最常見的共计手法。攻击者可以利用多種方式窃取 Cookie 獲取 Session ID：</p>
-<ul>
-<li>跨站腳本攻击 (Cross-Site Scripting (XSS))：利用 XSS 漏洞窃取使用者 Cookie</li>
-<li>网路窃听：使用 ARP Spoofing 等手法窃听网路封包獲取 Cookie<br>透過 Referer 取得：若网站允許 Session ID 使用 URL 传输，便可能從 Referer 取得 Session ID</li>
-</ul>
-<p>窃取利用的方式如下圖：</p>
-<p>受害者已經登入网站伺服器，並且取得 Session ID，在連線過程中攻击者用窃听的方式獲取受害者 Session ID。攻击者直接使用窃取到的 Session ID 送至伺服器，偽造受害者身分。若伺服器沒有檢查 Session ID 的使用者身分，則可以让攻击者得逞。<br><img src="https://lh3.googleusercontent.com/-glmPtR_Erp0/U3VCmo0w9yI/AAAAAAAAAZk/4rP1hOOC5W8/w600-no/2014-05-16-http-session-protection-01-session-id-sniffing.png" alt="enter image description here"></p>
-<p><img src="https://lh3.googleusercontent.com/--Si53ercaV0/U3VCmfP_ZKI/AAAAAAAAAZg/-Dirb4AYKGk/w600/2014-05-16-http-session-protection-02-session-id-spoofing.png" alt="enter image description here"></p>
-<h3 id="防护措施-1"><a href="#防护措施-1" class="headerlink" title="防护措施"></a>防护措施</h3><ul>
-<li>禁止將 Session ID 使用 URL (GET) 方式來传输</li>
-<li>設定加強安全性的 Cookie 属性：HttpOnly (无法被 JavaScript 存取)</li>
-<li>設定加強安全性的 Cookie 属性：Secure (只在 HTTPS 传输，若网站无 HTTPS 請勿設定)<br>在需要權限的頁面請使用者重新輸入密碼</li>
-</ul>
-<h2 id="Session-Fixation-固定-Session-ID"><a href="#Session-Fixation-固定-Session-ID" class="headerlink" title="Session Fixation (固定 Session ID)"></a>Session Fixation (固定 Session ID)</h2><p>攻击者诱使受害者使用特定的 Session ID 登入网站，而攻击者就能取得受害者的身分。</p>
-<ol>
-<li>攻击者從网站取得有效 Session ID</li>
-<li>使用社交工程等手法诱使受害者點選連結，使用該 Session ID 登入网站</li>
-<li>受害者輸入帳號密碼成功登入网站</li>
-<li>攻击者使用該 Session ID，操作受害者的帳號</li>
-</ol>
-<p><img src="https://lh5.googleusercontent.com/-qAizYyaOoRo/U3Vaaw6lqsI/AAAAAAAAAZ4/GNO7z3T6Mjg/s2400/2014-05-16-http-session-protection-04-session-id-fixation.png" alt="enter image description here"></p>
-<h2 id="防护措施-2"><a href="#防护措施-2" class="headerlink" title="防护措施"></a>防护措施</h2><p>在使用者登入成功後，立即更換 Session ID，防止攻击者操控 Session ID 給予受害者。<br>禁止將 Session ID 使用 URL (GET) 方式來传输</p>
-<h2 id="Session-防护"><a href="#Session-防护" class="headerlink" title="Session 防护"></a>Session 防护</h2><p>每個使用者在登入网站的時候，我們可以用每個人特有的識別資訊來確認身分：</p>
-<ul>
-<li>來源 IP 位址</li>
-<li>瀏覽器 User-Agent</li>
-</ul>
-<p>如果在同一個 Session 中，使用者的 IP 或者 User-Agent 改變了，最安全的作法就是把這個 Session 清除，請使用者重新登入。雖然使用者可能因為 IP 更換、Proxy 等因素導致被強制登出，但為了安全性，便利性必須要與之取捨。</p>
-<p>除了檢查個人識別資訊來確認是否盜用之外，也可以增加前述的 Session ID 的防护方式：</p>
-<ul>
-<li>Cookie 設定 Secure Flag (HTTPS)</li>
-<li>Cookie 設定 HTTP Only Flag</li>
-<li>成功登入後立即變更 Session ID</li>
-<li>Session 的清除機制也非常重要。當伺服器偵測到可疑的使用者 Session 行為時，例如攻击者惡意嘗試偽造 Session ID、使用者 Session 可能遭窃、或者逾時等情況，都應該立刻清除該 Session ID 以免被攻击者利用。</li>
-</ul>
-<h3 id="Session-清除机制时机："><a href="#Session-清除机制时机：" class="headerlink" title="Session 清除机制时机："></a>Session 清除机制时机：</h3><ul>
-<li>侦测到恶意尝试 Session ID</li>
-<li>识别咨询无效时</li>
-<li>超时</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
-<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
-<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
-<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
-<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
-<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
-<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
-<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
-<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
-<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
-<p>参考：</p>
-<ul>
-<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
-<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -810,7 +846,7 @@
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/5/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/7/">Next<span></span></a>
   </nav>
 
 </div>
@@ -840,11 +876,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>3</sup></a></li>
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>4</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
 		  
 		
 		  
@@ -852,7 +888,19 @@
 		  
 		
 		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
 		  
 		
 		  
@@ -860,7 +908,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>21</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>23</sup></a></li>
 		  
 		
 		  
@@ -880,6 +928,10 @@
 		  
 		
 		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>3</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
 		  
 		
@@ -893,7 +945,7 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>18</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>20</sup></a></li>
 			
 		
 			
@@ -909,19 +961,23 @@
 			
 		
 			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>4</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>4</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -933,11 +989,19 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>2</sup></a></li>
 			
 		
 			
@@ -949,27 +1013,15 @@
 			
 		
 			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/安全机制/" title="安全机制">安全机制<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hdfs/" title="Hdfs">Hdfs<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/API/" title="API">API<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java8/" title="Java8">Java8<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-SQL/" title="Spark SQL">Spark SQL<sup>1</sup></a></li>
+				<li><a href="/tags/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
 			
 		
 		</ul>
