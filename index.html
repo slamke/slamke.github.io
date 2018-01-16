@@ -94,7 +94,12 @@
 </header>
     <div class="article-content">
         
-        <h2 id="1-Yarn模式下资源分配"><a href="#1-Yarn模式下资源分配" class="headerlink" title="1. Yarn模式下资源分配"></a>1. Yarn模式下资源分配</h2><p>在Yarn模式下，<figure class="highlight plain"><figcaption><span>and和--executor-cores设置 )不同应用程序的Executors之间是互相独立的，每个应用程序的Executors只负责自己的应用程序的任务运行和数据存储。每个Executor是一个独立的JVM进程，JVM之间内存是无法共享的。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 2. 动态资源分配的简介</span><br><span class="line"></span><br><span class="line">动态资源调度是在Spark1.2之后才开始加进去的，</span><br><span class="line"></span><br><span class="line">①原理：当一个应用程序不需要使用资源，且后续没有资源申请的时候，它就将现有的资源交回给集群，这样集群便可以将资源分配给其他应用程序来使用。当该应用程序再次需要资源的时候就再去向集群申请。</span><br><span class="line"></span><br><span class="line">②优点：当集群中有很多应用程序的时候可以提高集群的资源利用率，比如集群中有一个应用程序作为服务一直在执行，集群给他分配了12个CPU和8G内存， 默认情况下，该应用会一直占用12个CPU和8G内存的资源，直到程序结束，如果目前该应用程序运行不需要这么多的资源，资源处于空闲状态的时候，集群也 不会把该资源分配给其他的应用程序，从而造成的资源的浪费。所以使用动态资源分配可以提高资源利用率。</span><br><span class="line"></span><br><span class="line">③缺点：动态资源分配的调度算法如果不合理可能造成应用程序的高延迟，一种情况是某个应用程序刚把资源交回给集群，下一刻就又需要使用资源，然后在去向集群申请。</span><br><span class="line"></span><br><span class="line">## 3. 动态资源分配的配置</span><br><span class="line"></span><br><span class="line">①修改配置文件spark-defaults.conf，添加如下内容</span><br><span class="line">``` shell</span><br><span class="line">spark.dynamicAllocation.enabled   true   //开启动态资源分配</span><br><span class="line">spark.shuffle.service.enabled     true   //启用External shuffle Service服务</span><br><span class="line">//shuffle.service是必须要启动的</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.minExecutors 1  //每个Application最小分配的executor数</span><br><span class="line">spark.dynamicAllocation.maxExecutors 30  //每个Application最大并发分配的executor数</span><br><span class="line"></span><br><span class="line">spark.shuffle.service.port 7337 //Shuffle Service服务端口，必须和yarn-site中的一致</span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.schedulerBacklogTimeout 1s </span><br><span class="line">spark.dynamicAllocation.sustainedSchedulerBacklogTimeout 5s</span><br></pre></td></tr></table></figure></p>
+        <h2 id="1-Yarn模式下资源分配"><a href="#1-Yarn模式下资源分配" class="headerlink" title="1. Yarn模式下资源分配"></a>1. Yarn模式下资源分配</h2><p>在Yarn模式下，<strong>ResourceManager</strong>(以后简称RM)会为每一个应用程序分配固定数量的Executors(默认是2个，可通过–num-executors设置)，且为每个Executor分配固定的CPU和内存(默认1个CPU和512M内存，可通过-executor-memory and和–executor-cores设置 )不同应用程序的Executors之间是互相独立的，每个应用程序的Executors只负责自己的应用程序的任务运行和数据存储。每个Executor是一个独立的JVM进程，JVM之间内存是无法共享的。</p>
+<h2 id="2-动态资源分配的简介"><a href="#2-动态资源分配的简介" class="headerlink" title="2. 动态资源分配的简介"></a>2. 动态资源分配的简介</h2><p>动态资源调度是在Spark1.2之后才开始加进去的，</p>
+<p>①原理：当一个应用程序不需要使用资源，且后续没有资源申请的时候，它就将现有的资源交回给集群，这样集群便可以将资源分配给其他应用程序来使用。当该应用程序再次需要资源的时候就再去向集群申请。</p>
+<p>②优点：当集群中有很多应用程序的时候可以提高集群的资源利用率，比如集群中有一个应用程序作为服务一直在执行，集群给他分配了12个CPU和8G内存， 默认情况下，该应用会一直占用12个CPU和8G内存的资源，直到程序结束，如果目前该应用程序运行不需要这么多的资源，资源处于空闲状态的时候，集群也 不会把该资源分配给其他的应用程序，从而造成的资源的浪费。所以使用动态资源分配可以提高资源利用率。</p>
+<p>③缺点：动态资源分配的调度算法如果不合理可能造成应用程序的高延迟，一种情况是某个应用程序刚把资源交回给集群，下一刻就又需要使用资源，然后在去向集群申请。</p>
+<h2 id="3-动态资源分配的配置"><a href="#3-动态资源分配的配置" class="headerlink" title="3. 动态资源分配的配置"></a>3. 动态资源分配的配置</h2><p>①修改配置文件spark-defaults.conf，添加如下内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">spark.dynamicAllocation.enabled   true   //开启动态资源分配</span><br><span class="line">spark.shuffle.service.enabled     true   //启用External shuffle Service服务</span><br><span class="line">//shuffle.service是必须要启动的</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.minExecutors 1  //每个Application最小分配的executor数</span><br><span class="line">spark.dynamicAllocation.maxExecutors 30  //每个Application最大并发分配的executor数</span><br><span class="line"></span><br><span class="line">spark.shuffle.service.port 7337 //Shuffle Service服务端口，必须和yarn-site中的一致</span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.schedulerBacklogTimeout 1s </span><br><span class="line">spark.dynamicAllocation.sustainedSchedulerBacklogTimeout 5s</span><br></pre></td></tr></table></figure></p>
 <p>②在$SPARK_HOME/lib目录下找到spark-<version>-yarn-shuffle.jar文件,将该jar文件添加到NodeManager节点的classpath环境中。</version></p>
 <p>③修改yarn-site.xml文件，设置如下参数</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">...........</span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>spark_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services.spark_shuffle.class<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>org.apache.spark.network.yarn.YarnShuffleService<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -998,6 +1003,10 @@
 			
 		
 			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
@@ -1006,27 +1015,19 @@
 			
 		
 			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -1038,7 +1039,11 @@
 			
 		
 			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
