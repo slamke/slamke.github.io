@@ -1,0 +1,642 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>基于用户投票的排名算法 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="需求基于用户投票的排名算法（一）：Delicious和Hacker News基于用户投票的排名算法（二）：Reddit基于用户投票的排名算法（三）：Stack Overflow基于用户投票的排名算法（四）：牛顿冷却定律
+对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。根据用户的投票">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于用户投票的排名算法">
+<meta property="og:url" content="slamke.github.io/2017/10/12/基于用户投票的排名算法/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="需求基于用户投票的排名算法（一）：Delicious和Hacker News基于用户投票的排名算法（二）：Reddit基于用户投票的排名算法（三）：Stack Overflow基于用户投票的排名算法（四）：牛顿冷却定律
+对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。根据用户的投票">
+<meta property="og:updated_time" content="2017-10-13T03:59:38.662Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于用户投票的排名算法">
+<meta name="twitter:description" content="需求基于用户投票的排名算法（一）：Delicious和Hacker News基于用户投票的排名算法（二）：Reddit基于用户投票的排名算法（三）：Stack Overflow基于用户投票的排名算法（四）：牛顿冷却定律
+对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。根据用户的投票">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/10/12/基于用户投票的排名算法/" title="基于用户投票的排名算法" itemprop="url">基于用户投票的排名算法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-12T10:02:33.000Z" itemprop="datePublished"> Published 2017-10-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#需求"><span class="toc-number">1.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#贝叶斯平均"><span class="toc-number">2.</span> <span class="toc-text">贝叶斯平均</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p><a href="http://www.ruanyifeng.com/blog/2012/02/ranking_algorithm_hacker_news.html" target="_blank" rel="external">基于用户投票的排名算法（一）：Delicious和Hacker News</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_reddit.html" target="_blank" rel="external">基于用户投票的排名算法（二）：Reddit</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_stack_overflow.html" target="_blank" rel="external">基于用户投票的排名算法（三）：Stack Overflow</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_newton_s_law_of_cooling.html" target="_blank" rel="external">基于用户投票的排名算法（四）：牛顿冷却定律</a></p>
+<p>对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。<br>根据用户的投票，决定最近一段时间内的”热文排名”。</p>
+<p>最直觉、最简单的算法，莫过于按照单位时间内用户的投票数进行排名。得票最多的项目，自然就排在第一位。这个算法的优点是比较简单、容易部署、内容更新相当快；缺点是，一方面，排名变化不够平滑，前一个小时还排名靠前的内容，往往第二个小时就一落千丈，另一方面，缺乏自动淘汰旧项目的机制，某些热门内容可能会长期占据排行榜前列。<br>所以根据得票数，系统自动统计出热门文章排行榜。但是，并非得票最多的文章排在第一位，还要考虑时间因素，新文章应该比旧文章更容易得到好的排名。</p>
+<p>公式： <figure class="highlight plain"><figcaption><span>= （P-1）/(T+2)^G ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">其中，　　P表示帖子的得票数，减去1是为了忽略发帖人的投票。 　　T表示距离发帖的时间（单位为小时），加上2是为了防止最新的帖子导致分母过小（之所以选择2，可能是因为从原始文章出现在其他网站，到转贴至Hacker News，平均需要两个小时）。　　G表示&quot;重力因子&quot;（gravityth power），即将帖子排名往下拉的力量，默认值为1.8，后文会详细讨论这个值。</span><br><span class="line"></span><br><span class="line">从这个公式来看，决定帖子排名有三个因素：</span><br><span class="line">第一个因素是得票数P。</span><br><span class="line">在其他条件不变的情况下，得票越多，排名越高。 如果你不想让&quot;高票帖子&quot;与&quot;低票帖子&quot;的差距过大，可以在得票数上加一个小于1的指数，比如(P-1)^0.8。</span><br><span class="line">第二个因素是距离发帖的时间T。</span><br><span class="line">在其他条件不变的情况下，越是新发表的帖子，排名越高。或者说，一个帖子的排名，会随着时间不断下降。</span><br><span class="line">第三个因素是重力因子G。</span><br><span class="line">它的数值大小决定了排名随时间下降的速度。G值越大，曲线越陡峭，排名下降得越快，意味着排行榜的更新速度越快。</span><br><span class="line"></span><br><span class="line">## 所有时段的排名</span><br><span class="line"></span><br><span class="line">[基于用户投票的排名算法（五）：威尔逊区间](http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_wilson_score_interval.html)</span><br><span class="line"></span><br><span class="line">一种常见的错误算法是： 　```　得分 = 赞成票 - 反对票</span><br></pre></td></tr></table></figure></p>
+<p>假定有两个项目，项目A是60张赞成票，40张反对票，项目B是550张赞成票，450张反对票。请问，谁应该排在前面？按照上面的公式，B会排在前面，因为它的得分（550 - 450 = 100）高于A（60 - 40 = 20）。但是实际上，B的好评率只有55%（550 / 1000），而A为60%（60 / 100），所以正确的结果应该是A排在前面。<br>另一种常见的错误算法是: <code>得分 = 赞成票 / 总票数</code> 如果”总票数”很大，这种算法其实是对的。问题出在如果”总票数”很少，这时就会出错。假定A有2张赞成票、0张反对票，B有100张赞成票、1张反对票。这种算法会使得A排在B前面。这显然错误。</p>
+<p>我们先做如下设定：<br>　　（1）每个用户的投票都是独立事件。<br>　　（2）用户只有两个选择，要么投赞成票，要么投反对票。<br>　　（3）如果投票总人数为n，其中赞成票为k，那么赞成票的比例p就等于k/n。<br>如果你熟悉统计学，可能已经看出来了，这是一种统计分布，叫做”二项分布”（binomial distribution）。这很重要，下面马上要用到。<br>们的思路是，p越大，就代表这个项目的好评比例越高，越应该排在前面。但是，p的可信性，取决于有多少人投票，如果样本太小，p就不可信。好在我们已经知道，p是”二项分布”中某个事件的发生概率，因此我们可以计算出p的置信区间。所谓”置信区间”，就是说，以某个概率而言，p会落在的那个区间。比如，某个产品的好评率是80%，但是这个值不一定可信。根据统计学，我们只能说，有95%的把握可以断定，好评率在75%到85%之间，即置信区间是[75%, 85%]。<br>这样一来，排名算法就比较清晰了：<br>　　第一步，计算每个项目的”好评率”（即赞成票的比例）。<br>　　第二步，计算每个”好评率”的置信区间（以95%的概率）。<br>　　第三步，根据置信区间的下限值，进行排名。这个值越大，排名就越高。</p>
+<p>置信区间的实质，就是进行可信度的修正，弥补样本量过小的影响。如果样本多，就说明比较可信，不需要很大的修正，所以置信区间会比较窄，下限值会比较大；如果样本少，就说明不一定可信，必须进行较大的修正，所以置信区间会比较宽，下限值会比较小。</p>
+<p>二项分布的置信区间有多种计算公式，最常见的是”正态区间”（Normal approximation interval），教科书里几乎都是这种方法。但是，它只适用于样本较多的情况（np &gt; 5 且 n(1 − p) &gt; 5），对于小样本，它的准确性很差。<br>1927年，美国数学家 Edwin Bidwell Wilson提出了一个修正公式，被称为”威尔逊区间”，很好地解决了小样本的准确性问题。</p>
+<h2 id="贝叶斯平均"><a href="#贝叶斯平均" class="headerlink" title="贝叶斯平均"></a>贝叶斯平均</h2><p><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_bayesian_average.html" target="_blank" rel="external">基于用户投票的排名算法（六）：贝叶斯平均</a></p>
+<p>介绍了”威尔逊区间”，它解决了投票人数过少、导致结果不可信的问题。<br>举例来说，如果只有2个人投票，”威尔逊区间”的下限值会将赞成票的比例大幅拉低。这样做固然保证了排名的可信性，但也带来了另一个问题：排行榜前列总是那些票数最多的项目，新项目或者冷门的项目，很难有出头机会，排名可能会长期靠后。</p>
+<p>在排名页面的底部，IMDB给出了它的计算方法。<code>WR = v/(v+m)  * R + m/(v+m) *C</code> </p>
+<ul>
+<li>WR， 加权得分（weighted rating）。</li>
+<li>R，该电影的用户投票的平均得分（Rating）。</li>
+<li>v，该电影的投票人数（votes）。</li>
+<li>m，排名前250名的电影的最低投票数（现在为3000）。</li>
+<li>C， 所有电影的平均得分（现在为6.9）。</li>
+</ul>
+<p>这种算法被称为”贝叶斯平均”（Bayesian average）。因为某种程度上，它借鉴了”贝叶斯推断”（Bayesian inference）的思想：既然不知道投票结果，那就先估计一个值，然后不断用新的信息修正，使得它越来越接近正确的值。<br>在这个公式中，m（总体平均分）是”先验概率”，每一次新的投票都是一个调整因子，使总体平均分不断向该项目的真实投票结果靠近。投票人数越多，该项目的”贝叶斯平均”就越接近算术平均，对排名的影响就越小。因此，这种方法可以给一些投票人数较少的项目，以相对公平的排名。<br>“贝叶斯平均”也有缺点，主要问题是它假设用户的投票是正态分布。比如，电影A有10个观众评分，5个为五星，5个为一星；电影B也有10个观众评分，都给了三星。这两部电影的平均得分（无论是算术平均，还是贝叶斯平均）都是三星，但是电影A可能比电影B更值得看。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/排名/">排名</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2017/10/12/基于用户投票的排名算法/" data-title="基于用户投票的排名算法 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/10/30/Spark写Redis实践总结/" title="Spark写Redis实践总结">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Spark写Redis实践总结</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/10/11/贝叶斯推断的原理和应用/"  title="贝叶斯推断的原理和应用">
+ <strong>下一篇：</strong><br/> 
+ <span>贝叶斯推断的原理和应用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#需求"><span class="toc-number">1.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#贝叶斯平均"><span class="toc-number">2.</span> <span class="toc-text">贝叶斯平均</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github Card</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>27</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>24</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
