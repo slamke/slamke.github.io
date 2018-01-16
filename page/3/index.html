@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,143 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/09/11/Kafka相关/" title="Kafka相关" itemprop="url">Kafka相关</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-09-11T10:14:42.000Z" itemprop="datePublished"> 發表於 2017-09-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://zhuanlan.zhihu.com/p/25212966" target="_blank" rel="external">初识消息系统kafka</a></p>
+<p><a href="http://matt33.com/2017/09/04/kafka-best-pratice/?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io" target="_blank" rel="external">Kafka 最佳实践</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/25227580" target="_blank" rel="external">深入kafka生产消费模型</a></p>
+<p><a href="Linkedin Camus，从Kafka到HDFS的数据传输管道">https://github.com/linkedin/camus</a></p>
+<p><a href="https://fangyeqing.github.io/2016/12/01/Camus%E4%BB%8B%E7%BB%8D/" target="_blank" rel="external">Camus介绍</a></p>
+<p><a href="http://blog.csdn.net/lmalds/article/details/53940549" target="_blank" rel="external">Gobblin–一个用于Hadoop的统一”数据抽取框架”</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Kafka/">Kafka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Kafka/">Kafka</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/06/09/Spark-Dataframe使用教程和Tips/" title="Spark Dataframe使用教程和Tips" itemprop="url">Spark Dataframe使用教程和Tips</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-06-09T03:36:23.000Z" itemprop="datePublished"> 發表於 2017-06-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Databricks官方文档"><a href="#Databricks官方文档" class="headerlink" title="Databricks官方文档"></a>Databricks官方文档</h2><p><a href="https://docs.databricks.com/spark/latest/dataframes-datasets/introduction-to-dataframes-scala.html#working-with-dataframes" target="_blank" rel="external">https://docs.databricks.com/spark/latest/dataframes-datasets/introduction-to-dataframes-scala.html#working-with-dataframes</a></p>
+<p>内置函数 <a href="https://spark.apache.org/docs/2.0.2/api/java/org/apache/spark/sql/functions.html" target="_blank" rel="external">https://spark.apache.org/docs/2.0.2/api/java/org/apache/spark/sql/functions.html</a></p>
+<h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><ol>
+<li><p>数据的精度</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span>  org.apache.spark.sql.functions._</span><br><span class="line">schemaPeople.agg(sum(<span class="string">"today_pay"</span>).cast(<span class="type">DecimalType</span>(precision=<span class="number">38</span>, scale=<span class="number">9</span>))).alias(<span class="string">"today_pay_sum"</span>)</span><br><span class="line"><span class="comment">// precision 数据长度</span></span><br><span class="line"><span class="comment">// scale 小数长度</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关联join的使用<br>官方的示例中，df.join(df2, ‘name’, ‘outer’)这种用法是错误的，<br>只能使用schemaPeople.as(“a”).join(schemaPeople.as(“b”), $”a.name” === $”b.name”, “outer”)，必须指明两个df join的字段</p>
+</li>
+<li><p>添加列<br>追加列信息，下一步处理时，必须使用val newDF = schemaPeople.withColumn(“add_col”, lit(“new col”))重新赋值</p>
+</li>
+<li>column的空值判断<br>NO：df.filter(col(‘xxx’) is not None)<br>YES：df.filter(col(‘xxx’).isNotNull())</li>
+<li>column常量赋值<br>用lit()包装，如df.withColumn(“src”, lit(“mobile”))</li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Dataframe/">Dataframe</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/06/01/hadoop的安全机制和审计/" title="hadoop的安全机制和审计" itemprop="url">hadoop的安全机制和审计</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +225,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-06-01T06:33:09.000Z" itemprop="datePublished"> Published 2017-06-01</time>
+    <time datetime="2017-06-01T06:33:09.000Z" itemprop="datePublished"> 發表於 2017-06-01</time>
     
   </p>
 </header>
@@ -179,7 +316,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-26T04:48:35.000Z" itemprop="datePublished"> Published 2017-05-26</time>
+    <time datetime="2017-05-26T04:48:35.000Z" itemprop="datePublished"> 發表於 2017-05-26</time>
     
   </p>
 </header>
@@ -243,7 +380,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-15T03:27:59.000Z" itemprop="datePublished"> Published 2017-05-15</time>
+    <time datetime="2017-05-15T03:27:59.000Z" itemprop="datePublished"> 發表於 2017-05-15</time>
     
   </p>
 </header>
@@ -343,7 +480,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-12T09:07:52.000Z" itemprop="datePublished"> Published 2017-05-12</time>
+    <time datetime="2017-05-12T09:07:52.000Z" itemprop="datePublished"> 發表於 2017-05-12</time>
     
   </p>
 </header>
@@ -413,7 +550,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-04T02:51:46.000Z" itemprop="datePublished"> Published 2017-05-04</time>
+    <time datetime="2017-05-04T02:51:46.000Z" itemprop="datePublished"> 發表於 2017-05-04</time>
     
   </p>
 </header>
@@ -500,7 +637,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T02:37:03.000Z" itemprop="datePublished"> Published 2017-04-13</time>
+    <time datetime="2017-04-13T02:37:03.000Z" itemprop="datePublished"> 發表於 2017-04-13</time>
     
   </p>
 </header>
@@ -611,7 +748,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-10T08:05:54.000Z" itemprop="datePublished"> Published 2017-04-10</time>
+    <time datetime="2017-04-10T08:05:54.000Z" itemprop="datePublished"> 發表於 2017-04-10</time>
     
   </p>
 </header>
@@ -704,7 +841,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-06T05:42:35.000Z" itemprop="datePublished"> Published 2017-04-06</time>
+    <time datetime="2017-04-06T05:42:35.000Z" itemprop="datePublished"> 發表於 2017-04-06</time>
     
   </p>
 </header>
@@ -791,243 +928,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/03/30/如何在Spark平台搭建ThriftServer/" title="如何在Spark平台搭建ThriftServer" itemprop="url">如何在Spark平台搭建ThriftServer</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-03-30T02:58:04.000Z" itemprop="datePublished"> Published 2017-03-30</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Thrift-JDBC-Server描述"><a href="#Thrift-JDBC-Server描述" class="headerlink" title="Thrift JDBC Server描述"></a>Thrift JDBC Server描述</h2><p>Thrift JDBC Server使用的是HIVE0.12的HiveServer2实现。能够使用Spark或者hive0.12版本的beeline脚本与JDBC Server进行交互使用。Thrift JDBC Server默认监听端口是10000。</p>
-<h2 id="使用Thrift-JDBC-Server前需要注意："><a href="#使用Thrift-JDBC-Server前需要注意：" class="headerlink" title="使用Thrift JDBC Server前需要注意："></a>使用Thrift JDBC Server前需要注意：</h2><p>1、将<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">说明: hive-site.xml配置有meta信息存储的MySQL路径</span><br><span class="line"></span><br><span class="line">2、需要在$SPARK_HOME/conf/spark-env.sh中的SPARK_CLASSPATH添加jdbc驱动的jar包</span><br><span class="line">export SPARK_CLASSPATH=$SPARK_CLASSPATH:/home/hadoop/software/mysql-connector-java-5.1.27-bin.jar</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Thrift JDBC Server/beeline启动</span><br><span class="line"></span><br><span class="line">1. 启动Thrift JDBC Server：默认端口是10000</span><br><span class="line"></span><br><span class="line">cd $SPARK_HOME/sbin</span><br><span class="line">start-thriftserver.sh</span><br><span class="line">&gt; 如何修改Thrift JDBC Server的默认监听端口号？借助于--hiveconf</span><br><span class="line">start-thriftserver.sh  --hiveconf hive.server2.thrift.port=14000</span><br><span class="line"></span><br><span class="line">Demo:</span><br><span class="line"></span><br><span class="line">``` shell</span><br><span class="line"></span><br><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">./sbin/start-thriftserver.sh \</span><br><span class="line">        --hiveconf hive.exec.mode.local.auto=true  \</span><br><span class="line">        --hiveconf hive.auto.convert.join=true     \</span><br><span class="line">        --hiveconf hive.mapjoin.smalltable.filesize=50000000 \</span><br><span class="line">        --name thriftserver    \</span><br><span class="line">        --master yarn-client \</span><br><span class="line">        --driver-cores    5   \</span><br><span class="line">        --driver-memory   5G  \</span><br><span class="line">        --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \</span><br><span class="line">        --conf spark.scheduler.mode=FAIR \</span><br><span class="line">        --conf spark.kryoserializer.buffer.max.mb=1024 \</span><br><span class="line">        --conf spark.storage.memoryFraction=0.2</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li>启动beeline<br>cd $SPARK_HOME/bin<br>beeline -u jdbc:hive2://hadoop000:10000</li>
-</ol>
-<p>Demo:</p>
-<pre><code class="shell">$ ./bin/beeline
-Beeline version 1.2.1.spark2 by Apache Hive
-beeline&gt; !connect jdbc:hive2://localhost:10000
-</code></pre>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/ThriftServer/">ThriftServer</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/03/29/Scala代码规范/" title="Scala代码规范" itemprop="url">Scala代码规范</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-03-29T10:00:07.000Z" itemprop="datePublished"> Published 2017-03-29</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="格式与命名"><a href="#格式与命名" class="headerlink" title="格式与命名"></a>格式与命名</h2><p>1) 代码格式<br>用两个空格缩进。避免每行长度超过100列。在两个方法、类、对象定义之间使用一个空白行。</p>
-<p>2) 优先考虑使用val，而非var。</p>
-<p>3) 当引入多个包时，使用花括号：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jxl.write.&#123;<span class="type">WritableCell</span>, <span class="type">Number</span>, <span class="type">Label</span>&#125;</span><br></pre></td></tr></table></figure></p>
-<p>当引入的包超过6个时，应使用通配符_：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.scalatest.events._</span><br></pre></td></tr></table></figure></p>
-<p>4) 若方法暴露为接口，则返回类型应该显式声明。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">execute</span></span>(conn: <span class="type">Connection</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">  executeCommand(conn, sqlStatement) <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Right</span>(result) =&gt; result</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Left</span>(_) =&gt; <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>5) 集合的命名规范<br>xs, ys, as, bs等作为某种Sequence对象的名称；<br>x, y, z, a, b作为sequence元素的名称。<br>h作为head的名称，t作为tail的名称。</p>
-<p>6) 避免对简单的表达式采用花括号；<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//suggestion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">square</span></span>(x: <span class="type">Int</span>) = x * x</span><br><span class="line"></span><br><span class="line"><span class="comment">//avoid</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">square</span></span>(x: <span class="type">Int</span>) = &#123;</span><br><span class="line">     x * x</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>7) 泛型类型参数的命名虽然没有限制，但建议遵循如下规则：<br>A            代表一个简单的类型，例如List[A]<br>B, C, D      用于第2、第3、第4等类型。例如：<br>                 class List[A] {<br>                     def map<a href="f: A =&gt; B" target="_blank" rel="external">B</a>: List[B] = …<br>                 }<br> N           代表数值类型</p>
-<p><strong>注意：</strong>在Java中，通常以K、V代表Map的key与value，但是在Scala中，更倾向于使用A、B代表Map的key与value。</p>
-<h2 id="语法特性"><a href="#语法特性" class="headerlink" title="语法特性"></a>语法特性</h2><p>1) 定义隐式类时，应该将构造函数的参数声明为val。</p>
-<p>2) <strong>使用for表达式；如果需要条件表达式，应将条件表达式写到for comprehension中</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//not good</span></span><br><span class="line"><span class="keyword">for</span> (file &lt;- files) &#123;</span><br><span class="line">     <span class="keyword">if</span> (hasSoundFileExtension(file) &amp;&amp; !soundFileIsLong(file)) &#123;</span><br><span class="line">        soundFiles += file</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//better</span></span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">     file &lt;- files</span><br><span class="line">     <span class="keyword">if</span> hasSoundFileExtension(file)</span><br><span class="line">     <span class="keyword">if</span> !soundFileIsLong(file)</span><br><span class="line">&#125; <span class="keyword">yield</span> file</span><br></pre></td></tr></table></figure></p>
-<p><strong>通常情况下，我们应优先考虑filter, map, flatMap等操作，而非for comprehension</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//best</span></span><br><span class="line">files.filter(hasSourceFileExtension).filterNot(soundFileIsLong)</span><br></pre></td></tr></table></figure></p>
-<p>3) 避免使用isInstanceOf，而是使用模式匹配，尤其是在处理比较复杂的类型判断时，使用模式匹配的可读性更好。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//avoid</span></span><br><span class="line"><span class="keyword">if</span> (x.isInstanceOf[<span class="type">Foo</span>]) &#123; do something …</span><br><span class="line"></span><br><span class="line"><span class="comment">//suggest</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">isPerson</span></span>(x: <span class="type">Any</span>): <span class="type">Boolean</span> = x <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> p: <span class="type">Person</span> =&gt; <span class="literal">true</span></span><br><span class="line">  <span class="keyword">case</span> _ =&gt; <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4) 以下情况使用abstract class，而不是trait：</p>
-<ul>
-<li>想要创建一个需要构造函数参数的基类</li>
-<li>代码可能会被Java代码调用</li>
-</ul>
-<p>5) <strong>如果希望trait只能被某个类（及其子类）extend，应该使用self type</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">MyTrait</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>: <span class="type">BaseType</span> =&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>如果希望对扩展trait的类做更多限制，可以在self type后增加更多对trait的混入：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">WarpCore</span> </span>&#123;</span><br><span class="line">     <span class="keyword">this</span>: <span class="type">Starship</span> <span class="keyword">with</span> <span class="type">WarpCoreEjector</span> <span class="keyword">with</span> <span class="type">FireExtinguisher</span> =&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// this works</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Enterprise</span> <span class="keyword">extends</span> <span class="title">Starship</span></span></span><br><span class="line">    <span class="keyword">with</span> <span class="type">WarpCore</span></span><br><span class="line">    <span class="keyword">with</span> <span class="type">WarpCoreEjector</span></span><br><span class="line">    <span class="keyword">with</span> <span class="type">FireExtinguisher</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// won't compile</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Enterprise</span> <span class="keyword">extends</span> <span class="title">Starship</span></span></span><br><span class="line">     <span class="keyword">with</span> <span class="type">WarpCore</span></span><br><span class="line">     <span class="keyword">with</span> <span class="type">WarpCoreEjector</span></span><br></pre></td></tr></table></figure></p>
-<p><strong>如果要限制扩展trait的类必须定义相关的方法，可以在self type中定义方法，这称之为structural type</strong>（类似动态语言的鸭子类型）:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">WarpCore</span> </span>&#123;</span><br><span class="line">     <span class="keyword">this</span>: &#123;</span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">ejectWarpCore</span></span>(password: <span class="type">String</span>): <span class="type">Boolean</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">startWarpCore</span></span>: <span class="type">Unit</span></span><br><span class="line">     &#125; =&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Starship</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Enterprise</span> <span class="keyword">extends</span> <span class="title">Starship</span> <span class="keyword">with</span> <span class="title">WarpCore</span> </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">ejectWarpCore</span></span>(password: <span class="type">String</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">          <span class="keyword">if</span> (password == <span class="string">"password"</span>) &#123; println(<span class="string">"core ejected"</span>); <span class="literal">true</span> &#125; <span class="keyword">else</span> <span class="literal">false</span> &#125;</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">startWarpCore</span> </span>&#123; println(<span class="string">"core started"</span>) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>6) <strong>对于较长的类型名称，在特定上下文中，以不影响阅读性和表达设计意图为前提，建议使用类型别名</strong>，它可以帮助程序变得更简短。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcurrentPool</span>[<span class="type">K</span>, <span class="type">V</span>] </span>&#123;</span><br><span class="line">   <span class="class"><span class="keyword">type</span> <span class="title">Queue</span> </span>= <span class="type">ConcurrentLinkedQueue</span>[<span class="type">V</span>]</span><br><span class="line">   <span class="class"><span class="keyword">type</span> <span class="title">Map</span>   </span>= <span class="type">ConcurrentHashMap</span>[<span class="type">K</span>, <span class="type">Queue</span>]  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>7) 如果要使用隐式参数，应尽量使用自定义类型作为隐式参数的类型，而避免过于宽泛的类型，如String，Int，Boolean等。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//suggestion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maxOfList</span></span>[<span class="type">T</span>](elements: <span class="type">List</span>[<span class="type">T</span>])</span><br><span class="line">         (<span class="keyword">implicit</span> orderer: <span class="type">T</span> =&gt; <span class="type">Ordered</span>[<span class="type">T</span>]): <span class="type">T</span> =</span><br><span class="line">   elements <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="type">List</span>() =&gt;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">IllegalArgumentException</span>(<span class="string">"empty list!"</span>)</span><br><span class="line">      <span class="keyword">case</span> <span class="type">List</span>(x) =&gt; x</span><br><span class="line">      <span class="keyword">case</span> x :: rest =&gt;</span><br><span class="line">         <span class="keyword">val</span> maxRest = maxListImpParm(rest)(orderer)</span><br><span class="line">         <span class="keyword">if</span> (orderer(x) &gt; maxRest) x</span><br><span class="line">         <span class="keyword">else</span> maxRest</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//avoid</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maxOfListPoorStyle</span></span>[<span class="type">T</span>](elements: <span class="type">List</span>[<span class="type">T</span>])</span><br><span class="line">        (<span class="keyword">implicit</span> orderer: (<span class="type">T</span>, <span class="type">T</span>) =&gt; <span class="type">Boolean</span>): <span class="type">T</span></span><br></pre></td></tr></table></figure></p>
-<p>8) <strong>对于异常的处理，Scala除了提供Java风格的try…catch…finally之外，还提供了allCatch.opt、Try…Success…Failure以及Either…Right…Left等风格的处理方式</strong>。其中，Try是2.10提供的语法。根据不同的场景选择不同风格：</p>
-<ul>
-<li><p>优先选择Try风格。Try很好地支持模式匹配，它兼具Option与Either的特点，因而既提供了集合的语义，又支持模式匹配，又提供了getOrElse()方法。同时，它还可以组合多个Try，并支持运用for combination。例如：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> z = <span class="keyword">for</span> &#123;</span><br><span class="line">    a &lt;- <span class="type">Try</span>(x.toInt) </span><br><span class="line">    b &lt;- <span class="type">Try</span>(y.toInt)</span><br><span class="line">&#125; <span class="keyword">yield</span> a * b</span><br><span class="line"><span class="keyword">val</span> answer = z.getOrElse(<span class="number">0</span>) * <span class="number">2</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果希望清楚的表现非此即彼的特性，应考虑使用Either。注意，约定成俗下，我们习惯将正确的结果放在Either的右边（Right既表示右边，又表示正确）</p>
-</li>
-<li><p>如果希望将异常情况处理为None，则应考虑使用allCatch.opt。例如：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.util.control.<span class="type">Exception</span>._</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">readTextFile</span></span>(f: <span class="type">String</span>): <span class="type">Option</span>[<span class="type">List</span>[<span class="type">String</span>]] =     </span><br><span class="line">    allCatch.opt(<span class="type">Source</span>.fromFile(f).getLines.toList)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果希望在执行后释放资源，从而需要使用finally时，考虑try…catch…finally，或者结合try…catch…finally与Either。例如：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">executeQuery</span></span>(conn: <span class="type">Connection</span>, sql: <span class="type">String</span>): <span class="type">Either</span>[<span class="type">SQLException</span>, <span class="type">ResultSet</span>] = &#123;</span><br><span class="line">  <span class="keyword">var</span> stmt: <span class="type">Statement</span> = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">var</span> rs: <span class="type">ResultSet</span> = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    stmt = conn.createStatement()</span><br><span class="line">    rs = stmt.executeQuery(sql)</span><br><span class="line">    <span class="type">Right</span>(rs)</span><br><span class="line">  &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> e: <span class="type">SQLException</span> =&gt; &#123;</span><br><span class="line">      e.printStackTrace()</span><br><span class="line">      <span class="type">Left</span>(e)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (rs != <span class="literal">null</span>) rs.close()</span><br><span class="line">      <span class="keyword">if</span> (stmt != <span class="literal">null</span>) stmt.close()</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> e: <span class="type">SQLException</span> =&gt; e.printStackTrace()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>为避免重复，还应考虑引入Load Pattern。 </p>
-<h2 id="编码模式"><a href="#编码模式" class="headerlink" title="编码模式"></a>编码模式</h2><p>1) <strong>Loan Pattern: 确保打开的资源（如文件、数据库连接）能够在操作完毕后被安全的释放</strong>。</p>
-<p>Loan Pattern的通用格式如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span>](r : <span class="type">Resource</span>)(f : <span class="type">Resource</span> =&gt; <span class="type">A</span>) : <span class="type">A</span> =</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">        f(r)</span><br><span class="line">   &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        r.dispose()</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
-<p>这个格式针对Resource类型进行操作。还有一种做法是：只要实现了close方法，都可以运用Loan Pattern：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span> &lt;: <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>():<span class="type">Unit</span>, <span class="type">B</span>][resource: <span class="type">A</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">B</span> = </span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">          f(resource)</span><br><span class="line">     &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">          resource.close()</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
-<p>以FileSource为例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">using(io.<span class="type">Source</span>.fromFile(<span class="string">"example.txt"</span>)) &#123; </span><br><span class="line">    source =&gt; &#123;</span><br><span class="line">        <span class="keyword">for</span> (line &lt;- source.getLines) &#123;</span><br><span class="line">            println(line)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>2) <strong>Cake Pattern: 利用self type实现依赖注入</strong></p>
-<p>例如，对于DbAccessor而言，需要提供不同的DbConnectionFactory来创建连接，从而访问不同的Data Source。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">DbConnectionFactory</span> </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">createDbConnection</span></span>: <span class="type">Connection</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">SybaseDbConnectionFactory</span> <span class="keyword">extends</span> <span class="title">DbConnectionFactory…</span></span></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">MySQLDbConnectionFactory</span> <span class="keyword">extends</span> <span class="title">DbConnectionFactory…</span></span></span><br></pre></td></tr></table></figure></p>
-<p>运用Cake Pattern，DbAccessor的定义应该为：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">DbAccessor</span> </span>&#123;</span><br><span class="line">     <span class="keyword">this</span>: <span class="type">DbConnectionFactory</span> =&gt; </span><br><span class="line"></span><br><span class="line">     <span class="comment">//…</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>由于DbAccessor使用了self type，因此可以在DbAccessor中调用DbConnectionFactory的方法createDbConnection()。客户端在创建DbAccessor时，可以根据需要选择混入的DbConnectionFactory：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sybaseDbAccessor = <span class="keyword">new</span> <span class="type">DbAccessor</span> <span class="keyword">with</span> <span class="type">SybaseDbConnectionFactory</span></span><br></pre></td></tr></table></figure></p>
-<p>当然，也可以定义object：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">SybaseDbAccessor</span> <span class="keyword">extends</span> <span class="title">DbAccessor</span> <span class="keyword">with</span> <span class="title">SybaseDbConnectionFactory</span></span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MySQLDbAccessor</span> <span class="keyword">extends</span> <span class="title">DbAccessor</span> <span class="keyword">with</span> <span class="title">MySQLDbConnectionFactory</span></span></span><br></pre></td></tr></table></figure></p>
-<h2 id="编码风格"><a href="#编码风格" class="headerlink" title="编码风格"></a>编码风格</h2><p>1) <strong>尽可能直接在函数定义的地方使用模式匹配。</strong>例如，在下面的写法中，match应该被折叠起来(collapse):<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">list map &#123; item =&gt;   </span><br><span class="line">     item <span class="keyword">match</span> &#123;     </span><br><span class="line">          <span class="keyword">case</span> <span class="type">Some</span>(x) =&gt; x     </span><br><span class="line">          <span class="keyword">case</span> <span class="type">None</span> =&gt; <span class="keyword">default</span>   </span><br><span class="line">     &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>用下面的写法替代：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">list map &#123;</span><br><span class="line">   <span class="keyword">case</span> <span class="type">Some</span>(x) =&gt; x</span><br><span class="line">   <span class="keyword">case</span> <span class="type">None</span> =&gt; <span class="keyword">default</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>它很清晰的表达了 list中的元素都被映射，间接的方式让人不容易明白。此时，<strong>传入map的函数实则为partial function</strong>。 </p>
-<p>2) <strong>避免使用null，而应该使用Option的None</strong>。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io._</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">CopyBytes</span> <span class="keyword">extends</span> <span class="title">App</span> </span>&#123;</span><br><span class="line">     <span class="keyword">var</span> in = <span class="type">None</span>: <span class="type">Option</span>[<span class="type">FileInputStream</span>]</span><br><span class="line">     <span class="keyword">var</span> out = <span class="type">None</span>: <span class="type">Option</span>[<span class="type">FileOutputStream</span>]</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">          in = <span class="type">Some</span>(<span class="keyword">new</span> <span class="type">FileInputStream</span>(<span class="string">"/tmp/Test.class"</span>))</span><br><span class="line">          out = <span class="type">Some</span>(<span class="keyword">new</span> <span class="type">FileOutputStream</span>(<span class="string">"/tmp/Test.class.copy"</span>))</span><br><span class="line">          <span class="keyword">var</span> c = <span class="number">0</span></span><br><span class="line">          <span class="keyword">while</span> (&#123;c = in.get.read; c != −<span class="number">1</span>&#125;) &#123;</span><br><span class="line">             out.get.write(c)</span><br><span class="line">    &#125;</span><br><span class="line">     &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">          <span class="keyword">case</span> e: <span class="type">IOException</span> =&gt; e.printStackTrace</span><br><span class="line">     &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">          println(<span class="string">"entered finally ..."</span>)</span><br><span class="line">          <span class="keyword">if</span> (in.isDefined) in.get.close</span><br><span class="line">          <span class="keyword">if</span> (out.isDefined) out.get.close</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>方法的返回值也要避免返回Null。应考虑返回Option，Either，或者Try。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.util.&#123;<span class="type">Try</span>, <span class="type">Success</span>, <span class="type">Failure</span>&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">readTextFile</span></span>(filename: <span class="type">String</span>): <span class="type">Try</span>[<span class="type">List</span>[<span class="type">String</span>]] = &#123; </span><br><span class="line">    <span class="type">Try</span>(io.<span class="type">Source</span>.fromFile(filename).getLines.toList</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> filename = <span class="string">"/etc/passwd"</span> </span><br><span class="line">readTextFile(filename) <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Success</span>(lines) =&gt; lines.foreach(println)</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Failure</span>(f) =&gt; println(f) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) <strong>若在Class中需要定义常量，应将其定义为val，并将其放在该类的伴生对象中</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pizza</span> (<span class="params">var crustSize: <span class="type">Int</span>, var crustType: <span class="type">String</span></span>) </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">this</span></span>(crustSize: <span class="type">Int</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>(crustSize, <span class="type">Pizza</span>.<span class="type">DEFAULT_CRUST_TYPE</span>)</span><br><span class="line">     &#125;</span><br><span class="line">   </span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">this</span></span>(crustType: <span class="type">String</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>(<span class="type">Pizza</span>.<span class="type">DEFAULT_CRUST_SIZE</span>, crustType)</span><br><span class="line">     &#125;</span><br><span class="line">   </span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">this</span></span>() &#123;</span><br><span class="line">          <span class="keyword">this</span>(<span class="type">Pizza</span>.<span class="type">DEFAULT_CRUST_SIZE</span>, <span class="type">Pizza</span>.<span class="type">DEFAULT_CRUST_TYPE</span>)</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">toString</span> </span>= <span class="string">s"A <span class="subst">$crustSize</span> inch pizza with a <span class="subst">$crustType</span> crust"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Pizza</span> </span>&#123;</span><br><span class="line">     <span class="keyword">val</span> <span class="type">DEFAULT_CRUST_SIZE</span> = <span class="number">12</span></span><br><span class="line">     <span class="keyword">val</span> <span class="type">DEFAULT_CRUST_TYPE</span> = <span class="string">"THIN"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4) 合理为构造函数或方法提供默认值。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Socket</span> (<span class="params">val timeout: <span class="type">Int</span> = 10000</span>)</span></span><br></pre></td></tr></table></figure></p>
-<p>5) 如果需要返回多个值时，应返回tuple。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getStockInfo</span> </span>= &#123;</span><br><span class="line">     <span class="comment">//</span></span><br><span class="line">     (<span class="string">"NFLX"</span>, <span class="number">100.00</span>, <span class="number">101.00</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>6) 作为访问器的方法，如果没有副作用，在声明时建议定义为没有括号。</p>
-<p>例如，Scala集合库提供的scala.collection.immutable.Queue中，dequeue方法没有副作用，声明时就没有括号：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.collection.immutable.<span class="type">Queue</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> q = <span class="type">Queue</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">val</span> value = q.dequeue</span><br></pre></td></tr></table></figure></p>
-<p>7) <strong>将包的公有代码（常量、枚举、类型定义、隐式转换等）放到package object中</strong>。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.agiledon.myapp</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> <span class="class"><span class="keyword">object</span> <span class="title">model</span> </span>&#123;</span><br><span class="line">     <span class="comment">// field</span></span><br><span class="line">     <span class="keyword">val</span> <span class="type">MAGIC_NUM</span> = <span class="number">42</span> <span class="number">182</span> | <span class="type">Chapter</span> <span class="number">6</span>: <span class="type">Objects</span></span><br><span class="line">￼</span><br><span class="line">     <span class="comment">// method</span></span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">echo</span></span>(a: <span class="type">Any</span>) &#123; println(a) &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">// enumeration</span></span><br><span class="line">     <span class="class"><span class="keyword">object</span> <span class="title">Margin</span> <span class="keyword">extends</span> <span class="title">Enumeration</span> </span>&#123;</span><br><span class="line">          <span class="class"><span class="keyword">type</span> <span class="title">Margin</span> </span>= <span class="type">Value</span></span><br><span class="line">          <span class="keyword">val</span> <span class="type">TOP</span>, <span class="type">BOTTOM</span>, <span class="type">LEFT</span>, <span class="type">RIGHT</span> = <span class="type">Value</span></span><br><span class="line">     &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">// type definition</span></span><br><span class="line">     <span class="class"><span class="keyword">type</span> <span class="title">MutableMap</span>[<span class="type">K</span>, <span class="type">V</span>] </span>= scala.collection.mutable.<span class="type">Map</span>[<span class="type">K</span>, <span class="type">V</span>]</span><br><span class="line">     <span class="keyword">val</span> <span class="type">MutableMap</span> = scala.collection.mutable.<span class="type">Map</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>8) 建议将package object放到与包对象命名空间一致的目录下，并命名为package.scala。以model为例，package.scala文件应放在：<br>+– com<br>     +– agiledon<br>          +– myapp<br>               +– model<br>                    +– package.scala</p>
-<p>9) 若有多个样例类属于同一类型，应共同继承自一个sealed trait。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">Message</span></span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">GetCustomers</span> <span class="keyword">extends</span> <span class="title">Message</span></span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">GetOrders</span> <span class="keyword">extends</span> <span class="title">Message</span></span></span><br></pre></td></tr></table></figure></p>
-<p><strong>注</strong>：这里的sealed，表示trait的所有实现都必须声明在定义trait的文件中。</p>
-<p>10) <strong>考虑使用renaming clause来简化代码。例如，替换被频繁使用的长名称方法</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="type">System</span>.out.&#123;println =&gt; p&#125;</span><br><span class="line"></span><br><span class="line">p(<span class="string">"hallo scala"</span>)</span><br><span class="line">p(<span class="string">"input"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>11) <strong>在遍历Map对象或者Tuple的List时，且需要访问map的key和value值时，优先考虑采用Partial Function</strong>，而非使用_1和_2的形式。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> dollar = <span class="type">Map</span>(<span class="string">"China"</span> -&gt; <span class="string">"CNY"</span>, <span class="string">"US"</span> -&gt; <span class="string">"DOL"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//perfer</span></span><br><span class="line">dollar.foreach &#123;</span><br><span class="line">     <span class="keyword">case</span> (country, currency) =&gt; println(<span class="string">s"<span class="subst">$country</span> -&gt; <span class="subst">$currency</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//avoid</span></span><br><span class="line">dollar.foreach ( x =&gt; println(<span class="string">s"<span class="subst">$x</span>._1 -&gt; <span class="subst">$x</span>._2"</span>) )</span><br></pre></td></tr></table></figure></p>
-<p>或者，考虑使用for comprehension：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ((country, currency) &lt;- dollar) println(<span class="string">s"<span class="subst">$country</span> -&gt; <span class="subst">$currency</span>"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>12) 遍历集合对象时，如果需要获得并操作集合对象的下标，不要使用如下方式：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> l = <span class="type">List</span>(<span class="string">"zero"</span>, <span class="string">"one"</span>, <span class="string">"two"</span>, <span class="string">"three"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i &lt;- <span class="number">0</span> until l.length) <span class="keyword">yield</span> (i, l(i))</span><br></pre></td></tr></table></figure></p>
-<p>而应该使用zipWithIndex方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ((number, index) &lt;- l.zipWithIndex) <span class="keyword">yield</span> (index, number)</span><br></pre></td></tr></table></figure></p>
-<p>或者：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">l.zipWithIndex.map(x =&gt; (x._2, x._1))</span><br></pre></td></tr></table></figure></p>
-<p>当然，如果需要将索引值放在Tuple的第二个元素，就更方便了。直接使用zipWithIndex即可。</p>
-<p>zipWithIndex的索引初始值为0，如果想指定索引的初始值，可以使用zip：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">l.zip(<span class="type">Stream</span> from <span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
-<p>13) 应尽量定义小粒度的trait，然后再以混入的方式继承多个trait。例如ScalaTest中的FlatSpec：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FlatSpec</span> <span class="keyword">extends</span> <span class="title">FlatSpecLike</span> ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">FlatSpecLike</span> <span class="keyword">extends</span> <span class="title">Suite</span> <span class="keyword">with</span> <span class="title">ShouldVerb</span> <span class="keyword">with</span> <span class="title">MustVerb</span> <span class="keyword">with</span> <span class="title">CanVerb</span> <span class="keyword">with</span> <span class="title">Informing</span> <span class="title">…</span></span></span><br></pre></td></tr></table></figure></p>
-<p>小粒度的trait既有利于重用，同时还有利于对业务逻辑进行单元测试，尤其是当一部分逻辑需要依赖外部环境时，可以运用“关注点分离”的原则，将不依赖于外部环境的逻辑分离到单独的trait中。</p>
-<p>14) 优先使用不可变集合。如果确定要使用可变集合，应明确的引用可变集合的命名空间。不要用使用import scala.collection.mutable._；然后引用 Set，应该用下面的方式替代：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.collections.mutable</span><br><span class="line"><span class="keyword">val</span> set = mutable.<span class="type">Set</span>()</span><br></pre></td></tr></table></figure></p>
-<p>这样更明确在使用一个可变集合。</p>
-<p>15) 在自己定义的方法和构造函数里，应适当的接受最宽泛的集合类型。通常可以归结为一个: Iterable, Seq, Set, 或 Map。如果你的方法需要一个 sequence，使用 Seq[T]，而不是List[T]。这样可以分离集合与它的实现，从而达成更好的可扩展性。</p>
-<p>16) <strong>应谨慎使用流水线转换的形式。当流水线转换的逻辑比较复杂时，应充分考虑代码的可读性，准确地表达开发者的意图，而不过分追求函数式编程的流水线转换风格。</strong>例如，我们想要从一组投票结果(语言，票数)中统计不同程序语言的票数并按照得票的顺序显示：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> votes = <span class="type">Seq</span>((<span class="string">"scala"</span>, <span class="number">1</span>), (<span class="string">"java"</span>, <span class="number">4</span>), (<span class="string">"scala"</span>, <span class="number">10</span>), (<span class="string">"scala"</span>, <span class="number">1</span>), (<span class="string">"python"</span>, <span class="number">10</span>))</span><br><span class="line"><span class="keyword">val</span> orderedVotes = votes</span><br><span class="line">   .groupBy(_._1)</span><br><span class="line">   .map &#123; <span class="keyword">case</span> (which, counts) =&gt;</span><br><span class="line">     (which, counts.foldLeft(<span class="number">0</span>)(_ + _._2))</span><br><span class="line">   &#125;.toSeq</span><br><span class="line">   .sortBy(_._2)</span><br><span class="line">   .reverse</span><br></pre></td></tr></table></figure></p>
-<p>上面的代码简洁并且正确，但几乎每个读者都不好理解作者的原本意图。一个策略是声明中间结果和参数：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> votesByLang = votes groupBy &#123; <span class="keyword">case</span> (lang, _) =&gt; lang &#125;</span><br><span class="line"><span class="keyword">val</span> sumByLang = votesByLang map &#123; </span><br><span class="line">     <span class="keyword">case</span> (lang, counts) =&gt;</span><br><span class="line">          <span class="keyword">val</span> countsOnly = counts map &#123; <span class="keyword">case</span> (_, count) =&gt; count &#125;</span><br><span class="line">          (lang, countsOnly.sum)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">val</span> orderedVotes = sumByLang.toSeq</span><br><span class="line">   .sortBy &#123; <span class="keyword">case</span> (_, count) =&gt; count &#125;</span><br><span class="line">   .reverse</span><br></pre></td></tr></table></figure></p>
-<p>代码也同样简洁，但更清晰的表达了转换的发生(通过命名中间值)，和正在操作的数据的结构(通过命名参数)。</p>
-<p>17) 对于Options对象，如果getOrElse能够表达业务逻辑，就应避免对其使用模式匹配。许多集合的操作都提供了返回Options的方法。例如headOption等。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> x = list.headOption getOrElse <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
-<p>这要比模式匹配更清楚：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> x = list <span class="keyword">match</span> </span><br><span class="line">     <span class="keyword">case</span> head::_ =&gt; head</span><br><span class="line">     <span class="keyword">case</span> <span class="type">Nil</span>: =&gt; <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
-<p>18) <strong>当需要对两个或两个以上的集合进行操作时，应优先考虑使用for表达式</strong>，而非map，flatMap等操作。此时，for comprehension会更简洁易读。例如，获取两个字符的所有排列，相同的字符不能出现两次。使用flatMap的代码为：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> chars = 'a' to 'z'</span><br><span class="line"><span class="keyword">val</span> perms = chars flatMap &#123; a =&gt;</span><br><span class="line">  chars flatMap &#123; b =&gt;</span><br><span class="line">    <span class="keyword">if</span> (a != b) <span class="type">Seq</span>(<span class="string">"%c%c"</span>.format(a, b))</span><br><span class="line">    <span class="keyword">else</span> <span class="type">Seq</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>使用for comprehension会更易懂：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">val</span> perms = <span class="keyword">for</span> &#123;</span><br><span class="line">   a &lt;- chars</span><br><span class="line">   b &lt;- chars</span><br><span class="line">   <span class="keyword">if</span> a != b</span><br><span class="line"> &#125; <span class="keyword">yield</span> <span class="string">"%c%c"</span>.format(a, b)</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 高效编码</span><br><span class="line"></span><br><span class="line"><span class="number">1</span>) 应尽量避免让<span class="class"><span class="keyword">trait</span><span class="title">去extend一个class。因为这种做法可能会导致间接的继承多个类，从而产生编译错误。同时，还会导致继承体系的复杂度。</span> </span></span><br><span class="line">```scala</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StarfleetComponent</span></span></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">StarfleetWarpCore</span> <span class="keyword">extends</span> <span class="title">StarfleetComponent</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Starship</span> <span class="keyword">extends</span> <span class="title">StarfleetComponent</span> <span class="keyword">with</span> <span class="title">StarfleetWarpCore</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RomulanStuff</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// won't compile</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Warbird</span> <span class="keyword">extends</span> <span class="title">RomulanStuff</span> <span class="keyword">with</span> <span class="title">StarfleetWarpCore</span></span></span><br></pre></td></tr></table></figure></p>
-<p>2) <strong>选择使用Seq时，若需要索引下标功能，优先考虑选择Vector，若需要Mutable的集合，则选择ArrayBuffer；<br>若要选择Linear集合，优先选择List，若需要Mutable的集合，则选择ListBuffer</strong>。</p>
-<p>3) 如果需要快速、通用、不变、带顺序的集合，应优先考虑使用Vector。Vector很好地平衡了快速的随机选择和快速的随机更新（函数式）操作。Vector是Scala集合库中最灵活的高效集合。一个原则是：当你对选择集合类型犹疑不定时，就应选择使用Vector。</p>
-<p>需要注意的是：当我们创建了一个IndexSeq时，Scala实际上会创建Vector对象：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> x = <span class="type">IndexedSeq</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">x: <span class="type">IndexedSeq</span>[<span class="type">Int</span>] = <span class="type">Vector</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
-<p>4) 如果需要选择通用的可变集合，应优先考虑使用ArrayBuffer。尤其面对一个大的集合，且新元素总是要添加到集合末尾时，就可以选择ArrayBuffer。如果使用的可变集合特性更近似于List这样的线性集合，则考虑使用ListBuffer。</p>
-<p>5) 如果需要将大量数据添加到集合中，建议选择使用List的prepend操作，将这些数据添加到List头部，最后做一次reverse操作。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> l = <span class="type">List</span>[<span class="type">Int</span>]()</span><br><span class="line">(<span class="number">1</span> to max).foreach &#123;</span><br><span class="line">     i =&gt; i +: l</span><br><span class="line">&#125;</span><br><span class="line">l.reverse</span><br></pre></td></tr></table></figure></p>
-<p>6) 当一个类的某个字段在获取值时需要耗费资源，并且，该字段的值并非一开始就需要使用。则应将该字段声明为lazy。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">lazy</span> <span class="keyword">val</span> field = computation()</span><br></pre></td></tr></table></figure></p>
-<p>7) <strong>在使用Future进行并发处理时，应使用回调的方式，而非阻塞：</strong><br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//avoid</span></span><br><span class="line"><span class="keyword">val</span> f = <span class="type">Future</span> &#123;</span><br><span class="line">     <span class="comment">//executing long time</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = <span class="type">Await</span>.result(f, <span class="number">5</span> second)</span><br><span class="line"></span><br><span class="line"><span class="comment">//suggesion</span></span><br><span class="line"><span class="keyword">val</span> f = <span class="type">Future</span> &#123;</span><br><span class="line">     <span class="comment">//executing long time</span></span><br><span class="line">&#125;</span><br><span class="line">f.onComplete &#123;</span><br><span class="line">     <span class="keyword">case</span> <span class="type">Success</span>(result) =&gt; <span class="comment">//handle result</span></span><br><span class="line">     <span class="keyword">case</span> <span class="type">Failure</span>(e) =&gt; e.printStackTrace</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>8) <strong>若有多个操作需要并行进行同步操作，可以选择使用par集合</strong>。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> urls = <span class="type">List</span>(<span class="string">"http://scala-lang.org"</span>,</span><br><span class="line">  <span class="string">"http://agiledon.github.com"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fromURL</span></span>(url: <span class="type">String</span>) = scala.io.<span class="type">Source</span>.fromURL(url)</span><br><span class="line">  .getLines().mkString(<span class="string">"\n"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> t = <span class="type">System</span>.currentTimeMillis()</span><br><span class="line">urls.par.map(fromURL(_))</span><br><span class="line">println(<span class="string">"time: "</span> + (<span class="type">System</span>.currentTimeMillis - t) + <span class="string">"ms"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>9) <strong>若有多个操作需要并行进行异步操作，则采用for comprehension对future进行join方式的执行</strong>。例如，假设Cloud.runAlgorithm()方法返回一个Futrue[Int]，可以同时执行多个runAlgorithm方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result1 = <span class="type">Cloud</span>.runAlgorithm(<span class="number">10</span>)</span><br><span class="line"><span class="keyword">val</span> result2 = <span class="type">Cloud</span>.runAlgorithm(<span class="number">20</span>)</span><br><span class="line"><span class="keyword">val</span> result3 = <span class="type">Cloud</span>.runAlgorithm(<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = <span class="keyword">for</span> &#123;</span><br><span class="line">  r1 &lt;- result1</span><br><span class="line">  r2 &lt;- result2</span><br><span class="line">  r3 &lt;- result3</span><br><span class="line">&#125; <span class="keyword">yield</span> (r1 + r2 + r3)</span><br><span class="line">     </span><br><span class="line">result onSuccess &#123;</span><br><span class="line">  <span class="keyword">case</span> result =&gt; println(<span class="string">s"total = <span class="subst">$result</span>"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>1) 测试类应该与被测试类处于同一包下。如果使用Spec2或ScalaTest的FlatSpec等，则测试类的命名应该为：被测类名 + Spec；若使用JUnit等框架，则测试类的命名为：被测试类名 + Test</p>
-<p>2) 测试含有具体实现的trait时，可以让被测试类直接继承Trait。例如：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">RecordsGenerator</span> </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">def</span> <span class="title">generateRecords</span></span>(table: <span class="type">List</span>[<span class="type">List</span>[<span class="type">String</span>]]): <span class="type">List</span>[<span class="type">Record</span>] &#123;</span><br><span class="line">          <span class="comment">//...</span></span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecordsGeneratorSpec</span> <span class="keyword">extends</span> <span class="title">FlatSpec</span> <span class="keyword">with</span> <span class="title">ShouldMatcher</span> <span class="keyword">with</span> <span class="title">RecordGenerator</span> </span>&#123;</span><br><span class="line">     <span class="keyword">val</span> table = <span class="type">List</span>(<span class="type">List</span>(<span class="string">"abc"</span>, <span class="string">"def"</span>), <span class="type">List</span>(<span class="string">"aaa"</span>, <span class="string">"bbb"</span>))</span><br><span class="line">     it should <span class="string">"generate records"</span> in &#123;</span><br><span class="line">          <span class="keyword">val</span> records = generateRecords(table)</span><br><span class="line">          records.size should be(<span class="number">2</span>)</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) 若要对文件进行测试，可以用字符串假装文件：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">CsvLine</span> </span>= <span class="type">String</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">formatCsv</span></span>(source: <span class="type">Source</span>): <span class="type">List</span>[<span class="type">CsvLine</span>] = &#123;</span><br><span class="line">     source.getLines(_.replace(<span class="string">", "</span>, <span class="string">"|"</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>formatCsv需要接受一个文件源，例如Source.fromFile(“testdata.txt”)。但在测试时，可以通过Source.fromString方法来生成formatCsv需要接收的Source对象：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">it should <span class="string">"format csv lines"</span> in &#123;</span><br><span class="line">     <span class="keyword">val</span> lines = <span class="type">Source</span>.fromString(<span class="string">"abc, def, hgi\n1, 2, 3\none, two, three"</span>)</span><br><span class="line">     <span class="keyword">val</span> result = formatCsv(lines)</span><br><span class="line">     result.mkString(<span class="string">"\n"</span>) should be(<span class="string">"abc|def|hgi\n1|2|3\none|two|three"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Scala/">Scala</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Scala/">Scala</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -1037,7 +952,7 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -1081,7 +996,7 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>27</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
 		  
 		
 		  
@@ -1118,11 +1033,11 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>24</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
 			
 		
 			
@@ -1134,19 +1049,19 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
@@ -1158,7 +1073,7 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 			
 		
 			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -1166,7 +1081,15 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 			
 		
 			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
@@ -1174,23 +1097,7 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -1198,7 +1105,15 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1206,7 +1121,7 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -1222,11 +1137,11 @@ beeline&gt; !connect jdbc:hive2://localhost:10000
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1378,7 +1293,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

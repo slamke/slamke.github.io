@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,196 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/01/16/Spark动态资源分配/" title="Spark动态资源分配" itemprop="url">Spark动态资源分配</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-16T09:36:32.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="1-Yarn模式下资源分配"><a href="#1-Yarn模式下资源分配" class="headerlink" title="1. Yarn模式下资源分配"></a>1. Yarn模式下资源分配</h2><p>在Yarn模式下，<figure class="highlight plain"><figcaption><span>and和--executor-cores设置 )不同应用程序的Executors之间是互相独立的，每个应用程序的Executors只负责自己的应用程序的任务运行和数据存储。每个Executor是一个独立的JVM进程，JVM之间内存是无法共享的。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 2. 动态资源分配的简介</span><br><span class="line"></span><br><span class="line">动态资源调度是在Spark1.2之后才开始加进去的，</span><br><span class="line"></span><br><span class="line">①原理：当一个应用程序不需要使用资源，且后续没有资源申请的时候，它就将现有的资源交回给集群，这样集群便可以将资源分配给其他应用程序来使用。当该应用程序再次需要资源的时候就再去向集群申请。</span><br><span class="line"></span><br><span class="line">②优点：当集群中有很多应用程序的时候可以提高集群的资源利用率，比如集群中有一个应用程序作为服务一直在执行，集群给他分配了12个CPU和8G内存， 默认情况下，该应用会一直占用12个CPU和8G内存的资源，直到程序结束，如果目前该应用程序运行不需要这么多的资源，资源处于空闲状态的时候，集群也 不会把该资源分配给其他的应用程序，从而造成的资源的浪费。所以使用动态资源分配可以提高资源利用率。</span><br><span class="line"></span><br><span class="line">③缺点：动态资源分配的调度算法如果不合理可能造成应用程序的高延迟，一种情况是某个应用程序刚把资源交回给集群，下一刻就又需要使用资源，然后在去向集群申请。</span><br><span class="line"></span><br><span class="line">## 3. 动态资源分配的配置</span><br><span class="line"></span><br><span class="line">①修改配置文件spark-defaults.conf，添加如下内容</span><br><span class="line">``` shell</span><br><span class="line">spark.dynamicAllocation.enabled   true   //开启动态资源分配</span><br><span class="line">spark.shuffle.service.enabled     true   //启用External shuffle Service服务</span><br><span class="line">//shuffle.service是必须要启动的</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.minExecutors 1  //每个Application最小分配的executor数</span><br><span class="line">spark.dynamicAllocation.maxExecutors 30  //每个Application最大并发分配的executor数</span><br><span class="line"></span><br><span class="line">spark.shuffle.service.port 7337 //Shuffle Service服务端口，必须和yarn-site中的一致</span><br><span class="line"></span><br><span class="line">spark.dynamicAllocation.schedulerBacklogTimeout 1s </span><br><span class="line">spark.dynamicAllocation.sustainedSchedulerBacklogTimeout 5s</span><br></pre></td></tr></table></figure></p>
+<p>②在$SPARK_HOME/lib目录下找到spark-<version>-yarn-shuffle.jar文件,将该jar文件添加到NodeManager节点的classpath环境中。</version></p>
+<p>③修改yarn-site.xml文件，设置如下参数</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">...........</span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>spark_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services.spark_shuffle.class<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>org.apache.spark.network.yarn.YarnShuffleService<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>④重新启动NodeManager。保证每个NodeManager节点读能找到spark-1.3.0-yarn-shuffle.jar该文件，否则NodeManager无法启动。我就是因为这个原因，导致花了很长时间才调试通。</p>
+<h2 id="4-资源分配策略"><a href="#4-资源分配策略" class="headerlink" title="4. 资源分配策略"></a>4. 资源分配策略</h2><p>资源的动态分配要求Spark在资源空闲的时候放弃Executors资源，在需要运行任务的时候申请Executors资源。但是很难预测一个即将放弃 Executors资源的应用程序下一刻是否会运行任务，或者一个刚申请的Executor在下一刻是否会处于空闲状态。</p>
+<p>①请求策略</p>
+<p>资源动态分配模式下，如果某个Spark应用程序有某些tasks处于等待运行状态时，该应用程序就会向集群申请更多的Executors资源，这意味着 集群为该应用程序分配的Executors资源不足以满足它提交的正在运行的，且还没有运行结束的tasks。Spark请求Executors采用的是 轮询的方式，当有tasks处于等待状态<code>spark.dynamicAllocation.schedulerBacklogTimeout</code>秒后会触发一次Executors请求，如果之后tasks一直处于等待状态，那么每隔<code>spark.dynamicAllocation.sustainedSchedulerBacklogTimeout</code>秒会触发一次Executors请求，每次轮询中申请的Executors个数以指数形式增长，比如第一个轮询申请1个Executor，之后会依次申请2，4，8…个Executors。</p>
+<p>需要关注两点，一是谨慎申请Executors资源，以免申请到的Executors资源只有一小部分处于运行状态，其他的大部分处于空闲状态。二是充分利用申请到的Executors资源，以防止后续有大量Executors资源申请的情况出现。</p>
+<p>②删除策略</p>
+<p>当某个Spark应用程序的某个Executor处于空闲状态<code>spark.dynamicAllocation.executorIdleTimeout</code>秒后就会删除该Executor，注意，如果有task处于等待状态的时候，该Executor就不会处于空闲状态。</p>
+<h2 id="5-如何有效的删除Executor"><a href="#5-如何有效的删除Executor" class="headerlink" title="5. 如何有效的删除Executor"></a>5. 如何有效的删除Executor</h2><p>在默认情况下，只有在Executor失败或者它所属的应用程序退出的情况下Executor才会结束，这两种情况下Executor的状态都不需要保 存，可以直接删除。在动态资源分配情况下，在Executor退出之前应用程序还在执行，所以在Executor的被删除之前需要将它的状态需要保存下 来，等下次执行Executor的时候可以重用。对于Shuffle保存Executor的状态尤其重要，在Shuffle阶段Executor会将 Map阶段的输出结果保存到本地文件系统中，然后在Reduce阶段其他的Executors会从该文件系统中读取Map阶段的输出结果。动态资源分配模 式下，一个Executor有可能在它的Shuffle还没有完成之前就将该Executor删除了，这就导致Shuffle阶段Executor保存的 文件在下次重新启动Executor的时候需要进行不必要的重新计算。</p>
+<p>解决方法是使用额外的Shuffle Service，这个特性是在Spark1.2之后加进来的，Shuffle Service是运行在集群每个节点上的服务，它与Spark应用程序及其Executors是相互独立的，如果Shuffle Service在运行，Spark的Executors就会从Shuffle Service获取Shuffle阶段保存的文件，而不是去每个节点获取。这就意味着一个Executors被删除之后，它在Shuffle阶段的状态信 息还一直运行在Shuffle Service中。</p>
+<h2 id="6-动态资源分配相关配置"><a href="#6-动态资源分配相关配置" class="headerlink" title="6. 动态资源分配相关配置"></a>6. 动态资源分配相关配置</h2><p>红色参数比较重要，在使用动态资源分配的时候最好自行设置。</p>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spark.dynamicAllocation.enabled</code></td>
+<td>false</td>
+<td>是否启动动态资源分配，默认不启动，目前只支持Yarn模式，Standalone和Mesoso暂不支持</td>
+</tr>
+<tr>
+<td>spark.dynamicAllocation.executorIdleTimeout</td>
+<td>600</td>
+<td>如果某个Executor在该时间段内处于空闲状态，那么它将被删除，其所占用的资源将返还给集群</td>
+</tr>
+<tr>
+<td><code>spark.dynamicAllocation.initialExecutors</code></td>
+<td>spark.dynamicAllocation.minExecutors</td>
+<td>动态资源分配启动时初始化的Executor的个数，默认情况下与spark.dynamicAllocation.minExecutors配置的值相同，如果启动动态资源分配，那么该值必须大于0，否则应用程序会因为没有资源而无法运行</td>
+</tr>
+<tr>
+<td><code>spark.dynamicAllocation.maxExecutors</code></td>
+<td>Integer.MAX_VALUE</td>
+<td>动态资源分配的Executors的最大个数</td>
+</tr>
+<tr>
+<td><code>spark.dynamicAllocation.minExecutors</code></td>
+<td>0</td>
+<td>分配的最小Executors个数，默认为0</td>
+</tr>
+<tr>
+<td>spark.dynamicAllocation.schedulerBacklogTimeout</td>
+<td>5</td>
+<td>如果有tasks处于等待状态，多少秒后开始向集群申请Executors资源，默认是5秒</td>
+</tr>
+<tr>
+<td>spark.dynamicAllocation.sustainedSchedulerBacklogTimeout</td>
+<td>schedulerBacklogTimeout</td>
+<td>如果申请的Executors资源无法满足当前Tasks的需求，那么采用轮询的方式向集群申请Executors资源，该值为轮询的时间间隔，默认值与schedulerBacklogTimeout相同</td>
+</tr>
+</tbody>
+</table>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/16/Spark-on-Yarn资源调度和作业调度/" title="Spark-on-Yarn资源调度和作业调度" itemprop="url">Spark-on-Yarn资源调度和作业调度</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-16T09:33:58.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="作业调度"><a href="#作业调度" class="headerlink" title="作业调度"></a>作业调度</h2><p>Spark默认采取FIFO策略运行多个Jobs，它提供一个队列来保存已经提交的Jobs，如果队头的Job不需要占用所有的集群资源，那么后续的 Job可以立即运行，但是如果队头的Job需要占用所有的集群资源，且运行时间很长，那么即使后续的Job很小，也要等待前面的Job执行完后才可以执 行，这样就造成了大量的延迟。</p>
+<p>Spark0.8+版本开始支持公平调度策略，在该策略下，Spark以round robin的方式为每个Job分配执行的Tasks，每个Job在同一时间都可以运行多个Tasks，Jobs之间是共享集群资源的。这就意味着当一个大 任务运行的同时，用户提交的小任务可以立即执行，且获得良好的响应时间，而不用去等待大任务的结束。</p>
+<p>通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">val conf = new SparkConf().setMaster(...).setAppName(...)</span><br><span class="line">conf.set(&quot;spark.scheduler.mode&quot;, &quot;FAIR&quot;)</span><br><span class="line">val sc = new SparkContext(conf)</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-公平调度池"><a href="#1-公平调度池" class="headerlink" title="1. 公平调度池"></a>1. 公平调度池</h3><p>Spark支持将不同的Jobs划分到不同的调度池中，可以为每个调度池设置不同的属性（比如权重），这样就可以将重要的Job分到高优先级的调度池中， 比如可以为每个用户创建一个调度池，并为每个用户划分相等的集群资源，而不用去管每个用户同时运行多少个Job。</p>
+<p>如果用户没有设置公平调度池，默认情况下提交的任务被划分到default调度池中，可通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">sc.setLocalProperty(&quot;spark.scheduler.pool&quot;, &quot;pool1&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>清除调度池<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.setLocalProperty(<span class="string">"spark.scheduler.pool"</span>, <span class="literal">null</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-默认调度池"><a href="#2-默认调度池" class="headerlink" title="2. 默认调度池"></a>2. 默认调度池</h3><p>默认情况下不同的调度池共享集群的资源，但在每个调度池内部，Job是以FIFO的方式运行的，比如为每个用户创建一个调度池，集群的资源平均分配给各个调度池，在调度池内部，每个Job按照FIFO的顺序运行。</p>
+<h3 id="3-调度池的属性"><a href="#3-调度池的属性" class="headerlink" title="3. 调度池的属性"></a>3. 调度池的属性</h3><p>schedulingMode：调度池内部Job之间的调度顺序，FIFO或FAIR，默认是FIFO<br>weight：调度池的权重，默认是1，如果设置为2，那么它将获取相当于其他调度池2倍的资源。<br>minShare：最少满足资源数，默认是0，只有在满足每个调度池minShare资源数的基础之上，才会按照weight比例来获取额外的资源。</p>
+<p>可创建一个类似于<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">conf.set(&quot;spark.scheduler.allocation.file&quot;, &quot;/path/to/file&quot;)</span><br><span class="line">   fairscheduler.xml.template文件内容</span><br></pre></td></tr></table></figure></p>
+<p>fairscheduler.xml.template文件内容<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">allocations</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"production"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>1<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>2<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"test"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FIFO<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>2<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>3<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">allocations</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="4-测试"><a href="#4-测试" class="headerlink" title="4. 测试"></a>4. 测试</h3><p>myFairScheduler.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">allocations</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"onlinetestpool"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>2<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>7<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"default"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>1<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>7<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">allocations</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>启动Spark应用<br>spark-shell \<br>–conf spark.scheduler.mode=FAIR \<br>–conf spark.scheduler.pool=onlinetestpool \<br>–conf spark.scheduler.allocation.file=/home/spark/spark/conf/fairscheduler.xml</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Yarn/">Yarn</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/01/16/Yarn的基本结构和工作原理/" title="Yarn的基本结构和工作原理" itemprop="url">Yarn的基本结构和工作原理</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +278,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-16T08:00:33.000Z" itemprop="datePublished"> Published 2018-01-16</time>
+    <time datetime="2018-01-16T08:00:33.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
     
   </p>
 </header>
@@ -187,7 +377,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-09T08:34:39.000Z" itemprop="datePublished"> Published 2018-01-09</time>
+    <time datetime="2018-01-09T08:34:39.000Z" itemprop="datePublished"> 發表於 2018-01-09</time>
     
   </p>
 </header>
@@ -247,7 +437,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-09T07:33:35.000Z" itemprop="datePublished"> Published 2018-01-09</time>
+    <time datetime="2018-01-09T07:33:35.000Z" itemprop="datePublished"> 發表於 2018-01-09</time>
     
   </p>
 </header>
@@ -329,7 +519,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-09T07:28:54.000Z" itemprop="datePublished"> Published 2018-01-09</time>
+    <time datetime="2018-01-09T07:28:54.000Z" itemprop="datePublished"> 發表於 2018-01-09</time>
     
   </p>
 </header>
@@ -390,7 +580,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-05T03:03:26.000Z" itemprop="datePublished"> Published 2018-01-05</time>
+    <time datetime="2018-01-05T03:03:26.000Z" itemprop="datePublished"> 發表於 2018-01-05</time>
     
   </p>
 </header>
@@ -493,7 +683,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-12-12T02:18:25.000Z" itemprop="datePublished"> Published 2017-12-12</time>
+    <time datetime="2017-12-12T02:18:25.000Z" itemprop="datePublished"> 發表於 2017-12-12</time>
     
   </p>
 </header>
@@ -559,7 +749,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-12-05T02:55:49.000Z" itemprop="datePublished"> Published 2017-12-05</time>
+    <time datetime="2017-12-05T02:55:49.000Z" itemprop="datePublished"> 發表於 2017-12-05</time>
     
   </p>
 </header>
@@ -619,7 +809,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-12-05T02:37:05.000Z" itemprop="datePublished"> Published 2017-12-05</time>
+    <time datetime="2017-12-05T02:37:05.000Z" itemprop="datePublished"> 發表於 2017-12-05</time>
     
   </p>
 </header>
@@ -667,173 +857,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/30/Spark写Redis实践总结/" title="Spark写Redis实践总结" itemprop="url">Spark写Redis实践总结</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-30T03:42:52.000Z" itemprop="datePublished"> Published 2017-10-30</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://bourneli.github.io/scala/spark/pit/2017/10/27/spark-to-redis.html" target="_blank" rel="external">Spark写Redis实践总结</a></p>
-<p>Redis是一个高性能键值数据库，最近几年非常流行。笔者所在的团队也在大规模的使用Redis作为后台数据存储解决方案。Redis作为机器学习算法与后台服务器的媒介，算法计算用户数据并写入Redis；后台服务器读取Redis，并为前端提供实时接口。本文主要介绍Spark写如Redis的实践，同时记录一些坑，方便后面回顾。</p>
-<p>笔者使用Spark 2.0的scala API，使用jedis客户端API，dependency如下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>redis.clients<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jedis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">type</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>写Redis的代码如下<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 写Redis</span></span><br><span class="line">sampleData.repartition(<span class="number">500</span>).foreachPartition(rows =&gt; &#123;</span><br><span class="line">  <span class="keyword">val</span> rc = <span class="keyword">new</span> <span class="type">Jedis</span>(redisHost, redisPort)</span><br><span class="line">  rc.auth(redisPassword)</span><br><span class="line">  <span class="keyword">val</span> pipe = rc.pipelined</span><br><span class="line"></span><br><span class="line">  rows.foreach(r =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> redisKey = r.getAs[<span class="type">String</span>](<span class="string">"key"</span>)</span><br><span class="line">    <span class="keyword">val</span> redisValue = r.getAs[<span class="type">String</span>](<span class="string">"value"</span>)</span><br><span class="line">    pipe.set(redisKey, redisValue)</span><br><span class="line">    pipe.expire(redisKey, expireDays * <span class="number">3600</span> * <span class="number">24</span>)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  pipe.sync()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
-<p>实践1：控制客户端对象数量</p>
-<p>sampleData是一个DataSet，每一行有两个数据：key和value。由于构建Jedis客户端会有一定开销，所以一定不要用map，而是mapPartition或foreachPartition。这样，这个开销只会与parition数量相关，与数据总量无关。试想如果sampleData有1亿行，在map中将会构建1亿个Jedis对象。</p>
-<p>实践2：批量插入数据</p>
-<p>笔者使用了pipe进行批量插入，而不是逐条插入，批量插入效率与逐条插入效率差异参考这里。但是批量插入有个非常大的坑。上面的代码中，一次性批量插入了整个partition的数据，所以如果单个partition的数据量太多，会导致Redis内存溢出，导致服务不可用！</p>
-<p>解决方法是在foreachPartition之前，repartition整个DateSet，确保每个分区的数据不要太大。推荐控制在1千左右。正如上面的列子，笔者将sampleData分为500个分区，每个分区1000条，那么sampleData的总数为50万左右。但是，如果数据总量太大，单个分区过小，会导致分区数过大，这样需要提高driver的内存，否则会导致driver内存溢出。</p>
-<p>实践3：控制在线更新并发</p>
-<p>Redis一般提供在线服务，在更新Redis的同时，它可能在前端提供服务。所以在写Redis时，不能使用太多executor。否则会使得QPS过高，影响在线服务响应，甚至导致Redis瘫痪。推荐的实践方法是提高数据的分区数量，确保每个partition的数量较小，然后逐步提高并发数量（executor数量）。观察在不同数量executor下，并发写入Redis的QPS，直到QPS达到一个可以接受的范围。</p>
-<p>进一步改进</p>
-<p>上述方案在5千万行数据，每行value小于100Byte的情况下，在我们的redis环境，写入时qps稳定在15000左右，不影响线上服务。这个方案被woliwang同学质疑，主要观点是如果数据量达到亿，十亿级别，如果还是设置每个partition 1000个数据量，会有上百万个partition，容易导致driver OOM。的确，上面的方案还有改进空间，可以对每个partition进一步分组，比将partition控制在10万数据量，然后每次批量写入1000数据，按顺序写100次 就可以写完，这样driver就不需要维护上百万的partition信息，同时也可以控制写入速率。</p>
-<p>最后</p>
-<p>实践是检验真理的唯一标准。上面的几点实践在不同Redis集群下，具体数值可能不一样，但原理不变。希望这些总结对你有用。如果自己想搭建spark+Redis环境，推荐VPS供应商Vultr，无需购买服务器，随时随地可用，物美价廉。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Redis/">Redis</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/12/基于用户投票的排名算法/" title="基于用户投票的排名算法" itemprop="url">基于用户投票的排名算法</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-12T10:02:33.000Z" itemprop="datePublished"> Published 2017-10-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p><a href="http://www.ruanyifeng.com/blog/2012/02/ranking_algorithm_hacker_news.html" target="_blank" rel="external">基于用户投票的排名算法（一）：Delicious和Hacker News</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_reddit.html" target="_blank" rel="external">基于用户投票的排名算法（二）：Reddit</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_stack_overflow.html" target="_blank" rel="external">基于用户投票的排名算法（三）：Stack Overflow</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_newton_s_law_of_cooling.html" target="_blank" rel="external">基于用户投票的排名算法（四）：牛顿冷却定律</a></p>
-<p>对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。<br>根据用户的投票，决定最近一段时间内的”热文排名”。</p>
-<p>最直觉、最简单的算法，莫过于按照单位时间内用户的投票数进行排名。得票最多的项目，自然就排在第一位。这个算法的优点是比较简单、容易部署、内容更新相当快；缺点是，一方面，排名变化不够平滑，前一个小时还排名靠前的内容，往往第二个小时就一落千丈，另一方面，缺乏自动淘汰旧项目的机制，某些热门内容可能会长期占据排行榜前列。<br>所以根据得票数，系统自动统计出热门文章排行榜。但是，并非得票最多的文章排在第一位，还要考虑时间因素，新文章应该比旧文章更容易得到好的排名。</p>
-<p>公式： <figure class="highlight plain"><figcaption><span>= （P-1）/(T+2)^G ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">其中，　　P表示帖子的得票数，减去1是为了忽略发帖人的投票。 　　T表示距离发帖的时间（单位为小时），加上2是为了防止最新的帖子导致分母过小（之所以选择2，可能是因为从原始文章出现在其他网站，到转贴至Hacker News，平均需要两个小时）。　　G表示&quot;重力因子&quot;（gravityth power），即将帖子排名往下拉的力量，默认值为1.8，后文会详细讨论这个值。</span><br><span class="line"></span><br><span class="line">从这个公式来看，决定帖子排名有三个因素：</span><br><span class="line">第一个因素是得票数P。</span><br><span class="line">在其他条件不变的情况下，得票越多，排名越高。 如果你不想让&quot;高票帖子&quot;与&quot;低票帖子&quot;的差距过大，可以在得票数上加一个小于1的指数，比如(P-1)^0.8。</span><br><span class="line">第二个因素是距离发帖的时间T。</span><br><span class="line">在其他条件不变的情况下，越是新发表的帖子，排名越高。或者说，一个帖子的排名，会随着时间不断下降。</span><br><span class="line">第三个因素是重力因子G。</span><br><span class="line">它的数值大小决定了排名随时间下降的速度。G值越大，曲线越陡峭，排名下降得越快，意味着排行榜的更新速度越快。</span><br><span class="line"></span><br><span class="line">## 所有时段的排名</span><br><span class="line"></span><br><span class="line">[基于用户投票的排名算法（五）：威尔逊区间](http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_wilson_score_interval.html)</span><br><span class="line"></span><br><span class="line">一种常见的错误算法是： 　```　得分 = 赞成票 - 反对票</span><br></pre></td></tr></table></figure></p>
-<p>假定有两个项目，项目A是60张赞成票，40张反对票，项目B是550张赞成票，450张反对票。请问，谁应该排在前面？按照上面的公式，B会排在前面，因为它的得分（550 - 450 = 100）高于A（60 - 40 = 20）。但是实际上，B的好评率只有55%（550 / 1000），而A为60%（60 / 100），所以正确的结果应该是A排在前面。<br>另一种常见的错误算法是: <code>得分 = 赞成票 / 总票数</code> 如果”总票数”很大，这种算法其实是对的。问题出在如果”总票数”很少，这时就会出错。假定A有2张赞成票、0张反对票，B有100张赞成票、1张反对票。这种算法会使得A排在B前面。这显然错误。</p>
-<p>我们先做如下设定：<br>　　（1）每个用户的投票都是独立事件。<br>　　（2）用户只有两个选择，要么投赞成票，要么投反对票。<br>　　（3）如果投票总人数为n，其中赞成票为k，那么赞成票的比例p就等于k/n。<br>如果你熟悉统计学，可能已经看出来了，这是一种统计分布，叫做”二项分布”（binomial distribution）。这很重要，下面马上要用到。<br>们的思路是，p越大，就代表这个项目的好评比例越高，越应该排在前面。但是，p的可信性，取决于有多少人投票，如果样本太小，p就不可信。好在我们已经知道，p是”二项分布”中某个事件的发生概率，因此我们可以计算出p的置信区间。所谓”置信区间”，就是说，以某个概率而言，p会落在的那个区间。比如，某个产品的好评率是80%，但是这个值不一定可信。根据统计学，我们只能说，有95%的把握可以断定，好评率在75%到85%之间，即置信区间是[75%, 85%]。<br>这样一来，排名算法就比较清晰了：<br>　　第一步，计算每个项目的”好评率”（即赞成票的比例）。<br>　　第二步，计算每个”好评率”的置信区间（以95%的概率）。<br>　　第三步，根据置信区间的下限值，进行排名。这个值越大，排名就越高。</p>
-<p>置信区间的实质，就是进行可信度的修正，弥补样本量过小的影响。如果样本多，就说明比较可信，不需要很大的修正，所以置信区间会比较窄，下限值会比较大；如果样本少，就说明不一定可信，必须进行较大的修正，所以置信区间会比较宽，下限值会比较小。</p>
-<p>二项分布的置信区间有多种计算公式，最常见的是”正态区间”（Normal approximation interval），教科书里几乎都是这种方法。但是，它只适用于样本较多的情况（np &gt; 5 且 n(1 − p) &gt; 5），对于小样本，它的准确性很差。<br>1927年，美国数学家 Edwin Bidwell Wilson提出了一个修正公式，被称为”威尔逊区间”，很好地解决了小样本的准确性问题。</p>
-<h2 id="贝叶斯平均"><a href="#贝叶斯平均" class="headerlink" title="贝叶斯平均"></a>贝叶斯平均</h2><p><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_bayesian_average.html" target="_blank" rel="external">基于用户投票的排名算法（六）：贝叶斯平均</a></p>
-<p>介绍了”威尔逊区间”，它解决了投票人数过少、导致结果不可信的问题。<br>举例来说，如果只有2个人投票，”威尔逊区间”的下限值会将赞成票的比例大幅拉低。这样做固然保证了排名的可信性，但也带来了另一个问题：排行榜前列总是那些票数最多的项目，新项目或者冷门的项目，很难有出头机会，排名可能会长期靠后。</p>
-<p>在排名页面的底部，IMDB给出了它的计算方法。<code>WR = v/(v+m)  * R + m/(v+m) *C</code> </p>
-<ul>
-<li>WR， 加权得分（weighted rating）。</li>
-<li>R，该电影的用户投票的平均得分（Rating）。</li>
-<li>v，该电影的投票人数（votes）。</li>
-<li>m，排名前250名的电影的最低投票数（现在为3000）。</li>
-<li>C， 所有电影的平均得分（现在为6.9）。</li>
-</ul>
-<p>这种算法被称为”贝叶斯平均”（Bayesian average）。因为某种程度上，它借鉴了”贝叶斯推断”（Bayesian inference）的思想：既然不知道投票结果，那就先估计一个值，然后不断用新的信息修正，使得它越来越接近正确的值。<br>在这个公式中，m（总体平均分）是”先验概率”，每一次新的投票都是一个调整因子，使总体平均分不断向该项目的真实投票结果靠近。投票人数越多，该项目的”贝叶斯平均”就越接近算术平均，对排名的影响就越小。因此，这种方法可以给一些投票人数较少的项目，以相对公平的排名。<br>“贝叶斯平均”也有缺点，主要问题是它假设用户的投票是正态分布。比如，电影A有10个观众评分，5个为五星，5个为一星；电影B也有10个观众评分，都给了三星。这两部电影的平均得分（无论是算术平均，还是贝叶斯平均）都是三星，但是电影A可能比电影B更值得看。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/算法/">算法</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/排名/">排名</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -843,7 +881,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -887,7 +925,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>27</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
 		  
 		
 		  
@@ -924,11 +962,11 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>24</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
 			
 		
 			
@@ -940,19 +978,19 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
@@ -964,7 +1002,7 @@
 			
 		
 			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -972,7 +1010,15 @@
 			
 		
 			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
@@ -980,23 +1026,7 @@
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -1004,7 +1034,15 @@
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1012,7 +1050,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -1028,11 +1066,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1184,7 +1222,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

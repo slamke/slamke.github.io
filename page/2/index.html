@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,158 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/10/30/Spark写Redis实践总结/" title="Spark写Redis实践总结" itemprop="url">Spark写Redis实践总结</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-30T03:42:52.000Z" itemprop="datePublished"> 發表於 2017-10-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://bourneli.github.io/scala/spark/pit/2017/10/27/spark-to-redis.html" target="_blank" rel="external">Spark写Redis实践总结</a></p>
+<p>Redis是一个高性能键值数据库，最近几年非常流行。笔者所在的团队也在大规模的使用Redis作为后台数据存储解决方案。Redis作为机器学习算法与后台服务器的媒介，算法计算用户数据并写入Redis；后台服务器读取Redis，并为前端提供实时接口。本文主要介绍Spark写如Redis的实践，同时记录一些坑，方便后面回顾。</p>
+<p>笔者使用Spark 2.0的scala API，使用jedis客户端API，dependency如下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>redis.clients<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jedis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">type</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>写Redis的代码如下<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 写Redis</span></span><br><span class="line">sampleData.repartition(<span class="number">500</span>).foreachPartition(rows =&gt; &#123;</span><br><span class="line">  <span class="keyword">val</span> rc = <span class="keyword">new</span> <span class="type">Jedis</span>(redisHost, redisPort)</span><br><span class="line">  rc.auth(redisPassword)</span><br><span class="line">  <span class="keyword">val</span> pipe = rc.pipelined</span><br><span class="line"></span><br><span class="line">  rows.foreach(r =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> redisKey = r.getAs[<span class="type">String</span>](<span class="string">"key"</span>)</span><br><span class="line">    <span class="keyword">val</span> redisValue = r.getAs[<span class="type">String</span>](<span class="string">"value"</span>)</span><br><span class="line">    pipe.set(redisKey, redisValue)</span><br><span class="line">    pipe.expire(redisKey, expireDays * <span class="number">3600</span> * <span class="number">24</span>)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  pipe.sync()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>实践1：控制客户端对象数量</p>
+<p>sampleData是一个DataSet，每一行有两个数据：key和value。由于构建Jedis客户端会有一定开销，所以一定不要用map，而是mapPartition或foreachPartition。这样，这个开销只会与parition数量相关，与数据总量无关。试想如果sampleData有1亿行，在map中将会构建1亿个Jedis对象。</p>
+<p>实践2：批量插入数据</p>
+<p>笔者使用了pipe进行批量插入，而不是逐条插入，批量插入效率与逐条插入效率差异参考这里。但是批量插入有个非常大的坑。上面的代码中，一次性批量插入了整个partition的数据，所以如果单个partition的数据量太多，会导致Redis内存溢出，导致服务不可用！</p>
+<p>解决方法是在foreachPartition之前，repartition整个DateSet，确保每个分区的数据不要太大。推荐控制在1千左右。正如上面的列子，笔者将sampleData分为500个分区，每个分区1000条，那么sampleData的总数为50万左右。但是，如果数据总量太大，单个分区过小，会导致分区数过大，这样需要提高driver的内存，否则会导致driver内存溢出。</p>
+<p>实践3：控制在线更新并发</p>
+<p>Redis一般提供在线服务，在更新Redis的同时，它可能在前端提供服务。所以在写Redis时，不能使用太多executor。否则会使得QPS过高，影响在线服务响应，甚至导致Redis瘫痪。推荐的实践方法是提高数据的分区数量，确保每个partition的数量较小，然后逐步提高并发数量（executor数量）。观察在不同数量executor下，并发写入Redis的QPS，直到QPS达到一个可以接受的范围。</p>
+<p>进一步改进</p>
+<p>上述方案在5千万行数据，每行value小于100Byte的情况下，在我们的redis环境，写入时qps稳定在15000左右，不影响线上服务。这个方案被woliwang同学质疑，主要观点是如果数据量达到亿，十亿级别，如果还是设置每个partition 1000个数据量，会有上百万个partition，容易导致driver OOM。的确，上面的方案还有改进空间，可以对每个partition进一步分组，比将partition控制在10万数据量，然后每次批量写入1000数据，按顺序写100次 就可以写完，这样driver就不需要维护上百万的partition信息，同时也可以控制写入速率。</p>
+<p>最后</p>
+<p>实践是检验真理的唯一标准。上面的几点实践在不同Redis集群下，具体数值可能不一样，但原理不变。希望这些总结对你有用。如果自己想搭建spark+Redis环境，推荐VPS供应商Vultr，无需购买服务器，随时随地可用，物美价廉。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Redis/">Redis</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/10/12/基于用户投票的排名算法/" title="基于用户投票的排名算法" itemprop="url">基于用户投票的排名算法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-12T10:02:33.000Z" itemprop="datePublished"> 發表於 2017-10-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p><a href="http://www.ruanyifeng.com/blog/2012/02/ranking_algorithm_hacker_news.html" target="_blank" rel="external">基于用户投票的排名算法（一）：Delicious和Hacker News</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_reddit.html" target="_blank" rel="external">基于用户投票的排名算法（二）：Reddit</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_stack_overflow.html" target="_blank" rel="external">基于用户投票的排名算法（三）：Stack Overflow</a><br><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_newton_s_law_of_cooling.html" target="_blank" rel="external">基于用户投票的排名算法（四）：牛顿冷却定律</a></p>
+<p>对信息进行排名，意味着将信息按照重要性依次排列，并且及时进行更新。排列的依据，可以基于信息本身的特征，也可以基于用户的投票，即让用户决定，什么样的信息可以排在第一位。<br>根据用户的投票，决定最近一段时间内的”热文排名”。</p>
+<p>最直觉、最简单的算法，莫过于按照单位时间内用户的投票数进行排名。得票最多的项目，自然就排在第一位。这个算法的优点是比较简单、容易部署、内容更新相当快；缺点是，一方面，排名变化不够平滑，前一个小时还排名靠前的内容，往往第二个小时就一落千丈，另一方面，缺乏自动淘汰旧项目的机制，某些热门内容可能会长期占据排行榜前列。<br>所以根据得票数，系统自动统计出热门文章排行榜。但是，并非得票最多的文章排在第一位，还要考虑时间因素，新文章应该比旧文章更容易得到好的排名。</p>
+<p>公式： <figure class="highlight plain"><figcaption><span>= （P-1）/(T+2)^G ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">其中，　　P表示帖子的得票数，减去1是为了忽略发帖人的投票。 　　T表示距离发帖的时间（单位为小时），加上2是为了防止最新的帖子导致分母过小（之所以选择2，可能是因为从原始文章出现在其他网站，到转贴至Hacker News，平均需要两个小时）。　　G表示&quot;重力因子&quot;（gravityth power），即将帖子排名往下拉的力量，默认值为1.8，后文会详细讨论这个值。</span><br><span class="line"></span><br><span class="line">从这个公式来看，决定帖子排名有三个因素：</span><br><span class="line">第一个因素是得票数P。</span><br><span class="line">在其他条件不变的情况下，得票越多，排名越高。 如果你不想让&quot;高票帖子&quot;与&quot;低票帖子&quot;的差距过大，可以在得票数上加一个小于1的指数，比如(P-1)^0.8。</span><br><span class="line">第二个因素是距离发帖的时间T。</span><br><span class="line">在其他条件不变的情况下，越是新发表的帖子，排名越高。或者说，一个帖子的排名，会随着时间不断下降。</span><br><span class="line">第三个因素是重力因子G。</span><br><span class="line">它的数值大小决定了排名随时间下降的速度。G值越大，曲线越陡峭，排名下降得越快，意味着排行榜的更新速度越快。</span><br><span class="line"></span><br><span class="line">## 所有时段的排名</span><br><span class="line"></span><br><span class="line">[基于用户投票的排名算法（五）：威尔逊区间](http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_wilson_score_interval.html)</span><br><span class="line"></span><br><span class="line">一种常见的错误算法是： 　```　得分 = 赞成票 - 反对票</span><br></pre></td></tr></table></figure></p>
+<p>假定有两个项目，项目A是60张赞成票，40张反对票，项目B是550张赞成票，450张反对票。请问，谁应该排在前面？按照上面的公式，B会排在前面，因为它的得分（550 - 450 = 100）高于A（60 - 40 = 20）。但是实际上，B的好评率只有55%（550 / 1000），而A为60%（60 / 100），所以正确的结果应该是A排在前面。<br>另一种常见的错误算法是: <code>得分 = 赞成票 / 总票数</code> 如果”总票数”很大，这种算法其实是对的。问题出在如果”总票数”很少，这时就会出错。假定A有2张赞成票、0张反对票，B有100张赞成票、1张反对票。这种算法会使得A排在B前面。这显然错误。</p>
+<p>我们先做如下设定：<br>　　（1）每个用户的投票都是独立事件。<br>　　（2）用户只有两个选择，要么投赞成票，要么投反对票。<br>　　（3）如果投票总人数为n，其中赞成票为k，那么赞成票的比例p就等于k/n。<br>如果你熟悉统计学，可能已经看出来了，这是一种统计分布，叫做”二项分布”（binomial distribution）。这很重要，下面马上要用到。<br>们的思路是，p越大，就代表这个项目的好评比例越高，越应该排在前面。但是，p的可信性，取决于有多少人投票，如果样本太小，p就不可信。好在我们已经知道，p是”二项分布”中某个事件的发生概率，因此我们可以计算出p的置信区间。所谓”置信区间”，就是说，以某个概率而言，p会落在的那个区间。比如，某个产品的好评率是80%，但是这个值不一定可信。根据统计学，我们只能说，有95%的把握可以断定，好评率在75%到85%之间，即置信区间是[75%, 85%]。<br>这样一来，排名算法就比较清晰了：<br>　　第一步，计算每个项目的”好评率”（即赞成票的比例）。<br>　　第二步，计算每个”好评率”的置信区间（以95%的概率）。<br>　　第三步，根据置信区间的下限值，进行排名。这个值越大，排名就越高。</p>
+<p>置信区间的实质，就是进行可信度的修正，弥补样本量过小的影响。如果样本多，就说明比较可信，不需要很大的修正，所以置信区间会比较窄，下限值会比较大；如果样本少，就说明不一定可信，必须进行较大的修正，所以置信区间会比较宽，下限值会比较小。</p>
+<p>二项分布的置信区间有多种计算公式，最常见的是”正态区间”（Normal approximation interval），教科书里几乎都是这种方法。但是，它只适用于样本较多的情况（np &gt; 5 且 n(1 − p) &gt; 5），对于小样本，它的准确性很差。<br>1927年，美国数学家 Edwin Bidwell Wilson提出了一个修正公式，被称为”威尔逊区间”，很好地解决了小样本的准确性问题。</p>
+<h2 id="贝叶斯平均"><a href="#贝叶斯平均" class="headerlink" title="贝叶斯平均"></a>贝叶斯平均</h2><p><a href="http://www.ruanyifeng.com/blog/2012/03/ranking_algorithm_bayesian_average.html" target="_blank" rel="external">基于用户投票的排名算法（六）：贝叶斯平均</a></p>
+<p>介绍了”威尔逊区间”，它解决了投票人数过少、导致结果不可信的问题。<br>举例来说，如果只有2个人投票，”威尔逊区间”的下限值会将赞成票的比例大幅拉低。这样做固然保证了排名的可信性，但也带来了另一个问题：排行榜前列总是那些票数最多的项目，新项目或者冷门的项目，很难有出头机会，排名可能会长期靠后。</p>
+<p>在排名页面的底部，IMDB给出了它的计算方法。<code>WR = v/(v+m)  * R + m/(v+m) *C</code> </p>
+<ul>
+<li>WR， 加权得分（weighted rating）。</li>
+<li>R，该电影的用户投票的平均得分（Rating）。</li>
+<li>v，该电影的投票人数（votes）。</li>
+<li>m，排名前250名的电影的最低投票数（现在为3000）。</li>
+<li>C， 所有电影的平均得分（现在为6.9）。</li>
+</ul>
+<p>这种算法被称为”贝叶斯平均”（Bayesian average）。因为某种程度上，它借鉴了”贝叶斯推断”（Bayesian inference）的思想：既然不知道投票结果，那就先估计一个值，然后不断用新的信息修正，使得它越来越接近正确的值。<br>在这个公式中，m（总体平均分）是”先验概率”，每一次新的投票都是一个调整因子，使总体平均分不断向该项目的真实投票结果靠近。投票人数越多，该项目的”贝叶斯平均”就越接近算术平均，对排名的影响就越小。因此，这种方法可以给一些投票人数较少的项目，以相对公平的排名。<br>“贝叶斯平均”也有缺点，主要问题是它假设用户的投票是正态分布。比如，电影A有10个观众评分，5个为五星，5个为一星；电影B也有10个观众评分，都给了三星。这两部电影的平均得分（无论是算术平均，还是贝叶斯平均）都是三星，但是电影A可能比电影B更值得看。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/排名/">排名</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/10/11/贝叶斯推断的原理和应用/" title="贝叶斯推断的原理和应用" itemprop="url">贝叶斯推断的原理和应用</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +240,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-10-11T15:00:15.000Z" itemprop="datePublished"> Published 2017-10-11</time>
+    <time datetime="2017-10-11T15:00:15.000Z" itemprop="datePublished"> 發表於 2017-10-11</time>
     
   </p>
 </header>
@@ -158,7 +310,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-10-09T06:42:02.000Z" itemprop="datePublished"> Published 2017-10-09</time>
+    <time datetime="2017-10-09T06:42:02.000Z" itemprop="datePublished"> 發表於 2017-10-09</time>
     
   </p>
 </header>
@@ -220,7 +372,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-19T07:32:55.000Z" itemprop="datePublished"> Published 2017-09-19</time>
+    <time datetime="2017-09-19T07:32:55.000Z" itemprop="datePublished"> 發表於 2017-09-19</time>
     
   </p>
 </header>
@@ -304,7 +456,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-18T07:56:30.000Z" itemprop="datePublished"> Published 2017-09-18</time>
+    <time datetime="2017-09-18T07:56:30.000Z" itemprop="datePublished"> 發表於 2017-09-18</time>
     
   </p>
 </header>
@@ -364,7 +516,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-14T08:43:25.000Z" itemprop="datePublished"> Published 2017-09-14</time>
+    <time datetime="2017-09-14T08:43:25.000Z" itemprop="datePublished"> 發表於 2017-09-14</time>
     
   </p>
 </header>
@@ -433,7 +585,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-13T07:00:01.000Z" itemprop="datePublished"> Published 2017-09-13</time>
+    <time datetime="2017-09-13T07:00:01.000Z" itemprop="datePublished"> 發表於 2017-09-13</time>
     
   </p>
 </header>
@@ -507,7 +659,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-13T03:51:40.000Z" itemprop="datePublished"> Published 2017-09-13</time>
+    <time datetime="2017-09-13T03:51:40.000Z" itemprop="datePublished"> 發表於 2017-09-13</time>
     
   </p>
 </header>
@@ -567,7 +719,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-12T03:21:00.000Z" itemprop="datePublished"> Published 2017-09-12</time>
+    <time datetime="2017-09-12T03:21:00.000Z" itemprop="datePublished"> 發表於 2017-09-12</time>
     
   </p>
 </header>
@@ -614,158 +766,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/09/11/Kafka相关/" title="Kafka相关" itemprop="url">Kafka相关</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-09-11T10:14:42.000Z" itemprop="datePublished"> Published 2017-09-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="https://zhuanlan.zhihu.com/p/25212966" target="_blank" rel="external">初识消息系统kafka</a></p>
-<p><a href="http://matt33.com/2017/09/04/kafka-best-pratice/?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io" target="_blank" rel="external">Kafka 最佳实践</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/25227580" target="_blank" rel="external">深入kafka生产消费模型</a></p>
-<p><a href="Linkedin Camus，从Kafka到HDFS的数据传输管道">https://github.com/linkedin/camus</a></p>
-<p><a href="https://fangyeqing.github.io/2016/12/01/Camus%E4%BB%8B%E7%BB%8D/" target="_blank" rel="external">Camus介绍</a></p>
-<p><a href="http://blog.csdn.net/lmalds/article/details/53940549" target="_blank" rel="external">Gobblin–一个用于Hadoop的统一”数据抽取框架”</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Kafka/">Kafka</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Kafka/">Kafka</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/06/09/Spark-Dataframe使用教程和Tips/" title="Spark Dataframe使用教程和Tips" itemprop="url">Spark Dataframe使用教程和Tips</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-06-09T03:36:23.000Z" itemprop="datePublished"> Published 2017-06-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Databricks官方文档"><a href="#Databricks官方文档" class="headerlink" title="Databricks官方文档"></a>Databricks官方文档</h2><p><a href="https://docs.databricks.com/spark/latest/dataframes-datasets/introduction-to-dataframes-scala.html#working-with-dataframes" target="_blank" rel="external">https://docs.databricks.com/spark/latest/dataframes-datasets/introduction-to-dataframes-scala.html#working-with-dataframes</a></p>
-<p>内置函数 <a href="https://spark.apache.org/docs/2.0.2/api/java/org/apache/spark/sql/functions.html" target="_blank" rel="external">https://spark.apache.org/docs/2.0.2/api/java/org/apache/spark/sql/functions.html</a></p>
-<h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><ol>
-<li><p>数据的精度</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span>  org.apache.spark.sql.functions._</span><br><span class="line">schemaPeople.agg(sum(<span class="string">"today_pay"</span>).cast(<span class="type">DecimalType</span>(precision=<span class="number">38</span>, scale=<span class="number">9</span>))).alias(<span class="string">"today_pay_sum"</span>)</span><br><span class="line"><span class="comment">// precision 数据长度</span></span><br><span class="line"><span class="comment">// scale 小数长度</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>关联join的使用<br>官方的示例中，df.join(df2, ‘name’, ‘outer’)这种用法是错误的，<br>只能使用schemaPeople.as(“a”).join(schemaPeople.as(“b”), $”a.name” === $”b.name”, “outer”)，必须指明两个df join的字段</p>
-</li>
-<li><p>添加列<br>追加列信息，下一步处理时，必须使用val newDF = schemaPeople.withColumn(“add_col”, lit(“new col”))重新赋值</p>
-</li>
-<li>column的空值判断<br>NO：df.filter(col(‘xxx’) is not None)<br>YES：df.filter(col(‘xxx’).isNotNull())</li>
-<li>column常量赋值<br>用lit()包装，如df.withColumn(“src”, lit(“mobile”))</li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Dataframe/">Dataframe</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -775,7 +790,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -819,7 +834,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>27</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
 		  
 		
 		  
@@ -856,11 +871,11 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>24</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
 			
 		
 			
@@ -872,19 +887,19 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
@@ -896,7 +911,7 @@
 			
 		
 			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -904,7 +919,15 @@
 			
 		
 			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
@@ -912,23 +935,7 @@
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -936,7 +943,15 @@
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -944,7 +959,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -960,11 +975,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1116,7 +1131,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

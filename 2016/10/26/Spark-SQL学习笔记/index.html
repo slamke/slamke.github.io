@@ -48,7 +48,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -64,7 +64,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -87,14 +87,14 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-10-26</time>
+    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> 發表於 2016-10-26</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">Contents</strong>
+			<strong class="toc-title">文章目錄</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-SQL-学习笔记"><span class="toc-number">1.</span> <span class="toc-text">Spark SQL 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-DataFrames"><span class="toc-number">1.1.</span> <span class="toc-text">Creating DataFrames</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行sql"><span class="toc-number">1.2.</span> <span class="toc-text">运行sql</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-Datasets"><span class="toc-number">2.</span> <span class="toc-text">Creating Datasets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interoperating-with-RDDs"><span class="toc-number">3.</span> <span class="toc-text">Interoperating with RDDs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inferring-the-Schema-Using-Reflection"><span class="toc-number">3.1.</span> <span class="toc-text">Inferring the Schema Using Reflection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Programmatically-Specifying-the-Schema"><span class="toc-number">3.2.</span> <span class="toc-text">Programmatically Specifying the Schema</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Sources"><span class="toc-number">4.</span> <span class="toc-text">Data Sources</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Generic-Load-Save-Functions"><span class="toc-number">4.1.</span> <span class="toc-text">Generic Load/Save Functions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-SQL-on-files-directly"><span class="toc-number">4.2.</span> <span class="toc-text">Run SQL on files directly</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saving-to-Persistent-Tables"><span class="toc-number">4.3.</span> <span class="toc-text">Saving to Persistent Tables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parquet"><span class="toc-number">5.</span> <span class="toc-text">Parquet</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Discovery-分区"><span class="toc-number">5.1.</span> <span class="toc-text">Partition Discovery 分区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Schema-Merging"><span class="toc-number">5.2.</span> <span class="toc-text">Schema Merging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hive支持"><span class="toc-number">6.</span> <span class="toc-text">hive支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC-To-Other-Databases"><span class="toc-number">7.</span> <span class="toc-text">JDBC To Other Databases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能优化"><span class="toc-number">8.</span> <span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Distributed-SQL-Engine"><span class="toc-number">9.</span> <span class="toc-text">Distributed SQL Engine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他特性"><span class="toc-number">10.</span> <span class="toc-text">其他特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching"><span class="toc-number">10.1.</span> <span class="toc-text">Caching</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态分区"><span class="toc-number">11.</span> <span class="toc-text">动态分区</span></a></li></ol>
 		
@@ -237,22 +237,22 @@
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">Contents</strong>
+  <strong class="toc-title">文章目錄</strong>
  
  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-SQL-学习笔记"><span class="toc-number">1.</span> <span class="toc-text">Spark SQL 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-DataFrames"><span class="toc-number">1.1.</span> <span class="toc-text">Creating DataFrames</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行sql"><span class="toc-number">1.2.</span> <span class="toc-text">运行sql</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-Datasets"><span class="toc-number">2.</span> <span class="toc-text">Creating Datasets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interoperating-with-RDDs"><span class="toc-number">3.</span> <span class="toc-text">Interoperating with RDDs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inferring-the-Schema-Using-Reflection"><span class="toc-number">3.1.</span> <span class="toc-text">Inferring the Schema Using Reflection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Programmatically-Specifying-the-Schema"><span class="toc-number">3.2.</span> <span class="toc-text">Programmatically Specifying the Schema</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Sources"><span class="toc-number">4.</span> <span class="toc-text">Data Sources</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Generic-Load-Save-Functions"><span class="toc-number">4.1.</span> <span class="toc-text">Generic Load/Save Functions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-SQL-on-files-directly"><span class="toc-number">4.2.</span> <span class="toc-text">Run SQL on files directly</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saving-to-Persistent-Tables"><span class="toc-number">4.3.</span> <span class="toc-text">Saving to Persistent Tables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parquet"><span class="toc-number">5.</span> <span class="toc-text">Parquet</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Discovery-分区"><span class="toc-number">5.1.</span> <span class="toc-text">Partition Discovery 分区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Schema-Merging"><span class="toc-number">5.2.</span> <span class="toc-text">Schema Merging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hive支持"><span class="toc-number">6.</span> <span class="toc-text">hive支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC-To-Other-Databases"><span class="toc-number">7.</span> <span class="toc-text">JDBC To Other Databases</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能优化"><span class="toc-number">8.</span> <span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Distributed-SQL-Engine"><span class="toc-number">9.</span> <span class="toc-text">Distributed SQL Engine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他特性"><span class="toc-number">10.</span> <span class="toc-text">其他特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching"><span class="toc-number">10.1.</span> <span class="toc-text">Caching</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态分区"><span class="toc-number">11.</span> <span class="toc-text">动态分区</span></a></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -262,7 +262,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -306,7 +306,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>27</sup></a></li>
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
 		  
 		
 		  
@@ -343,11 +343,11 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>24</sup></a></li>
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
 			
 		
 			
@@ -359,19 +359,19 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
@@ -383,7 +383,7 @@
 			
 		
 			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -391,7 +391,15 @@
 			
 		
 			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 			
@@ -399,23 +407,7 @@
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -423,7 +415,15 @@
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -431,7 +431,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -447,11 +447,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -680,7 +680,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

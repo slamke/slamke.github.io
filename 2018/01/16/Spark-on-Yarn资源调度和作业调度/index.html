@@ -4,26 +4,26 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>如何优雅地终止正在运行的Spark Streaming程序 | 雁渡寒潭 风吹疏竹</title>
+    <title>Spark-on-Yarn资源调度和作业调度 | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="转自: https://www.iteblog.com/archives/1890.html
-一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们">
+    <meta name="description" content="作业调度Spark默认采取FIFO策略运行多个Jobs，它提供一个队列来保存已经提交的Jobs，如果队头的Job不需要占用所有的集群资源，那么后续的 Job可以立即运行，但是如果队头的Job需要占用所有的集群资源，且运行时间很长，那么即使后续的Job很小，也要等待前面的Job执行完后才可以执 行，这样就造成了大量的延迟。
+Spark0.8+版本开始支持公平调度策略，在该策略下，Spark以roun">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何优雅地终止正在运行的Spark Streaming程序">
-<meta property="og:url" content="slamke.github.io/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/index.html">
+<meta property="og:title" content="Spark-on-Yarn资源调度和作业调度">
+<meta property="og:url" content="slamke.github.io/2018/01/16/Spark-on-Yarn资源调度和作业调度/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="转自: https://www.iteblog.com/archives/1890.html
-一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们">
-<meta property="og:updated_time" content="2017-03-02T06:16:50.428Z">
+<meta property="og:description" content="作业调度Spark默认采取FIFO策略运行多个Jobs，它提供一个队列来保存已经提交的Jobs，如果队头的Job不需要占用所有的集群资源，那么后续的 Job可以立即运行，但是如果队头的Job需要占用所有的集群资源，且运行时间很长，那么即使后续的Job很小，也要等待前面的Job执行完后才可以执 行，这样就造成了大量的延迟。
+Spark0.8+版本开始支持公平调度策略，在该策略下，Spark以roun">
+<meta property="og:updated_time" content="2018-01-16T09:48:50.852Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何优雅地终止正在运行的Spark Streaming程序">
-<meta name="twitter:description" content="转自: https://www.iteblog.com/archives/1890.html
-一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们">
+<meta name="twitter:title" content="Spark-on-Yarn资源调度和作业调度">
+<meta name="twitter:description" content="作业调度Spark默认采取FIFO策略运行多个Jobs，它提供一个队列来保存已经提交的Jobs，如果队头的Job不需要占用所有的集群资源，那么后续的 Job可以立即运行，但是如果队头的Job需要占用所有的集群资源，且运行时间很长，那么即使后续的Job很小，也要等待前面的Job执行完后才可以执 行，这样就造成了大量的延迟。
+Spark0.8+版本开始支持公平调度策略，在该策略下，Spark以roun">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -83,14 +83,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" title="如何优雅地终止正在运行的Spark Streaming程序" itemprop="url">如何优雅地终止正在运行的Spark Streaming程序</a>
+      <a href="/2018/01/16/Spark-on-Yarn资源调度和作业调度/" title="Spark-on-Yarn资源调度和作业调度" itemprop="url">Spark-on-Yarn资源调度和作业调度</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-03-02T06:14:30.000Z" itemprop="datePublished"> 發表於 2017-03-02</time>
+    <time datetime="2018-01-16T09:33:58.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
     
   </p>
 </header>
@@ -99,21 +99,22 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目錄</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#等作业运行完再关闭"><span class="toc-number">1.</span> <span class="toc-text">等作业运行完再关闭</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过Spark内置机制关闭"><span class="toc-number">2.</span> <span class="toc-text">通过Spark内置机制关闭</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#作业调度"><span class="toc-number">1.</span> <span class="toc-text">作业调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-公平调度池"><span class="toc-number">1.1.</span> <span class="toc-text">1. 公平调度池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-默认调度池"><span class="toc-number">1.2.</span> <span class="toc-text">2. 默认调度池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-调度池的属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. 调度池的属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-测试"><span class="toc-number">1.4.</span> <span class="toc-text">4. 测试</span></a></li></ol></li></ol>
 		
 		</div>
 		
-		<p>转自: <a href="https://www.iteblog.com/archives/1890.html" target="_blank" rel="external">https://www.iteblog.com/archives/1890.html</a></p>
-<p>一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们咋办？这里有两种方法。</p>
-<h2 id="等作业运行完再关闭"><a href="#等作业运行完再关闭" class="headerlink" title="等作业运行完再关闭"></a>等作业运行完再关闭</h2><p>我们都知道，Spark Streaming每隔batchDuration的时间会把源源不断的流数据分割成一批有限数据集，然后计算这些数据，我们可以从Spark提供的监控页面看到当前batch是否执行完成，当作业执行完，我们就可以手动执行kill命令来强制关闭这个Streaming作业。这种方式的缺点就是得盯着监控页面，然后决定关不关闭，很不灵活。</p>
-<h2 id="通过Spark内置机制关闭"><a href="#通过Spark内置机制关闭" class="headerlink" title="通过Spark内置机制关闭"></a>通过Spark内置机制关闭</h2><p>其实Spark内置就为我们提供了一种优雅的方法来关闭长期运行的Streaming作业，我们来看看 StreamingContext类中定义的一个 stop 方法：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop</span></span>(stopSparkContext: <span class="type">Boolean</span>, stopGracefully: <span class="type">Boolean</span>)</span><br></pre></td></tr></table></figure>
-<p>官方文档对其解释是：Stop the execution of the streams, with option of ensuring all received data has been processed. 控制所有接收的数据是否被处理的参数就是 stopGracefully，如果我们将它设置为true，Spark则会等待所有接收的数据被处理完成，然后再关闭计算引擎，这样就可以避免数据的丢失。现在的问题是我们在哪里调用这个stop方法？</p>
-<p>Spark 1.4版本之前<br>在Spark 1.4版本之前，我们需要手动调用这个 stop 方法，一种比较合适的方式是通过 Runtime.getRuntime().addShutdownHook 来添加一个钩子，其会在JVM关闭的之前执行传递给他的函数，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Runtime</span>.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="type">Thread</span>() &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">run</span></span>() &#123;</span><br><span class="line">    log(<span class="string">"Gracefully stop Spark Streaming"</span>)</span><br><span class="line">    streamingContext.stop(<span class="literal">true</span>, <span class="literal">true</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
-<p>如果你使用的是Scala，我们还可以通过以下的方法实现类似的功能：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scala.sys.addShutdownHook(&#123;</span><br><span class="line">  streamingContext.stop(<span class="literal">true</span>,<span class="literal">true</span>)</span><br><span class="line">)&#125;)</span><br></pre></td></tr></table></figure></p>
-<p>通过上面的办法，我们客户确保程序退出之前会执行上面的函数，从而保证Streaming程序关闭的时候不丢失数据。</p>
-<p>Spark 1.4版本之后<br>上面方式可以达到我们的需求，但是在每个程序里面都添加这样的重复代码也未免太过麻烦了！值得高兴的是，从Apache Spark 1.4版本开始，Spark内置提供了spark.streaming.stopGracefullyOnShutdown参数来决定是否需要以Gracefully方式来关闭Streaming程序（详情请参见SPARK-7776）。Spark会在启动 StreamingContext 的时候注册这个钩子，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">shutdownHookRef = <span class="type">ShutdownHookManager</span>.addShutdownHook(</span><br><span class="line">          <span class="type">StreamingContext</span>.<span class="type">SHUTDOWN_HOOK_PRIORITY</span>)(stopOnShutdown)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">stopOnShutdown</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> stopGracefully = conf.getBoolean(<span class="string">"spark.streaming.stopGracefullyOnShutdown"</span>, <span class="literal">false</span>)</span><br><span class="line">    logInfo(<span class="string">s"Invoking stop(stopGracefully=<span class="subst">$stopGracefully</span>) from shutdown hook"</span>)</span><br><span class="line">    <span class="comment">// Do not stop SparkContext, let its own shutdown hook stop it</span></span><br><span class="line">    stop(stopSparkContext = <span class="literal">false</span>, stopGracefully = stopGracefully)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>从上面的代码可以看出，我们可以根据自己的需求来设置 spark.streaming.stopGracefullyOnShutdown 的值，而不需要在每个Streaming程序里面手动调用StreamingContext的stop方法，确实方便多了。不过虽然这个参数在Spark 1.4开始引入，但是却是在Spark 1.6才开始才有文档正式介绍（可以参见<a href="https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）" target="_blank" rel="external">https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）</a></p>
+		<h2 id="作业调度"><a href="#作业调度" class="headerlink" title="作业调度"></a>作业调度</h2><p>Spark默认采取FIFO策略运行多个Jobs，它提供一个队列来保存已经提交的Jobs，如果队头的Job不需要占用所有的集群资源，那么后续的 Job可以立即运行，但是如果队头的Job需要占用所有的集群资源，且运行时间很长，那么即使后续的Job很小，也要等待前面的Job执行完后才可以执 行，这样就造成了大量的延迟。</p>
+<p>Spark0.8+版本开始支持公平调度策略，在该策略下，Spark以round robin的方式为每个Job分配执行的Tasks，每个Job在同一时间都可以运行多个Tasks，Jobs之间是共享集群资源的。这就意味着当一个大 任务运行的同时，用户提交的小任务可以立即执行，且获得良好的响应时间，而不用去等待大任务的结束。</p>
+<p>通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">val conf = new SparkConf().setMaster(...).setAppName(...)</span><br><span class="line">conf.set(&quot;spark.scheduler.mode&quot;, &quot;FAIR&quot;)</span><br><span class="line">val sc = new SparkContext(conf)</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-公平调度池"><a href="#1-公平调度池" class="headerlink" title="1. 公平调度池"></a>1. 公平调度池</h3><p>Spark支持将不同的Jobs划分到不同的调度池中，可以为每个调度池设置不同的属性（比如权重），这样就可以将重要的Job分到高优先级的调度池中， 比如可以为每个用户创建一个调度池，并为每个用户划分相等的集群资源，而不用去管每个用户同时运行多少个Job。</p>
+<p>如果用户没有设置公平调度池，默认情况下提交的任务被划分到default调度池中，可通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">sc.setLocalProperty(&quot;spark.scheduler.pool&quot;, &quot;pool1&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>清除调度池<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.setLocalProperty(<span class="string">"spark.scheduler.pool"</span>, <span class="literal">null</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-默认调度池"><a href="#2-默认调度池" class="headerlink" title="2. 默认调度池"></a>2. 默认调度池</h3><p>默认情况下不同的调度池共享集群的资源，但在每个调度池内部，Job是以FIFO的方式运行的，比如为每个用户创建一个调度池，集群的资源平均分配给各个调度池，在调度池内部，每个Job按照FIFO的顺序运行。</p>
+<h3 id="3-调度池的属性"><a href="#3-调度池的属性" class="headerlink" title="3. 调度池的属性"></a>3. 调度池的属性</h3><p>schedulingMode：调度池内部Job之间的调度顺序，FIFO或FAIR，默认是FIFO<br>weight：调度池的权重，默认是1，如果设置为2，那么它将获取相当于其他调度池2倍的资源。<br>minShare：最少满足资源数，默认是0，只有在满足每个调度池minShare资源数的基础之上，才会按照weight比例来获取额外的资源。</p>
+<p>可创建一个类似于<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">``` scala</span><br><span class="line">conf.set(&quot;spark.scheduler.allocation.file&quot;, &quot;/path/to/file&quot;)</span><br><span class="line">   fairscheduler.xml.template文件内容</span><br></pre></td></tr></table></figure></p>
+<p>fairscheduler.xml.template文件内容<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">allocations</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"production"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>1<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>2<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"test"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FIFO<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>2<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>3<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">allocations</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="4-测试"><a href="#4-测试" class="headerlink" title="4. 测试"></a>4. 测试</h3><p>myFairScheduler.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">allocations</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"onlinetestpool"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>2<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>7<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pool</span> <span class="attr">name</span>=<span class="string">"default"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingMode</span>&gt;</span>FAIR<span class="tag">&lt;/<span class="name">schedulingMode</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>1<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">minShare</span>&gt;</span>7<span class="tag">&lt;/<span class="name">minShare</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">allocations</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>启动Spark应用<br>spark-shell \<br>–conf spark.scheduler.mode=FAIR \<br>–conf spark.scheduler.pool=onlinetestpool \<br>–conf spark.scheduler.allocation.file=/home/spark/spark/conf/fairscheduler.xml</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -127,7 +128,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Spark-Streaming/">Spark Streaming</a>
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Yarn/">Yarn</a>
   </div>
 
 </div>
@@ -136,7 +137,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" data-title="如何优雅地终止正在运行的Spark Streaming程序 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2018/01/16/Spark-on-Yarn资源调度和作业调度/" data-title="Spark-on-Yarn资源调度和作业调度 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -150,18 +151,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/03/15/Spark的UDF/" title="Spark的UDF">
+ <a href="/2018/01/16/Spark动态资源分配/" title="Spark动态资源分配">
   <strong>上一篇：</strong><br/>
   <span>
-  Spark的UDF</span>
+  Spark动态资源分配</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2017/02/23/Spark有用的配置选项/"  title="Spark有用的配置选项">
+<a href="/2018/01/16/Yarn的基本结构和工作原理/"  title="Yarn的基本结构和工作原理">
  <strong>下一篇：</strong><br/> 
- <span>Spark有用的配置选项
+ <span>Yarn的基本结构和工作原理
 </span>
 </a>
 </div>
@@ -176,7 +177,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目錄</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#等作业运行完再关闭"><span class="toc-number">1.</span> <span class="toc-text">等作业运行完再关闭</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过Spark内置机制关闭"><span class="toc-number">2.</span> <span class="toc-text">通过Spark内置机制关闭</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#作业调度"><span class="toc-number">1.</span> <span class="toc-text">作业调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-公平调度池"><span class="toc-number">1.1.</span> <span class="toc-text">1. 公平调度池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-默认调度池"><span class="toc-number">1.2.</span> <span class="toc-text">2. 默认调度池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-调度池的属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. 调度池的属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-测试"><span class="toc-number">1.4.</span> <span class="toc-text">4. 测试</span></a></li></ol></li></ol>
  
   </div>
 
