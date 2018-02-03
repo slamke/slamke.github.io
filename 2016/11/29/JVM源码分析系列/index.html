@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>scala的类型和反射机制 | 雁渡寒潭 风吹疏竹</title>
+    <title>JVM源码分析系列 | 雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
@@ -22,7 +22,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 
 为什么会有metaspace如果perm设置太小了，系统运行过程中就容易出现内存溢出，设置大了又总">
 <meta property="og:type" content="article">
-<meta property="og:title" content="scala的类型和反射机制">
+<meta property="og:title" content="JVM源码分析系列">
 <meta property="og:url" content="slamke.github.io/2016/11/29/JVM源码分析系列/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="JVM源码分析系列
@@ -35,9 +35,9 @@ MetaspaceJVM源码分析之Metaspace解密
 metaspace，顾名思义，元数据空间，专门用来存元数据的，它是jdk8里特有的数据结构用来替代perm
 
 为什么会有metaspace如果perm设置太小了，系统运行过程中就容易出现内存溢出，设置大了又总">
-<meta property="og:updated_time" content="2016-12-14T02:58:16.794Z">
+<meta property="og:updated_time" content="2018-02-03T09:10:23.642Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="scala的类型和反射机制">
+<meta name="twitter:title" content="JVM源码分析系列">
 <meta name="twitter:description" content="JVM源码分析系列
 
 不保证顺序的Class.getMethodsJVM源码分析之不保证顺序的Class.getMethods
@@ -107,7 +107,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/11/29/JVM源码分析系列/" title="scala的类型和反射机制" itemprop="url">scala的类型和反射机制</a>
+      <a href="/2016/11/29/JVM源码分析系列/" title="JVM源码分析系列" itemprop="url">JVM源码分析系列</a>
   </h1>
   <p class="article-author">By
        
@@ -218,7 +218,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2016/11/29/JVM源码分析系列/" data-title="scala的类型和反射机制 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/11/29/JVM源码分析系列/" data-title="JVM源码分析系列 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -232,18 +232,18 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/12/23/大数据下的DistinctCount/" title="大数据下的DistinctCount">
+ <a href="/2016/11/29/Scala的类型和反射机制/" title="Scala的类型和反射机制">
   <strong>上一篇：</strong><br/>
   <span>
-  大数据下的DistinctCount</span>
+  Scala的类型和反射机制</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2016/11/29/scala的类型和反射机制/"  title="scala的类型和反射机制">
+<a href="/2016/11/27/SparkStreaming数据产生与导入相关的内存分析/"  title="SparkStreaming数据产生与导入相关的内存分析">
  <strong>下一篇：</strong><br/> 
- <span>scala的类型和反射机制
+ <span>SparkStreaming数据产生与导入相关的内存分析
 </span>
 </a>
 </div>
@@ -290,11 +290,11 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -326,7 +326,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -367,7 +367,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -375,11 +375,15 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -387,19 +391,7 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -407,11 +399,39 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -420,26 +440,6 @@ metaspace，顾名思义，元数据空间，专门用来存元数据的，它�
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

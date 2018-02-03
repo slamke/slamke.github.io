@@ -21,14 +21,14 @@ HTTP协议在设计的时候是无状态的。这">
 <meta property="og:description" content="Session原理、安全以及最基本的Express和Redis实现Session基础概念
 Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。
 HTTP协议在设计的时候是无状态的。这">
-<meta property="og:image" content="https://segmentfault.com/img/bVlcpM">
-<meta property="og:updated_time" content="2016-04-01T09:55:07.837Z">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/web/session.jpg?raw=true">
+<meta property="og:updated_time" content="2018-02-03T08:25:36.125Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Session原理、安全以及最基本的Express和Redis实现">
 <meta name="twitter:description" content="Session原理、安全以及最基本的Express和Redis实现Session基础概念
 Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。
 HTTP协议在设计的时候是无状态的。这">
-<meta name="twitter:image" content="https://segmentfault.com/img/bVlcpM">
+<meta name="twitter:image" content="https://github.com/slamke/image/blob/master/web/session.jpg?raw=true">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -118,7 +118,7 @@ HTTP协议在设计的时候是无状态的。这">
 <li>从HTTP Header中提取Session ID</li>
 <li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
 </ol>
-<p><img src="https://segmentfault.com/img/bVlcpM" alt="enter image description here"></p>
+<p><img src="https://github.com/slamke/image/blob/master/web/session.jpg?raw=true" alt="enter image description here"></p>
 <p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
 <p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
 <h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
@@ -177,18 +177,18 @@ HTTP协议在设计的时候是无状态的。这">
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理">
+ <a href="/2016/04/03/如何定位消耗CPU最多的线程/" title="如何定位消耗CPU最多的线程">
   <strong>上一篇：</strong><br/>
   <span>
-  Session和Cookie的区别与联系以及Session的实现原理</span>
+  如何定位消耗CPU最多的线程</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2016/03/23/java-multi-thread-start/"  title="Java中一个线程可以多次start吗?">
+<a href="/2016/04/01/HTTP Session 攻击与防护/"  title="HTTP Session 攻击与防护">
  <strong>下一篇：</strong><br/> 
- <span>Java中一个线程可以多次start吗?
+ <span>HTTP Session 攻击与防护
 </span>
 </a>
 </div>
@@ -235,11 +235,11 @@ HTTP协议在设计的时候是无状态的。这">
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -271,7 +271,7 @@ HTTP协议在设计的时候是无状态的。这">
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -312,7 +312,7 @@ HTTP协议在设计的时候是无状态的。这">
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -320,11 +320,15 @@ HTTP协议在设计的时候是无状态的。这">
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -332,19 +336,7 @@ HTTP协议在设计的时候是无状态的。这">
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -352,11 +344,39 @@ HTTP协议在设计的时候是无状态的。这">
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -365,26 +385,6 @@ HTTP协议在设计的时候是无状态的。这">
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

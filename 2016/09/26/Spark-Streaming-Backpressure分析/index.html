@@ -17,12 +17,12 @@
 <meta property="og:url" content="slamke.github.io/2016/09/26/Spark-Streaming-Backpressure分析/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="1. 为什么引入Backpressure默认情况下，Spark Streaming通过Receiver以生产者生产数据的速率接收数据，计算过程中会出现batch processing time &amp;gt; batch interval的情况，其中batch processing time 为实际计算一个批次花费时间， batch interval为Streaming应用设置的批处理间隔。这意味着Sp">
-<meta property="og:image" content="http://images.cnblogs.com/cnblogs_com/barrenlake/745320/o_%e4%bb%a4%e7%89%8c%e6%a1%b6%e6%9c%ba%e5%88%b6.png">
-<meta property="og:updated_time" content="2016-09-26T03:34:09.567Z">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/spark/backpressure.png?raw=true">
+<meta property="og:updated_time" content="2018-01-17T07:04:32.183Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark Streaming Backpressure分析">
 <meta name="twitter:description" content="1. 为什么引入Backpressure默认情况下，Spark Streaming通过Receiver以生产者生产数据的速率接收数据，计算过程中会出现batch processing time &amp;gt; batch interval的情况，其中batch processing time 为实际计算一个批次花费时间， batch interval为Streaming应用设置的批处理间隔。这意味着Sp">
-<meta name="twitter:image" content="http://images.cnblogs.com/cnblogs_com/barrenlake/745320/o_%e4%bb%a4%e7%89%8c%e6%a1%b6%e6%9c%ba%e5%88%b6.png">
+<meta name="twitter:image" content="https://github.com/slamke/image/blob/master/spark/backpressure.png?raw=true">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -105,7 +105,7 @@
 		<h2 id="1-为什么引入Backpressure"><a href="#1-为什么引入Backpressure" class="headerlink" title="1. 为什么引入Backpressure"></a>1. 为什么引入Backpressure</h2><p>默认情况下，Spark Streaming通过Receiver以生产者生产数据的速率接收数据，计算过程中会出现batch processing time &gt; batch interval的情况，其中batch processing time 为实际计算一个批次花费时间， batch interval为Streaming应用设置的批处理间隔。这意味着Spark Streaming的数据接收速率高于Spark从队列中移除数据的速率，也就是数据处理能力低，在设置间隔内不能完全处理当前接收速率接收的数据。如果这种情况持续过长的时间，会造成数据在内存中堆积，导致Receiver所在Executor内存溢出等问题（如果设置StorageLevel包含disk, 则内存存放不下的数据会溢写至disk, 加大延迟）。Spark 1.5以前版本，用户如果要限制Receiver的数据接收速率，可以通过设置静态配制参数“spark.streaming.receiver.maxRate”的值来实现，此举虽然可以通过限制接收速率，来适配当前的处理能力，防止内存溢出，但也会引入其它问题。比如：producer数据生产高于maxRate，当前集群处理能力也高于maxRate，这就会造成资源利用率下降等问题。为了更好的协调数据接收速率与资源处理能力，Spark Streaming 从v1.5开始引入反压机制（back-pressure）,通过动态控制数据接收速率来适配集群数据处理能力。</p>
 <h2 id="2-Backpressure"><a href="#2-Backpressure" class="headerlink" title="2. Backpressure"></a>2. Backpressure</h2><p>Spark Streaming Backpressure:  根据JobScheduler反馈作业的执行信息来动态调整Receiver数据接收率。通过属性“spark.streaming.backpressure.enabled”来控制是否启用backpressure机制，默认值false，即不启用。</p>
 <h2 id="3-流量控制点"><a href="#3-流量控制点" class="headerlink" title="3. 流量控制点"></a>3. 流量控制点</h2><p>当Receiver开始接收数据时，会通过supervisor.pushSingle()方法将接收的数据存入currentBuffer等待BlockGenerator定时将数据取走，包装成block. 在将数据存放入currentBuffer之时，要获取许可（令牌）。如果获取到许可就可以将数据存入buffer, 否则将被阻塞，进而阻塞Receiver从数据源拉取数据。<br>其令牌投放采用令牌桶机制进行， 原理如下图所示:</p>
-<p><img src="http://images.cnblogs.com/cnblogs_com/barrenlake/745320/o_%e4%bb%a4%e7%89%8c%e6%a1%b6%e6%9c%ba%e5%88%b6.png" alt=""></p>
+<p><img src="https://github.com/slamke/image/blob/master/spark/backpressure.png?raw=true" alt=""></p>
 <p>牌桶机制： 大小固定的令牌桶可自行以恒定的速率源源不断地产生令牌。如果令牌不被消耗，或者被消耗的速度小于产生的速度，令牌就会不断地增多，直到把桶填满。后面再产生的令牌就会从桶中溢出。最后桶中可以保存的最大令牌数永远不会超过桶的大小。当进行某操作时需要令牌时会从令牌桶中取出相应的令牌数，如果获取到则继续操作，否则阻塞。用完之后不用放回。</p>
 <p>Streaming 数据流被Receiver接收后，按行解析后存入iterator中。然后逐个存入Buffer，在存入buffer时会先获取token，如果没有token存在，则阻塞；如果获取到则将数据存入buffer.  然后等价后续生成block操作。</p>
   
@@ -202,11 +202,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -238,7 +238,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -279,7 +279,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -287,11 +287,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -299,19 +303,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -319,11 +311,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -332,26 +352,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

@@ -21,14 +21,14 @@ Object类中的">
 <meta property="og:description" content="概述Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。
 Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：
 Object类中的">
-<meta property="og:image" content="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg">
-<meta property="og:updated_time" content="2016-04-24T14:09:30.497Z">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/java/object_methods.jpg?raw=true">
+<meta property="og:updated_time" content="2018-02-03T08:12:34.778Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java基础:Object类中的方法解析">
 <meta name="twitter:description" content="概述Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。
 Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：
 Object类中的">
-<meta name="twitter:image" content="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg">
+<meta name="twitter:image" content="https://github.com/slamke/image/blob/master/java/object_methods.jpg?raw=true">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -109,7 +109,7 @@ Object类中的">
 		</div>
 		
 		<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。</p>
-<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg" alt="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg"></p>
+<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="https://github.com/slamke/image/blob/master/java/object_methods.jpg?raw=true" alt=""></p>
 <h1 id="Object类中的方法"><a href="#Object类中的方法" class="headerlink" title="Object类中的方法"></a>Object类中的方法</h1><p>Java中的每个类都具有定义在Object类中的这些方法。</p>
 <h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><figure class="highlight plain"><figcaption><span>Object()```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，Java中通过形如 new A(args..)形式创建一个属于该类型的对象。其中A即是类名，A(args..)即此类定义中相对应的构造函数。通过此种形式创建的对象都是通过类中的构造函数完成。为体现此特性，Java中规定：在类定义过程中，对于未定义构造函数的类，默认会有一个无参数的构造函数，作为所有类的基类，Object类自然要反映出此特性，在源码中，未给出Object类构造函数定义，但实际上，此构造函数是存在的。</span><br><span class="line"> </span><br><span class="line">当然，并不是所有的类都是通过此种方式去构建，也自然的，并不是所有的类构造函数都是public。</span><br><span class="line"></span><br><span class="line">## private static native void registerNatives();</span><br><span class="line"> </span><br><span class="line">registerNatives函数前面有native关键字修饰，Java中，用native关键字修饰的函数表明该方法的实现并不是在Java中去完成，而是由C/C++去完成，并被编译成了.dll，由Java去调用。方法的具体实现体在dll文件中，对于不同平台，其具体实现应该有所不同。用native修饰，即表示操作系统，需要提供此方法，Java本身需要使用。具体到registerNatives()方法本身，其主要作用是将C/C++中的方法映射到Java中的native方法，实现方法命名的解耦。</span><br><span class="line"></span><br><span class="line">## protected Object clone()</span><br><span class="line"></span><br><span class="line">Creates and returns a copy of this object.</span><br><span class="line"></span><br><span class="line">Object类中的说明是：</span><br><span class="line">``` java</span><br><span class="line">　　protected Object clone() throws CloneNotSupportedException</span><br></pre></td></tr></table></figure>
 <p>这个方法比较特殊：<br>首先，使用这个方法的类必须实现java.lang.Cloneable接口，否则会抛出CloneNotSupportedException异常。<br>Cloneable接口中不包含任何方法，所以实现它时只要在类声明中加上implements语句即可。</p>
@@ -235,11 +235,11 @@ Object类中的">
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -271,7 +271,7 @@ Object类中的">
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -312,7 +312,7 @@ Object类中的">
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -320,11 +320,15 @@ Object类中的">
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -332,19 +336,7 @@ Object类中的">
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -352,11 +344,39 @@ Object类中的">
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -365,26 +385,6 @@ Object类中的">
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

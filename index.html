@@ -81,6 +81,170 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/02/03/动态分区说明/" title="动态分区说明" itemprop="url">动态分区说明</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-03T09:32:12.000Z" itemprop="datePublished"> Published 2018-02-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Hive分区"><a href="#Hive分区" class="headerlink" title="Hive分区"></a>Hive分区</h1><p><a href="http://lxw1234.com/archives/2015/06/286.htm" target="_blank" rel="external">Hive的动态分区</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>hive中支持两种类型的分区：</p>
+<ul>
+<li>静态分区SP（static partition）</li>
+<li>动态分区DP（dynamic partition）</li>
+</ul>
+<p>静态分区与动态分区的主要区别在于静态分区是手动指定，而动态分区是通过数据来进行判断。详细来说，静态分区的列实在编译时期，通过用户传递来决定的；动态分区只有在SQL执行时才能决定。</p>
+<h2 id="动态分区说明"><a href="#动态分区说明" class="headerlink" title="动态分区说明"></a>动态分区说明</h2><p>关系型数据库（如Oracle）中，对分区表Insert数据时候，数据库自动会根据分区字段的值，将数据插入到相应的分区中，Hive中也提供了类似的机制，即动态分区(Dynamic Partition)，只不过，使用Hive的动态分区，需要进行相应的配置。</p>
+<p>按照常规的方法向分区表中插入数据，如果源数据量很大，那么针对一个分区就要写一个insert，非常麻烦，你必须先要知道源数据中都有什么样的数据才能创建分区。<br>例如:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; insert overwrite table partition_test partition(stat_date='20110728',province='henan') select member_id,name from partition_test_input where stat_date='20110728' and province='henan';</span><br></pre></td></tr></table></figure></p>
+<p>使用动态分区可以很好的解决上述问题。动态分区可以根据查询得到的数据自动匹配到相应的分区中去。<br>使用动态分区要先设置hive.exec.dynamic.partition参数值为true，默认值为false，即不允许使用：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; set hive.exec.dynamic.partition;</span><br><span class="line">hive.exec.dynamic.partition=false</span><br><span class="line">hive&gt; set hive.exec.dynamic.partition=true;</span><br><span class="line">hive&gt; set hive.exec.dynamic.partition;</span><br><span class="line">hive.exec.dynamic.partition=true</span><br></pre></td></tr></table></figure></p>
+<p>动态分区的使用方法很简单，假设我想向stat_date=’20110728’这个分区下面插入数据，至于province插入到哪个子分区下面让数据库自己来判断，那可以这样写：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; insert overwrite table partition_test partition(stat_date='20110728',province)</span><br><span class="line">&gt; select member_id,name,province from partition_test_input where stat_date='20110728';</span><br><span class="line">Total MapReduce jobs = 2</span><br><span class="line">...</span><br><span class="line">3 Rows loaded to partition_test</span><br><span class="line">OK</span><br></pre></td></tr></table></figure></p>
+<p>stat_date叫做<strong>静态分区列</strong>，province叫做<strong>动态分区列</strong>。select子句中需要把动态分区列按照分区的顺序写出来，静态分区列不用写出来。这样stat_date=’20110728’的所有数据，会根据province的不同分别插入到/user/hive/warehouse/partition_test/stat_date=20110728/下面的不同的子文件夹下，如果源数据对应的province子分区不存在，则会自动创建，非常方便，而且避免了人工控制插入数据与分区的映射关系存在的潜在风险。</p>
+<ul>
+<li>注意，动态分区不允许主分区采用动态列而副分区采用静态列，这样将导致所有的主分区都要创建副分区静态列所定义的分区</li>
+<li>动态分区可以允许所有的分区列都是动态分区列，但是要首先设置一个参数hive.exec.dynamic.partition.mode ：<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; set hive.exec.dynamic.partition.mode;</span><br><span class="line">hive.exec.dynamic.partition.mode=strict</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="动态分区demo"><a href="#动态分区demo" class="headerlink" title="动态分区demo"></a>动态分区demo</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> hive.exec.dynamic.<span class="keyword">partition</span>=<span class="literal">true</span>;  </span><br><span class="line"><span class="keyword">SET</span> hive.exec.dynamic.<span class="keyword">partition</span>.<span class="keyword">mode</span>=nonstrict; </span><br><span class="line"><span class="keyword">SET</span> hive.exec.<span class="keyword">max</span>.dynamic.<span class="keyword">partitions</span>.pernode = <span class="number">1000</span>;</span><br><span class="line"><span class="keyword">SET</span> hive.exec.<span class="keyword">max</span>.dynamic.<span class="keyword">partitions</span>=<span class="number">1000</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">TABLE</span> t_lxw1234_partitioned <span class="keyword">PARTITION</span> (<span class="keyword">month</span>,<span class="keyword">day</span>) </span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">url</span>,<span class="keyword">substr</span>(<span class="keyword">day</span>,<span class="number">1</span>,<span class="number">7</span>) <span class="keyword">AS</span> <span class="keyword">month</span>,<span class="keyword">day</span> </span><br><span class="line"><span class="keyword">FROM</span> t_lxw1234;</span><br></pre></td></tr></table></figure>
+<h2 id="动态分区参数"><a href="#动态分区参数" class="headerlink" title="动态分区参数"></a>动态分区参数</h2><p>使用动态分区需要注意设定以下参数：</p>
+<ul>
+<li><p>hive.exec.dynamic.partition<br>默认值：false<br>是否开启动态分区功能，默认false关闭。<br>使用动态分区时候，该参数必须设置成true;</p>
+</li>
+<li><p>hive.exec.dynamic.partition.mode<br>默认值：strict<br>动态分区的模式，默认strict，表示必须指定至少一个分区为静态分区，nonstrict模式表示允许所有的分区字段都可以使用动态分区。<br>一般需要设置为nonstrict</p>
+</li>
+<li><p>hive.exec.max.dynamic.partitions.pernode<br>默认值：100<br>在每个执行MR的节点上，最大可以创建多少个动态分区。<br>该参数需要根据实际的数据来设定。<br>比如：源数据中包含了一年的数据，即day字段有365个值，那么该参数就需要设置成大于365，如果使用默认值100，则会报错。</p>
+</li>
+<li><p>hive.exec.max.dynamic.partitions<br>默认值：1000<br>在所有执行MR的节点上，最大一共可以创建多少个动态分区。<br>同上参数解释。</p>
+</li>
+<li><p>hive.exec.max.created.files<br>默认值：100000<br>整个MR Job中，最大可以创建多少个HDFS文件。<br>一般默认值足够了，除非你的数据量非常大，需要创建的文件数大于100000，可根据实际情况加以调整。</p>
+</li>
+<li><p>hive.error.on.empty.partition<br>默认值：false<br>当有空分区生成时，是否抛出异常。<br>一般不需要设置。</p>
+</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hive/">Hive</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hive/">Hive</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/16/Spark遇到中文乱码问题如何解决/" title="Spark遇到中文乱码问题如何解决" itemprop="url">Spark遇到中文乱码问题如何解决</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-16T10:18:38.000Z" itemprop="datePublished"> Published 2018-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Spark-遇到中文乱码问题如何解决？"><a href="#Spark-遇到中文乱码问题如何解决？" class="headerlink" title="Spark 遇到中文乱码问题如何解决？"></a>Spark 遇到中文乱码问题如何解决？</h1><ul>
+<li><p>问题原因：<br>一般是spark平台机器环境编码设置问题</p>
+</li>
+<li><p>解决方法：</p>
+</li>
+</ul>
+<ol>
+<li><p>在spark-default中为executor加上-Dfile.encoding=UTF-8<br>spark/conf/spark-defaults.conf</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark.executor.extraJavaOptions -XX:+UseParallelGC -XX:+UseParallelOldGC -XX:ParallelGCThreads=4 -XX:NewRatio=3 -XX:SurvivorRatio=3 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -Dfile.encoding=UTF-8</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在所有涉及到字节转换时，一定要指定编码方式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String -&gt; Byte: </span><br><span class="line">string.getBytes(<span class="string">"UTF-8"</span>)</span><br><span class="line"></span><br><span class="line">Byte -&gt; String:</span><br><span class="line"><span class="keyword">new</span> String(bytes, <span class="string">"UTF-8"</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/01/16/Spark动态资源分配/" title="Spark动态资源分配" itemprop="url">Spark动态资源分配</a>
   </h1>
   <p class="article-author">By
@@ -544,13 +708,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Spark/">Spark</a>
+  <span></span> <a href="/tags/Spring/">Spring</a>
   </div>
 
 </div>
@@ -741,127 +905,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/12/05/如何有效地记录JavaSQL日志/" title="如何有效地记录JavaSQL日志" itemprop="url">如何有效地记录JavaSQL日志</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-12-05T02:55:49.000Z" itemprop="datePublished"> Published 2017-12-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>参考： <a href="http://blog.oneapm.com/apm-tech/178.html" target="_blank" rel="external">http://blog.oneapm.com/apm-tech/178.html</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/SQL/">SQL</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/12/05/JUnit测试中文乱码问题解决/" title="JUnit测试中文乱码问题解决" itemprop="url">JUnit测试中文乱码问题解决</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-12-05T02:37:05.000Z" itemprop="datePublished"> Published 2017-12-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>pom.xml中添加plugin： 指定测试时的编码类型<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">forkMode</span>&gt;</span>once<span class="tag">&lt;/<span class="name">forkMode</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>-Dfile.encoding=UTF-8<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">        	<span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*Test.java<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>参考： <a href="http://yong3773.iteye.com/blog/1971454" target="_blank" rel="external">http://yong3773.iteye.com/blog/1971454</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Junit/">Junit</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -898,11 +941,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -934,7 +977,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -975,7 +1018,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -983,11 +1026,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -995,19 +1042,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -1015,11 +1050,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -1028,26 +1091,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

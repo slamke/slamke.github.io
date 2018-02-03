@@ -81,6 +81,144 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/02/23/Spark有用的配置选项/" title="Spark有用的配置选项" itemprop="url">Spark有用的配置选项</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-02-23T08:58:04.000Z" itemprop="datePublished"> Published 2017-02-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="任务提交"><a href="#任务提交" class="headerlink" title="任务提交"></a>任务提交</h2><ul>
+<li><figure class="highlight plain"><figcaption><span>spark任务对应的Jar，配置该选项后，每次提交任务不用上传该assembly.jar,减少了任务启动时间</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">``` shell</span><br><span class="line">spark.yarn.jar hdfs://****:****/path/spark/spark-assembly-***.jar</span><br></pre></td></tr></table></figure>
+</li>
+<li><figure class="highlight plain"><figcaption><span>yarn提交任务时的黑名单</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">## Shuffle</span><br><span class="line"></span><br><span class="line">- ```spark.shuffle.file.buffer``` </span><br><span class="line"></span><br><span class="line">Size of the in-memory buffer for each shuffle file output stream. These buffers reduce the number of disk seeks and system calls made in creating intermediate shuffle files.</span><br><span class="line"></span><br><span class="line">## Memory</span><br><span class="line"></span><br><span class="line">- ```spark.yarn.executor.memoryOverhead``` </span><br><span class="line">The amount of off-heap memory (in megabytes) to be allocated per executor. This is memory that accounts for things like VM overheads, interned strings, other native overheads, etc. This tends to grow with the executor size (typically 6-10%).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Spark SQL</span><br><span class="line"></span><br><span class="line">- ``` spark.sql.shuffle.partitions</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Spark SQL 2.0版本之前，reduce的个数是通过spark.default.parallelism和spark.sql.shuffle.partitions两个参数进行配置。如果配置过大，将会导致下游产生很多碎片化的Task，或者下游HDFS产生很多小文件。如果设置过小，将会导致单个ReduceTask计算负载过大。</p>
+<ul>
+<li><figure class="highlight plain"><figcaption><span>```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Spark SQL 2.0+支持通过spark.sql.adaptive.enabled来设置reduce大小自适应</span><br><span class="line">- ```spark.sql.files.ignoreCorruptFiles</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/01/12/Spark2-0-DataSource-API/" title="Spark2.0 DataSource API" itemprop="url">Spark2.0 DataSource API</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-12T07:51:50.000Z" itemprop="datePublished"> Published 2017-01-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Spark-1-如何实现Spark-External-Datasource"><a href="#Spark-1-如何实现Spark-External-Datasource" class="headerlink" title="Spark 1 如何实现Spark External Datasource"></a>Spark 1 如何实现Spark External Datasource</h2><p><a href="https://www.mapr.com/blog/spark-data-source-api-extending-our-spark-sql-query-engine" target="_blank" rel="external">Spark Data Source API: Extending Our Spark SQL Query Engine</a></p>
+<p><a href="http://blog.csdn.net/oopsoom/article/details/42061077" target="_blank" rel="external">Spark SQL之External DataSource外部数据源（一）示例</a></p>
+<p><a href="http://blog.csdn.net/oopsoom/article/details/42064075" target="_blank" rel="external">Spark SQL之External DataSource外部数据源（二）源码分析</a></p>
+<p>参考实现：</p>
+<ul>
+<li><a href="https://github.com/SequoiaDB/spark-sequoiadb" target="_blank" rel="external">spark-sequoiadb</a></li>
+<li><a href="https://github.com/databricks/spark-csv" target="_blank" rel="external">spark-csv</a></li>
+<li><a href="https://github.com/RedisLabs/spark-redis" target="_blank" rel="external">spark-redis</a></li>
+<li><a href="http://geek.csdn.net/news/detail/76853" target="_blank" rel="external">Spark多数据源计算实践及其在GrowingIO的实践</a></li>
+</ul>
+<p><a href="http://wiki.baidu.com/pages/viewpage.action?pageId=213816907" target="_blank" rel="external">no</a></p>
+<h2 id="Spark-2-如何实现Spark-External-Datasource"><a href="#Spark-2-如何实现Spark-External-Datasource" class="headerlink" title="Spark 2 如何实现Spark External Datasource"></a>Spark 2 如何实现Spark External Datasource</h2><p><a href="https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource-api.html" target="_blank" rel="external">https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource-api.html</a></p>
+<p><a href="https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource.html" target="_blank" rel="external">https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource.html</a></p>
+<p><a href="http://www.spark.tc/exploring-the-apache-spark-datasource-api/" target="_blank" rel="external">http://www.spark.tc/exploring-the-apache-spark-datasource-api/</a></p>
+<p>新特性：</p>
+<ul>
+<li>子查询的自持</li>
+<li>更加丰富的读写api支持，包括<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">- RelationProvider</span><br><span class="line"></span><br><span class="line">https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource-api.html</span><br><span class="line"></span><br><span class="line">https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-datasource.html</span><br><span class="line"></span><br><span class="line">http://www.spark.tc/exploring-the-apache-spark-datasource-api/</span><br><span class="line"></span><br><span class="line">[关键](http://wiki.baidu.com/pages/viewpage.action?pageId=213816907)</span><br><span class="line"></span><br><span class="line">- DataSourceRegister</span><br><span class="line"></span><br><span class="line">triat ```DataSourceRegister``` is an interface to register DataSources under their shortName aliases (to look them up later).</span><br><span class="line">``` scala</span><br><span class="line">package org.apache.spark.sql.sources</span><br><span class="line"></span><br><span class="line">trait DataSourceRegister &#123;</span><br><span class="line">  def shortName(): String</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>It allows users to use the data source alias as the format type over the fully qualified class name.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark2-0/">Spark2.0</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/01/12/Hive-MapReduce-Spark分布式生成唯一数值型ID/" title="Hive MapReduce Spark分布式生成唯一数值型ID" itemprop="url">Hive MapReduce Spark分布式生成唯一数值型ID</a>
   </h1>
   <p class="article-author">By
@@ -258,7 +396,7 @@
 </header>
     <div class="article-content">
         
-        <h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><figcaption><span>代表hadoop的一个文件系统，目前系统已经有很多个具体实现:</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+        <h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
 <p>spark-client关于filesystem实现的配置<figure class="highlight plain"><figcaption><span>```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">``` xml</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">    &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.DFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">   &lt;name&gt;fs.webhdfs.impl&lt;/name&gt;</span><br><span class="line">   &lt;value&gt;org.apache.hadoop.smw.hdfs.web.WebHdfsFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
 <h2 id="HFTP介绍"><a href="#HFTP介绍" class="headerlink" title="HFTP介绍"></a>HFTP介绍</h2><p>HFTP 是hadoop文件系统用来让你从一个远程的hadoop HDFS集群中读取数据的组件。这个读取是通过HTTP，并且数据源是DataNodes。HFTP是一个只读的文件系统，当你试图用来写入数据或者修改文件系统状态时，会抛出异常。</p>
 <p>HFTP 主要的帮助在有多个HDFS集群，并存在多个版本时，将数据从一个集群迁移到另一个。HFTP 在不同版本的HDFS中是兼容写的。你可以操作例如：</p>
@@ -286,7 +424,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/HDFS/">HDFS</a><a href="/tags/HFTP/">HFTP</a>
+  <span></span> <a href="/tags/HDFS/">HDFS</a><a href="/tags/HFTP/">HFTP</a><a href="/tags/Hadoop/">Hadoop</a>
   </div>
 
 </div>
@@ -546,7 +684,99 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/11/29/JVM源码分析系列/" title="scala的类型和反射机制" itemprop="url">scala的类型和反射机制</a>
+      <a href="/2016/11/29/Scala的类型和反射机制/" title="Scala的类型和反射机制" itemprop="url">Scala的类型和反射机制</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> Published 2016-11-29</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Scala的反射机制"><a href="#Scala的反射机制" class="headerlink" title="Scala的反射机制"></a>Scala的反射机制</h1><ol>
+<li><p>Manifest &amp; ClassManifest<br>Manifest是在编译时捕捉的，编码了“捕捉时”所致的类型信息。然后就可以在运行时检查和使用类型信息，但是manifest只能捕捉当Manifest被查找时在隐式作用域里的类型。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first</span></span>[<span class="type">A</span> : <span class="type">ClassManifest</span>](x:<span class="type">Array</span>[<span class="type">A</span>]) = <span class="type">Array</span>(x(<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ClassTag &amp; TypeTag</p>
+</li>
+</ol>
+<ul>
+<li><p>ClassTag[T]保存了被泛型擦除后的原始类型T,提供给运行时的</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">mkArray</span></span>[<span class="type">T</span> : <span class="type">ClassTag</span>](elems: <span class="type">T</span>*) = <span class="type">Array</span>[<span class="type">T</span>](elems: _*)</span><br><span class="line">mkArray: [<span class="type">T</span>](elems: <span class="type">T</span>*)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: scala.reflect.<span class="type">ClassTag</span>[<span class="type">T</span>])<span class="type">Array</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>TypeTag则保存所有具体的类型</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramInfo</span></span>[<span class="type">T</span>](x: <span class="type">T</span>)(<span class="keyword">implicit</span> tag: <span class="type">TypeTag</span>[<span class="type">T</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> targs = tag.tpe <span class="keyword">match</span> &#123; <span class="keyword">case</span> <span class="type">TypeRef</span>(_, _, args) =&gt; args &#125;</span><br><span class="line">  println(<span class="string">s"type of <span class="subst">$x</span> has type arguments <span class="subst">$targs</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line">scala&gt; paramInfo(<span class="number">42</span>)</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> 42 <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"></span>)</span></span><br><span class="line">scala&gt; paramInfo(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> <span class="title">List</span>(<span class="params">1, 2</span>) <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"><span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>可以看到，获取到的类型是具体的类型，而不是被擦除后的类型List(Any)</p>
+<p>scala在2.10里却用TypeTag替代了Manifest，用ClassTag替代了ClassManifest，原因是在路径依赖类型中，Manifest存在问题：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span>&#123;<span class="class"><span class="keyword">class</span> <span class="title">Bar</span>&#125;</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">m</span></span>(f: <span class="type">Foo</span>)(b: f.<span class="type">Bar</span>)(<span class="keyword">implicit</span> ev: <span class="type">Manifest</span>[f.<span class="type">Bar</span>]) = ev</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> f1 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b1 = <span class="keyword">new</span> f1.<span class="type">Bar</span></span><br><span class="line">scala&gt; <span class="keyword">val</span> f2 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b2 = <span class="keyword">new</span> f2.<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev1 = m(f1)(b1)</span><br><span class="line">ev1: <span class="type">Manifest</span>[f1.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">681e731</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev2 = m(f2)(b2)</span><br><span class="line">ev2: <span class="type">Manifest</span>[f2.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">3e50039</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; ev1 == ev2 <span class="comment">// they should be different, thus the result is wrong</span></span><br><span class="line">res28: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<p>ev1 不应该等于 ev2 的，因为其依赖路径（外部实例）是不一样的。<br>还有其他因素，所以在2.10版本里，使用 TypeTag 替代了 Manifest<br>TypeTag:由编辑器生成,只能通过隐式参数或者上下文绑定获取<br>可以有两种方式获取:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用typeTag</span></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">getTypeTag</span></span>[<span class="type">T</span>:<span class="type">TypeTag</span>](a:<span class="type">T</span>) = typeTag[<span class="type">T</span>]</span><br><span class="line">getTypeTag: [<span class="type">T</span>](a: <span class="type">T</span>)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>])reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用implicitly 等价的 </span></span><br><span class="line"><span class="comment">//scala&gt;def getTypeTag[T:TypeTag](a:T) = implicitly[TypeTag[T]]</span></span><br><span class="line"></span><br><span class="line">scala&gt; getTypeTag(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line">res0: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]] = <span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]]</span><br></pre></td></tr></table></figure></p>
+<p>通过TypeTag的tpe方法获得需要的Type(如果不是从对象换取Type 而是从class中获得 可以直接用 typeOf[类名])</p>
+<ol>
+<li><p>反射获取TypeTag和ClassTag<br><a href="http://www.programcreek.com/java-api-examples/index.php?api=scala.reflect.ClassTag" target="_blank" rel="external">JavaCodeExample</a><br>String———-&gt;Calss————–&gt;Manifest——–&gt;TypeTag<br>Class.forName    ManifestFactory.classType scala.reflect.runtime.universe.manifestToTypeTag</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe</span><br><span class="line"><span class="keyword">import</span> scala.reflect.<span class="type">ManifestFactory</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> className = <span class="string">"java.lang.String"</span></span><br><span class="line"><span class="keyword">val</span> mirror = universe.runtimeMirror(getClass.getClassLoader)</span><br><span class="line"><span class="keyword">val</span> cls = <span class="type">Class</span>.forName(className)</span><br><span class="line"><span class="keyword">val</span> t = universe.manifestToTypeTag(mirror, <span class="type">ManifestFactory</span>.classType(cls))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>classOf与getClass方法的差异</p>
+</li>
+</ol>
+<p>getClass 方法得到的是 Class[A]的某个子类，而 classOf[A] 得到是正确的 Class[A]，但是去比较的话，这两个类型是equals为true的</p>
+<p>classOf获取运行时的类型。classOf[T] 相当于 java中的T.class; 而getClass:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listClass = classOf[<span class="type">List</span>[_]]</span><br><span class="line">   * <span class="comment">// listClass is java.lang.Class[List[_]] = class scala.collection.immutable.List</span></span><br><span class="line"><span class="keyword">val</span> mapIntString = classOf[<span class="type">Map</span>[<span class="type">Int</span>,<span class="type">String</span>]]</span><br><span class="line">   * <span class="comment">// mapIntString is java.lang.Class[Map[Int,String]] = interface scala.collection.immutable.Map</span></span><br><span class="line">   * &#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span>  <span class="title">A</span></span></span><br><span class="line">scala&gt; <span class="keyword">val</span> a = <span class="keyword">new</span> <span class="type">A</span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass</span><br><span class="line">res2: <span class="type">Class</span>[_ &lt;: <span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; classOf[<span class="type">A</span>]</span><br><span class="line">res3: <span class="type">Class</span>[<span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass  == classOf[<span class="type">A</span>]</span><br><span class="line">res13: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<p>这种细微的差别，体现在类型赋值时，因为java里的 Class[T]是不支持协变的，所以无法把一个 Class[_ &lt; : A] 赋值给一个 Class[A]<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> c:<span class="type">Class</span>[<span class="type">A</span>] = a.getClass</span><br><span class="line">&lt;console&gt;:<span class="number">9</span>: error: <span class="class"><span class="keyword">type</span> <span class="title">mismatch</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>类(class)与类型(type)是两个不一样的概念</p>
+<p>(在java里因为早期一直使用class表达type，并且现在也延续这样的习惯)；类型(type)比类(class)更”具体”，任何数据都有类型。类是面向对象系统里对同一类数据的抽象，在没有泛型之前，类型系统不存在高阶概念，直接与类一一映射，而泛型出现之后，就不在一一映射了。比如定义class List[T] {}, 可以有List[Int] 和 List[String]等具体类型，它们的类是同一个List，但类型则根据不同的构造参数类型而不同。</p>
+<p>类型一致的对象它们的类也是一致的，反过来，类一致的，其类型不一定一致。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; classOf[<span class="type">List</span>[<span class="type">Int</span>]] == classOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res16: <span class="type">Boolean</span> = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">scala&gt; typeOf[<span class="type">List</span>[<span class="type">Int</span>]] == typeOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res17: <span class="type">Boolean</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Scala/">Scala</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/反射/">反射</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/11/29/JVM源码分析系列/" title="JVM源码分析系列" itemprop="url">JVM源码分析系列</a>
   </h1>
   <p class="article-author">By
        
@@ -668,339 +898,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/29/scala的类型和反射机制/" title="scala的类型和反射机制" itemprop="url">scala的类型和反射机制</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> Published 2016-11-29</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>#Scala的反射机制</p>
-<ol>
-<li><p>Manifest &amp; ClassManifest<br>Manifest是在编译时捕捉的，编码了“捕捉时”所致的类型信息。然后就可以在运行时检查和使用类型信息，但是manifest只能捕捉当Manifest被查找时在隐式作用域里的类型。</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first</span></span>[<span class="type">A</span> : <span class="type">ClassManifest</span>](x:<span class="type">Array</span>[<span class="type">A</span>]) = <span class="type">Array</span>(x(<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>ClassTag &amp; TypeTag</p>
-</li>
-</ol>
-<ul>
-<li><p>ClassTag[T]保存了被泛型擦除后的原始类型T,提供给运行时的</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">mkArray</span></span>[<span class="type">T</span> : <span class="type">ClassTag</span>](elems: <span class="type">T</span>*) = <span class="type">Array</span>[<span class="type">T</span>](elems: _*)</span><br><span class="line">mkArray: [<span class="type">T</span>](elems: <span class="type">T</span>*)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: scala.reflect.<span class="type">ClassTag</span>[<span class="type">T</span>])<span class="type">Array</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>TypeTag则保存所有具体的类型</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramInfo</span></span>[<span class="type">T</span>](x: <span class="type">T</span>)(<span class="keyword">implicit</span> tag: <span class="type">TypeTag</span>[<span class="type">T</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> targs = tag.tpe <span class="keyword">match</span> &#123; <span class="keyword">case</span> <span class="type">TypeRef</span>(_, _, args) =&gt; args &#125;</span><br><span class="line">  println(<span class="string">s"type of <span class="subst">$x</span> has type arguments <span class="subst">$targs</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line">scala&gt; paramInfo(<span class="number">42</span>)</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> 42 <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"></span>)</span></span><br><span class="line">scala&gt; paramInfo(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> <span class="title">List</span>(<span class="params">1, 2</span>) <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"><span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>可以看到，获取到的类型是具体的类型，而不是被擦除后的类型List(Any)</p>
-<p>scala在2.10里却用TypeTag替代了Manifest，用ClassTag替代了ClassManifest，原因是在路径依赖类型中，Manifest存在问题：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span>&#123;<span class="class"><span class="keyword">class</span> <span class="title">Bar</span>&#125;</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">m</span></span>(f: <span class="type">Foo</span>)(b: f.<span class="type">Bar</span>)(<span class="keyword">implicit</span> ev: <span class="type">Manifest</span>[f.<span class="type">Bar</span>]) = ev</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> f1 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b1 = <span class="keyword">new</span> f1.<span class="type">Bar</span></span><br><span class="line">scala&gt; <span class="keyword">val</span> f2 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b2 = <span class="keyword">new</span> f2.<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev1 = m(f1)(b1)</span><br><span class="line">ev1: <span class="type">Manifest</span>[f1.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">681e731</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev2 = m(f2)(b2)</span><br><span class="line">ev2: <span class="type">Manifest</span>[f2.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">3e50039</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; ev1 == ev2 <span class="comment">// they should be different, thus the result is wrong</span></span><br><span class="line">res28: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
-<p>ev1 不应该等于 ev2 的，因为其依赖路径（外部实例）是不一样的。<br>还有其他因素，所以在2.10版本里，使用 TypeTag 替代了 Manifest<br>TypeTag:由编辑器生成,只能通过隐式参数或者上下文绑定获取<br>可以有两种方式获取:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用typeTag</span></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">getTypeTag</span></span>[<span class="type">T</span>:<span class="type">TypeTag</span>](a:<span class="type">T</span>) = typeTag[<span class="type">T</span>]</span><br><span class="line">getTypeTag: [<span class="type">T</span>](a: <span class="type">T</span>)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>])reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用implicitly 等价的 </span></span><br><span class="line"><span class="comment">//scala&gt;def getTypeTag[T:TypeTag](a:T) = implicitly[TypeTag[T]]</span></span><br><span class="line"></span><br><span class="line">scala&gt; getTypeTag(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line">res0: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]] = <span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]]</span><br></pre></td></tr></table></figure></p>
-<p>通过TypeTag的tpe方法获得需要的Type(如果不是从对象换取Type 而是从class中获得 可以直接用 typeOf[类名])</p>
-<ol>
-<li><p>反射获取TypeTag和ClassTag<br><a href="http://www.programcreek.com/java-api-examples/index.php?api=scala.reflect.ClassTag" target="_blank" rel="external">JavaCodeExample</a><br>String———-&gt;Calss————–&gt;Manifest——–&gt;TypeTag<br>Class.forName    ManifestFactory.classType scala.reflect.runtime.universe.manifestToTypeTag</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe</span><br><span class="line"><span class="keyword">import</span> scala.reflect.<span class="type">ManifestFactory</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> className = <span class="string">"java.lang.String"</span></span><br><span class="line"><span class="keyword">val</span> mirror = universe.runtimeMirror(getClass.getClassLoader)</span><br><span class="line"><span class="keyword">val</span> cls = <span class="type">Class</span>.forName(className)</span><br><span class="line"><span class="keyword">val</span> t = universe.manifestToTypeTag(mirror, <span class="type">ManifestFactory</span>.classType(cls))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>classOf与getClass方法的差异</p>
-</li>
-</ol>
-<p>getClass 方法得到的是 Class[A]的某个子类，而 classOf[A] 得到是正确的 Class[A]，但是去比较的话，这两个类型是equals为true的</p>
-<p>classOf获取运行时的类型。classOf[T] 相当于 java中的T.class; 而getClass:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listClass = classOf[<span class="type">List</span>[_]]</span><br><span class="line">   * <span class="comment">// listClass is java.lang.Class[List[_]] = class scala.collection.immutable.List</span></span><br><span class="line"><span class="keyword">val</span> mapIntString = classOf[<span class="type">Map</span>[<span class="type">Int</span>,<span class="type">String</span>]]</span><br><span class="line">   * <span class="comment">// mapIntString is java.lang.Class[Map[Int,String]] = interface scala.collection.immutable.Map</span></span><br><span class="line">   * &#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span>  <span class="title">A</span></span></span><br><span class="line">scala&gt; <span class="keyword">val</span> a = <span class="keyword">new</span> <span class="type">A</span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass</span><br><span class="line">res2: <span class="type">Class</span>[_ &lt;: <span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; classOf[<span class="type">A</span>]</span><br><span class="line">res3: <span class="type">Class</span>[<span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass  == classOf[<span class="type">A</span>]</span><br><span class="line">res13: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
-<p>这种细微的差别，体现在类型赋值时，因为java里的 Class[T]是不支持协变的，所以无法把一个 Class[_ &lt; : A] 赋值给一个 Class[A]<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> c:<span class="type">Class</span>[<span class="type">A</span>] = a.getClass</span><br><span class="line">&lt;console&gt;:<span class="number">9</span>: error: <span class="class"><span class="keyword">type</span> <span class="title">mismatch</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p>类(class)与类型(type)是两个不一样的概念</p>
-<p>(在java里因为早期一直使用class表达type，并且现在也延续这样的习惯)；类型(type)比类(class)更”具体”，任何数据都有类型。类是面向对象系统里对同一类数据的抽象，在没有泛型之前，类型系统不存在高阶概念，直接与类一一映射，而泛型出现之后，就不在一一映射了。比如定义class List[T] {}, 可以有List[Int] 和 List[String]等具体类型，它们的类是同一个List，但类型则根据不同的构造参数类型而不同。</p>
-<p>类型一致的对象它们的类也是一致的，反过来，类一致的，其类型不一定一致。</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; classOf[<span class="type">List</span>[<span class="type">Int</span>]] == classOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res16: <span class="type">Boolean</span> = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">scala&gt; typeOf[<span class="type">List</span>[<span class="type">Int</span>]] == typeOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res17: <span class="type">Boolean</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Scala/">Scala</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/反射/">反射</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/27/SparkStreaming数据产生与导入相关的内存分析/" title="SparkStreaming数据产生与导入相关的内存分析" itemprop="url">SparkStreaming数据产生与导入相关的内存分析</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-27T14:30:08.000Z" itemprop="datePublished"> Published 2016-11-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>转自<a href="http://www.jianshu.com/p/9e44d3fd62af" target="_blank" rel="external">Spark Streaming 数据产生与导入相关的内存分析</a></p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我这篇文章会分几个点来描述Spark Streaming 的Receiver在内存方面的表现。</p>
-<ul>
-<li>一个大致的数据接受流程</li>
-<li>一些存储结构的介绍</li>
-<li>哪些点可能导致内存问题，以及相关的配置参数<br>另外，有位大牛写了<a href="https://github.com/proflin/CoolplaySpark/tree/master/Spark%20Streaming%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E7%B3%BB%E5%88%97" target="_blank" rel="external">Spark Streaming 源码解析系列</a>，我觉得写的不错，这里也推荐下。</li>
-</ul>
-<p>我在部门尽力推荐使用Spark Streaming做数据处理，目前已经应用在日志处理，机器学习等领域。这期间也遇到不少问题，尤其是Kafka在接受到的数据量非常大的情况下，会有一些内存相关的问题。</p>
-<p>另外特别说明下，我们仅仅讨论的是High Level的Kafka Stream，也就是输入流通过如下方式创建：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">KafkaUtils</span>.createStream</span><br></pre></td></tr></table></figure></p>
-<p>并且不开启WAL的情况下。</p>
-<h1 id="数据接受流程"><a href="#数据接受流程" class="headerlink" title="数据接受流程"></a>数据接受流程</h1><p>启动Spark Streaming(后续缩写为SS)后，SS 会选择一台Executor 启动ReceiverSupervisor,并且标记为Active状态。接着按如下步骤处理：</p>
-<ol>
-<li><p>ReceiverSupervisor会启动对应的Receiver(这里是KafkaReceiver)</p>
-</li>
-<li><p>KafkaReceiver 会根据配置启动新的线程接受数据，在该线程中调用 ReceiverSupervisor.store 方法填充数据，注意，这里是一条一条填充的。</p>
-</li>
-<li><p>ReceiverSupervisor 会调用 BlockGenerator.addData 进行数据填充。</p>
-</li>
-</ol>
-<p>到目前为止，整个过程不会有太多内存消耗，正常的一个线性调用。所有复杂的数据结构都隐含在 BlockGenerator 中。</p>
-<h1 id="BlockGenerator-存储结构"><a href="#BlockGenerator-存储结构" class="headerlink" title="BlockGenerator 存储结构"></a>BlockGenerator 存储结构</h1><p>BlockGenerator 会复杂些，这里有几个点，</p>
-<ol>
-<li><p>维护了一个缓存 currentBuffer ，就是一个无限长度的ArrayBuffer。currentBuffer 并不会被复用，而是每次都会新建，然后把老的对象直接封装成Block，BlockGenerator会负责保证currentBuffer 只有一个。currentBuffer 填充的速度是可以被限制的，以秒为单位，配置参数为 spark.streaming.receiver.maxRate。这个是Spark内存控制的第一道防线，填充currentBuffer 是阻塞的，消费Kafka的线程直接做填充。</p>
-</li>
-<li><p>维护了一个 blocksForPushing 队列， size 默认为10个(1.5.1版本)，可通过 spark.streaming.blockQueueSize 进行配置。该队列主要用来实现生产-消费模式。每个元素其实是一个currentBuffer形成的block。</p>
-</li>
-<li><p>blockIntervalTimer 是一个定时器。其实是一个生产者，负责将currentBuffer 的数据放到 blocksForPushing 中。通过参数 spark.streaming.blockInterval 设置，默认为200ms。放的方式很简单，直接把currentBuffer做为Block的数据源。这就是为什么currentBuffer不会被复用。</p>
-</li>
-<li><p>blockPushingThread 也是一个定时器，负责将Block从blocksForPushing取出来,然后交给BlockManagerBasedBlockHandler.storeBlock 方法。10毫秒会取一次，不可配置。到这一步，才真的将数据放到了Spark的BlockManager中。</p>
-</li>
-</ol>
-<p>步骤描述完了，我们看看有哪些值得注意的地方。</p>
-<h1 id="currentBuffer"><a href="#currentBuffer" class="headerlink" title="currentBuffer"></a>currentBuffer</h1><p>首先自然要说下currentBuffer,如果200ms期间你从Kafka接受的数据足够大，则足以把内存承包了。而且currentBuffer使用的并不是spark的storage内存，而是有限的用于运算存储的内存。 默认应该是 heap*0.4。除了把内存搞爆掉了，还有一个是GC。导致receiver所在的Executor 极容易挂掉，处理速度也巨慢。 如果你在SparkUI发现Receiver挂掉了，考虑有没有可能是这个问题。</p>
-<h1 id="blocksForPushing"><a href="#blocksForPushing" class="headerlink" title="blocksForPushing"></a>blocksForPushing</h1><p>blocksForPushing 这个是作为currentBuffer 和BlockManager之间的中转站。默认存储的数据最大可以达到 10*currentBuffer 大小。一般不打可能，除非你的 spark.streaming.blockInterval 设置的比10ms 还小，官方推荐最小也要设置成 50ms，你就不要搞对抗了。所以这块不用太担心。</p>
-<h1 id="blockPushingThread"><a href="#blockPushingThread" class="headerlink" title="blockPushingThread"></a>blockPushingThread</h1><p>blockPushingThread 负责从 blocksForPushing 获取数据，并且写入 BlockManager 。这里很蛋疼的事情是，blockPushingThread只写他自己所在的Executor的 blockManager,也就是每个batch周期的数据都会被 一个Executor给扛住了。 这是导致内存被撑爆的最大风险。 也就是说，每个batch周期接受到的数据最好不要超过接受Executor的内存(Storage)的一半。否则有你受的。我发现在数据量很大的情况下，最容易挂掉的就是Receiver所在的Executor了。 建议Spark-Streaming团队最好是能将数据写入到多个BlockManager上。</p>
-<h1 id="StorageLevel的配置问题"><a href="#StorageLevel的配置问题" class="headerlink" title="StorageLevel的配置问题"></a>StorageLevel的配置问题</h1><p>另外还有几个值得注意的问题：</p>
-<p>如果你配置成Memory_Disk ,如果Receiver所在的Executor一旦挂掉，你也歇菜了，整个Spark Streaming作业会失败。失败的原因是一部分block找不到了。</p>
-<p>如果你配置成Memory_Disk_2，数据会被replication到不同的节点。一般而言不会出现作业失败或者丢数据。但解决不了Receiver也容易挂的问题，当然还是主要还是内存引起的。</p>
-<p>最好是采用默认设置 MEMORY_AND_DISK_SER_2 比较靠谱些。</p>
-<p>这里面还有一个风险点就是，如果某个batch processing延迟了，那么对应的BlockManager的数据不会被释放，然后下一个batch的数据还在进，也会加重内存问题。</p>
-<h1 id="动态控制消费速率以及相关论文"><a href="#动态控制消费速率以及相关论文" class="headerlink" title="动态控制消费速率以及相关论文"></a>动态控制消费速率以及相关论文</h1><p>另外，spark的消费速度可以设置上限以外，亦可以根据processing time 来动态调整。通过 spark.streaming.backpressure.enabled 设置为true 可以打开。算法的论文可参考： Socc 2014: Adaptive Stream Processing using Dynamic Batch Sizing ,还是有用的，我现在也都开启着。</p>
-<p>Spark里除了这个 Dynamic,还有一个就是Dynamic Allocation,也就是Executor数量会根据资源使用情况，自动伸缩。我其实蛮喜欢Spark这个特色的。具体的可以查找下相关设计文档。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Spark-Streaming/">Spark Streaming</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/10/26/Spark-SQL学习笔记/" title="Spark SQL 学习笔记" itemprop="url">Spark SQL 学习笔记</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-10-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Spark-SQL-学习笔记"><a href="#Spark-SQL-学习笔记" class="headerlink" title="Spark SQL 学习笔记"></a>Spark SQL 学习笔记</h2><p><a href="http://lxw1234.com/archives/2015/06/296.htm" target="_blank" rel="external">Spark SQL中实现Hive MapJoin</a><br>重点参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 定义</span><br><span class="line">- DataFrames</span><br><span class="line">A DataFrame is a distributed collection of data organized into named columns. It is conceptually equivalent to a table in a relational database or a data frame in R/Python, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as: structured data files, tables in Hive, external databases, or existing RDDs.</span><br><span class="line"></span><br><span class="line">- Datasets</span><br><span class="line">A Dataset is a new experimental interface added in Spark 1.6 that tries to provide the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 概述</span><br><span class="line">入口:  SQLContext </span><br><span class="line">``` scala</span><br><span class="line">val sc: SparkContext // An existing SparkContext.</span><br><span class="line">val sqlContext = new org.apache.spark.sql.SQLContext(sc)</span><br><span class="line"></span><br><span class="line">// this is used to implicitly convert an RDD to a DataFrame.</span><br><span class="line">import sqlContext.implicits._</span><br></pre></td></tr></table></figure></p>
-<p>Hive支持:   HiveContext<br>功能: more complete HiveQL parser, access to Hive UDFs, and the ability to read data from Hive tables</p>
-<h3 id="Creating-DataFrames"><a href="#Creating-DataFrames" class="headerlink" title="Creating DataFrames"></a>Creating DataFrames</h3><p>With a SQLContext, applications can create DataFrames from an existing RDD, from a Hive table, or from data sources.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sc: <span class="type">SparkContext</span> <span class="comment">// An existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.json(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Displays the content of the DataFrame to stdout</span></span><br><span class="line">df.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Print the schema in a tree format</span></span><br><span class="line">df.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select only the "name" column</span></span><br><span class="line">df.select(<span class="string">"name"</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select everybody, but increment the age by 1</span></span><br><span class="line">df.select(df(<span class="string">"name"</span>), df(<span class="string">"age"</span>) + <span class="number">1</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Select people older than 21</span></span><br><span class="line">df.filter(df(<span class="string">"age"</span>) &gt; <span class="number">21</span>).show()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Count people by age</span></span><br><span class="line">df.groupBy(<span class="string">"age"</span>).count().show()</span><br></pre></td></tr></table></figure></p>
-<h3 id="运行sql"><a href="#运行sql" class="headerlink" title="运行sql"></a>运行sql</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM table"</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="Creating-Datasets"><a href="#Creating-Datasets" class="headerlink" title="Creating Datasets"></a>Creating Datasets</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Encoders for most common types are automatically provided by importing sqlContext.implicits._</span></span><br><span class="line"><span class="keyword">val</span> ds = <span class="type">Seq</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).toDS()</span><br><span class="line">ds.map(_ + <span class="number">1</span>).collect() <span class="comment">// Returns: Array(2, 3, 4)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/ <span class="type">DataFrames</span> can be converted to a <span class="type">Dataset</span> by providing a <span class="class"><span class="keyword">class</span>. <span class="title">Mapping</span> <span class="title">will</span> <span class="title">be</span> <span class="title">done</span> <span class="title">by</span> <span class="title">name</span>.</span></span><br><span class="line"><span class="keyword">val</span> path = <span class="string">"examples/src/main/resources/people.json"</span></span><br><span class="line"><span class="keyword">val</span> people = sqlContext.read.json(path).as[<span class="type">Person</span>]</span><br></pre></td></tr></table></figure>
-<h2 id="Interoperating-with-RDDs"><a href="#Interoperating-with-RDDs" class="headerlink" title="Interoperating with RDDs"></a>Interoperating with RDDs</h2><h3 id="Inferring-the-Schema-Using-Reflection"><a href="#Inferring-the-Schema-Using-Reflection" class="headerlink" title="Inferring the Schema Using Reflection"></a>Inferring the Schema Using Reflection</h3><p>The Scala interface for Spark SQL supports automatically converting an RDD containing <strong>case classes</strong> to a DataFrame. </p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="comment">// this is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the schema using a case class.</span></span><br><span class="line"><span class="comment">// Note: Case classes in Scala 2.10 can support only up to 22 fields. To work around this limit,</span></span><br><span class="line"><span class="comment">// you can use custom classes that implement the Product interface.</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Int</span></span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD of Person objects and register it as a table.</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>).map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Person</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim.toInt)).toDF()</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> teenagers = sqlContext.sql(<span class="string">"SELECT name, age FROM people WHERE age &gt;= 13 AND age &lt;= 19"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// 可以使用索引访问每一行中的列</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or by field name:</span></span><br><span class="line">teenagers.map(t =&gt; <span class="string">"Name: "</span> + t.getAs[<span class="type">String</span>](<span class="string">"name"</span>)).collect().foreach(println)</span><br><span class="line"></span><br><span class="line"><span class="comment">// row.getValuesMap[T] retrieves multiple columns at once into a Map[String, T]</span></span><br><span class="line">teenagers.map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"name"</span>, <span class="string">"age"</span>))).collect().foreach(println)</span><br><span class="line"><span class="comment">// Map("name" -&gt; "Justin", "age" -&gt; 19)</span></span><br></pre></td></tr></table></figure>
-<h3 id="Programmatically-Specifying-the-Schema"><a href="#Programmatically-Specifying-the-Schema" class="headerlink" title="Programmatically Specifying the Schema"></a>Programmatically Specifying the Schema</h3><ol>
-<li>Create an RDD of Rows from the original RDD;</li>
-<li>Create the schema represented by a StructType matching the structure of Rows in the RDD created in Step 1.</li>
-<li>Apply the schema to the RDD of Rows via createDataFrame method provided by SQLContext.<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create an RDD</span></span><br><span class="line"><span class="keyword">val</span> people = sc.textFile(<span class="string">"examples/src/main/resources/people.txt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The schema is encoded in a string</span></span><br><span class="line"><span class="keyword">val</span> schemaString = <span class="string">"name age"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Row.</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">Row</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Import Spark SQL data types</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.types.&#123;<span class="type">StructType</span>,<span class="type">StructField</span>,<span class="type">StringType</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate the schema based on the string of schema</span></span><br><span class="line"><span class="keyword">val</span> schema =</span><br><span class="line">  <span class="type">StructType</span>(</span><br><span class="line">    schemaString.split(<span class="string">" "</span>).map(fieldName =&gt; <span class="type">StructField</span>(fieldName, <span class="type">StringType</span>, <span class="literal">true</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Convert records of the RDD (people) to Rows.</span></span><br><span class="line"><span class="keyword">val</span> rowRDD = people.map(_.split(<span class="string">","</span>)).map(p =&gt; <span class="type">Row</span>(p(<span class="number">0</span>), p(<span class="number">1</span>).trim))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply the schema to the RDD.</span></span><br><span class="line"><span class="keyword">val</span> peopleDataFrame = sqlContext.createDataFrame(rowRDD, schema)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Register the DataFrames as a table.</span></span><br><span class="line">peopleDataFrame.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SQL statements can be run by using the sql methods provided by sqlContext.</span></span><br><span class="line"><span class="keyword">val</span> results = sqlContext.sql(<span class="string">"SELECT name FROM people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations.</span></span><br><span class="line"><span class="comment">// The columns of a row in the result can be accessed by field index or by field name.</span></span><br><span class="line">results.map(t =&gt; <span class="string">"Name: "</span> + t(<span class="number">0</span>)).collect().foreach(println)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Data-Sources"><a href="#Data-Sources" class="headerlink" title="Data Sources"></a>Data Sources</h2><h3 id="Generic-Load-Save-Functions"><a href="#Generic-Load-Save-Functions" class="headerlink" title="Generic Load/Save Functions"></a>Generic Load/Save Functions</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.read.load(<span class="string">"examples/src/main/resources/users.parquet"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"favorite_color"</span>).write.save(<span class="string">"namesAndFavColors.parquet"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 显式指定格式</span></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.format(<span class="string">"json"</span>).load(<span class="string">"examples/src/main/resources/people.json"</span>)</span><br><span class="line">df.select(<span class="string">"name"</span>, <span class="string">"age"</span>).write.format(<span class="string">"parquet"</span>).save(<span class="string">"namesAndAges.parquet"</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="Run-SQL-on-files-directly"><a href="#Run-SQL-on-files-directly" class="headerlink" title="Run SQL on files directly"></a>Run SQL on files directly</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> df = sqlContext.sql(<span class="string">"SELECT * FROM parquet.`examples/src/main/resources/users.parquet`"</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="Saving-to-Persistent-Tables"><a href="#Saving-to-Persistent-Tables" class="headerlink" title="Saving to Persistent Tables"></a>Saving to Persistent Tables</h3><p>When working with a HiveContext, DataFrames can also be saved as persistent tables using the saveAsTable command. Unlike the registerTempTable command, saveAsTable will materialize the contents of the dataframe and create a pointer to the data in the HiveMetastore.<br>将会真的使用hive创建一张内表</p>
-<h2 id="Parquet"><a href="#Parquet" class="headerlink" title="Parquet"></a>Parquet</h2><h3 id="Partition-Discovery-分区"><a href="#Partition-Discovery-分区" class="headerlink" title="Partition Discovery 分区"></a>Partition Discovery 分区</h3><p>Currently, numeric data types and string type are supported.<br>参数设置: spark.sql.sources.partitionColumnTypeInference.enabled    true.<br>文件路径  path/to/table/gender=male </p>
-<h3 id="Schema-Merging"><a href="#Schema-Merging" class="headerlink" title="Schema Merging"></a>Schema Merging</h3><p>支持Parquet属性变更<br>该属性默认被关闭<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sqlContext from the previous example is used in this example.</span></span><br><span class="line"><span class="comment">// This is used to implicitly convert an RDD to a DataFrame.</span></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a simple DataFrame, stored into a partition directory</span></span><br><span class="line"><span class="keyword">val</span> df1 = sc.makeRDD(<span class="number">1</span> to <span class="number">5</span>).map(i =&gt; (i, i * <span class="number">2</span>)).toDF(<span class="string">"single"</span>, <span class="string">"double"</span>)</span><br><span class="line">df1.write.parquet(<span class="string">"data/test_table/key=1"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create another DataFrame in a new partition directory,</span></span><br><span class="line"><span class="comment">// adding a new column and dropping an existing column</span></span><br><span class="line"><span class="keyword">val</span> df2 = sc.makeRDD(<span class="number">6</span> to <span class="number">10</span>).map(i =&gt; (i, i * <span class="number">3</span>)).toDF(<span class="string">"single"</span>, <span class="string">"triple"</span>)</span><br><span class="line">df2.write.parquet(<span class="string">"data/test_table/key=2"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Read the partitioned table</span></span><br><span class="line"><span class="keyword">val</span> df3 = sqlContext.read.option(<span class="string">"mergeSchema"</span>, <span class="string">"true"</span>).parquet(<span class="string">"data/test_table"</span>)</span><br><span class="line">df3.printSchema()</span><br><span class="line"></span><br><span class="line"><span class="comment">// The final schema consists of all 3 columns in the Parquet files together</span></span><br><span class="line"><span class="comment">// with the partitioning column appeared in the partition directory paths.</span></span><br><span class="line"><span class="comment">// root</span></span><br><span class="line"><span class="comment">// |-- single: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- double: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- triple: int (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- key : int (nullable = true)</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="hive支持"><a href="#hive支持" class="headerlink" title="hive支持"></a>hive支持</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sc is an existing SparkContext.</span></span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.hive.<span class="type">HiveContext</span>(sc)</span><br><span class="line"></span><br><span class="line">sqlContext.sql(<span class="string">"CREATE TABLE IF NOT EXISTS src (key INT, value STRING)"</span>)</span><br><span class="line">sqlContext.sql(<span class="string">"LOAD DATA LOCAL INPATH 'examples/src/main/resources/kv1.txt' INTO TABLE src"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Queries are expressed in HiveQL</span></span><br><span class="line">sqlContext.sql(<span class="string">"FROM src SELECT key, value"</span>).collect().foreach(println)</span><br></pre></td></tr></table></figure>
-<h2 id="JDBC-To-Other-Databases"><a href="#JDBC-To-Other-Databases" class="headerlink" title="JDBC To Other Databases"></a>JDBC To Other Databases</h2><p>支持JDBC协议连接其他数据源<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> jdbcDF = sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:postgresql:dbserver"</span>,</span><br><span class="line">  <span class="string">"dbtable"</span> -&gt; <span class="string">"schema.tablename"</span>)).load()</span><br></pre></td></tr></table></figure></p>
-<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>Caching Data In Memory</p>
-<ol>
-<li>sqlContext.cacheTable(“tableName”)  / sqlContext.uncacheTable(“tableName”)</li>
-<li>dataFrame.cache()</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>默认值</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>spark.sql.inMemoryColumnarStorage.compressed</td>
-<td>true</td>
-<td>是否进行</td>
-</tr>
-<tr>
-<td>spark.sql.inMemoryColumnarStorage.batchSize</td>
-<td>10000</td>
-<td>cache时的batch的大小</td>
-</tr>
-<tr>
-<td>spark.sql.autoBroadcastJoinThreshold</td>
-<td>10485760 (10 MB)</td>
-<td>join时进行广播的数据量</td>
-</tr>
-<tr>
-<td>spark.sql.tungsten.enabled</td>
-<td>true</td>
-<td>是否开启tungsten支持</td>
-</tr>
-<tr>
-<td>spark.sql.shuffle.partitions</td>
-<td>200</td>
-<td>join和聚合时shuffle的分区数量</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Distributed-SQL-Engine"><a href="#Distributed-SQL-Engine" class="headerlink" title="Distributed SQL Engine"></a>Distributed SQL Engine</h2><p>启动ThriftServer 使用beeline或者JDBC连接使用</p>
-<ol>
-<li>Running the Thrift JDBC/ODBC server<br>The Thrift JDBC/ODBC server implemented here corresponds to the HiveServer2 in Hive 1.2.1 You can test the JDBC server with the beeline script that comes with either Spark or Hive 1.2.1.<br>To start the JDBC/ODBC server, run the following in the Spark directory:<blockquote>
-<p>./sbin/start-thriftserver.sh</p>
-</blockquote>
-</li>
-</ol>
-<p>or</p>
-<blockquote>
-<p>./sbin/start-thriftserver.sh \<br>  –hiveconf hive.server2.thrift.port=<listening-port> \<br>  –hiveconf hive.server2.thrift.bind.host=<listening-host> \<br>  –master <master-uri></master-uri></listening-host></listening-port></p>
-</blockquote>
-<ol>
-<li>use beeline to test the Thrift JDBC/ODBC server:<blockquote>
-<p>./bin/beeline<br>beeline&gt; !connect jdbc:hive2://localhost:10000</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="其他特性"><a href="#其他特性" class="headerlink" title="其他特性"></a>其他特性</h2><h3 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h3><p>NOTE: CACHE TABLE tbl is now eager by default not lazy. Don’t need to trigger cache materialization manually anymore.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CACHE</span> [<span class="type">LAZY</span>] <span class="type">TABLE</span> [<span class="type">AS</span> <span class="type">SELECT</span>] ...</span><br><span class="line"><span class="type">CACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br><span class="line"><span class="type">UNCACHE</span> <span class="type">TABLE</span> logs_last_month;</span><br></pre></td></tr></table></figure></p>
-<h2 id="动态分区"><a href="#动态分区" class="headerlink" title="动态分区"></a>动态分区</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').saveAsTable(...)</span><br><span class="line">or</span><br><span class="line">df.write.partitionBy(<span class="symbol">'yea</span>r', <span class="symbol">'mont</span>h').insertInto(...)</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/4/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/6/">Next<span></span></a>
@@ -1037,11 +934,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -1073,7 +970,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -1114,7 +1011,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -1122,11 +1019,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -1134,19 +1035,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -1154,11 +1043,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -1167,26 +1084,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

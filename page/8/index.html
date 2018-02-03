@@ -81,6 +81,162 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/05/03/hive的Transform和MR/" title="Hive的Transform和UDF" itemprop="url">Hive的Transform和UDF</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> Published 2016-05-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="UDTF"><a href="#UDTF" class="headerlink" title="UDTF"></a>UDTF</h2><ul>
+<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888819.html" target="_blank" rel="external">Hive中UDTF编写和使用</a></li>
+</ul>
+<h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><ul>
+<li><a href="http://www.cnblogs.com/ggjucheng/archive/2013/02/01/2888051.html" target="_blank" rel="external">Hive udaf开发入门和运行过程详解</a></li>
+<li><a href="http://blog.csdn.net/desilting/article/details/45505121" target="_blank" rel="external">Hive通用型自定义聚合函数（UDAF）</a></li>
+</ul>
+<h2 id="Hive中的TRANSFORM：使用脚本完成Map-Reduce"><a href="#Hive中的TRANSFORM：使用脚本完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：使用脚本完成Map/Reduce"></a>Hive中的TRANSFORM：使用脚本完成Map/Reduce</h2><p>转自: <a href="http://www.coder4.com/archives/4052" target="_blank" rel="external">http://www.coder4.com/archives/4052</a></p>
+<p>首先来看一下数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; select * from test;</span><br><span class="line">OK</span><br><span class="line">1       3</span><br><span class="line">2       2</span><br><span class="line">3       1</span><br></pre></td></tr></table></figure></p>
+<p>假设，我们要输出每一列的md5值。在目前的hive中是没有这个udf的。</p>
+<p>我们看一下Python的代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/home/tops/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    line = line.strip()</span><br><span class="line">    arr = line.split()</span><br><span class="line">    md5_arr = []</span><br><span class="line">    <span class="keyword">for</span> a <span class="keyword">in</span> arr:</span><br><span class="line">        md5_arr.append(hashlib.md5(a).hexdigest())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"\t"</span>.join(md5_arr)</span><br></pre></td></tr></table></figure></p>
+<p>在Hive中，使用脚本，首先要将他们加入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add file /xxxx/test.py</span><br></pre></td></tr></table></figure>
+<p>然后，在调用时，使用TRANSFORM语法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    TRANSFORM (col1, col2) </span><br><span class="line">    USING &apos;./test.py&apos; </span><br><span class="line">    AS (new1, new2) </span><br><span class="line">FORM </span><br><span class="line">    test;</span><br></pre></td></tr></table></figure>
+<p>这里，我们使用了AS，指定输出的若干个列，分别对应到哪个列名。如果省略这句，则Hive会将第1个tab前的结果作为key，后面其余作为value。</p>
+<p>这里有一个小坑：有时候，我们结合INSERT OVERWRITE使用上述TRANSFORM，而目标表，其分割副可能不是\t。但是请牢记：TRANSFORM的分割符号，传入、传出脚本的，永远是\t。不要考虑外面其他的分割符号！</p>
+<p>最后，解释一下MAP、REDUCE。</p>
+<p>在有的Hive语句中，大家可能会看到SELECT MAP (…)  USING ‘xx.py’这样的语法。</p>
+<p>然而，在Hive中，MAP、REDUCE只不过是TRANSFORM的别名，Hive不保证一定会在map/reduce中调用脚本。看看官方文档是怎么说的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Formally, MAP ... and REDUCE ... are syntactic transformations of SELECT TRANSFORM ( ... ). In other words, they serve as comments or notes to the reader of the query. BEWARE: Use of these keywords may be dangerous as (e.g.) typing &quot;REDUCE&quot; does not force a reduce phase to occur and typing &quot;MAP&quot; does not force a new map phase!</span><br></pre></td></tr></table></figure>
+<p>所以、混用map reduce语法关键字，甚至会引起混淆，所以建议大家还是都用TRANSFORM吧。</p>
+<p>友情提示：如果脚本不是Python，而是awk、sed等系统内置命令，可以直接使用，而不用add file。</p>
+<p>如果表中有MAP，ARRAY等复杂类型，怎么用TRANSFORM生成？</p>
+<p>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> features</span><br><span class="line">(</span><br><span class="line">    <span class="keyword">id</span> <span class="built_in">BIGINT</span>,</span><br><span class="line">    norm_features <span class="keyword">MAP</span>&lt;<span class="keyword">STRING</span>, <span class="built_in">FLOAT</span>&gt; </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>答案是，要在脚本的输出中，对特殊字段按照HDFS文件中的格式输出即可。</p>
+<p>例如，以上面的表结构为例，每行输出应为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1^Ifeature1^C1.0^Bfeature2^C2.0</span><br></pre></td></tr></table></figure>
+<p>其中^I是tab键，这是TRANSFORM要求的分割符号。^B和^C是Hive存储时MAP类型的KV分割符。</p>
+<p>另外，在Hive的TRANSFORM语句的时候，要注意AS中加上类型声明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT TRANSFORM(stuff)</span><br><span class="line">USING &apos;script&apos;</span><br><span class="line">AS (thing1 INT, thing2 MAP&lt;STRING, FLOAT&gt;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce"><a href="#Hive中的TRANSFORM：自定义Mapper和Reducer完成Map-Reduce" class="headerlink" title="Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce"></a>Hive中的TRANSFORM：自定义Mapper和Reducer完成Map/Reduce</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Mapper.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Mapper</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Maps a single row into an intermediate rows.</span><br><span class="line">   * </span><br><span class="line">   * <span class="doctag">@param</span> record</span><br><span class="line">   *          input record</span><br><span class="line">   * <span class="doctag">@param</span> output</span><br><span class="line">   *          collect mapped rows.</span><br><span class="line">   * <span class="doctag">@throws</span> Exception</span><br><span class="line">   *           on error</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">map</span><span class="params">(String[] record, Output output)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以将一列拆分为多列</p>
+<p>使用样例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExecuteMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String FULL_PATH_CLASS = <span class="string">"com.***.dpop.ods.mr.impl."</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Mapper&gt; mappers = <span class="keyword">new</span> HashMap&lt;String, Mapper&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Process class must be given"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> GenericMR().map(System.in, System.out,</span><br><span class="line">                getMapper(args[<span class="number">0</span>], Arrays.copyOfRange(args, <span class="number">1</span>, args.length)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Mapper <span class="title">getMapper</span><span class="params">(String parserClass, String[] args)</span></span><br><span class="line">            <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mappers.containsKey(parserClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> mappers.get(parserClass);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class[] classes = <span class="keyword">new</span> Class[args.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; classes.length; ++i) &#123;</span><br><span class="line">            classes[i] = String.class;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Mapper mapper = (Mapper) Class.forName(FULL_PATH_CLASS + parserClass).getConstructor(classes).newInstance(args);</span><br><span class="line">            mappers.put(parserClass, mapper);</span><br><span class="line">            <span class="keyword">return</span> mapper;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"Unknown MapperClass:"</span> + parserClass, e);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span>  ClassNotFoundException(<span class="string">"Error Constructing processor"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MR_USING=" USING 'java -Xmx512m -Xms512m -cp ods-mr-1.0.jar:hive-contrib-2.3.33.jar com.***.dpop.ods.mr.api.ExecuteMap "</span><br><span class="line"></span><br><span class="line">COMMAND="FROM dw_rtb.event_fact_adx_auction "</span><br><span class="line">COMMAND="$&#123;COMMAND&#125; INSERT overwrite TABLE dw_rtb.event_fact_mid_adx_auction_ad PARTITION(yymmdd=$&#123;CURRENT_DATE&#125;) SELECT transform(search_id, print_time, pthread_id, ad_s) $&#123;MR_USING&#125; EventFactMidAdxAuctionAdMapper' as search_id, print_time, pthread_id, ad_s, ssp_id WHERE $INSERT_PARTITION and original = 'exinternal' "</span><br></pre></td></tr></table></figure>
+<h2 id="Hive-Python-Streaming的原理及写法"><a href="#Hive-Python-Streaming的原理及写法" class="headerlink" title="Hive Python Streaming的原理及写法"></a>Hive Python Streaming的原理及写法</h2><p><a href="http://www.tuicool.com/articles/vmumUjA" target="_blank" rel="external">http://www.tuicool.com/articles/vmumUjA</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hive/">Hive</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hive/">Hive</a><a href="/tags/MR/">MR</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/02/REST-API-设计最佳实践/" title="REST API 设计最佳实践" itemprop="url">REST API 设计最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> Published 2016-05-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://waylau.com/best-practices-for-better-restful-api/" target="_blank" rel="external">RESTful API 设计最佳实践</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/REST/">REST</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/REST/">REST</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/02/Spark-SQL汇总/" title="Spark SQL汇总" itemprop="url">Spark SQL汇总</a>
   </h1>
   <p class="article-author">By
@@ -159,7 +315,7 @@
     <div class="article-content">
         
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Object类是类层次结构的根，Java中所有的类从根本上都继承自这个类。Object类是Java中唯一没有父类的类。其他所有的类，包括标准容器类，比如数组，都继承了Object类中的方法。</p>
-<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg" alt="http://images.cnitblog.com/i/426802/201404/262136225915517.jpg"></p>
+<p>Object类位于java.lang包中，java.lang包包含着Java最基础和核心的类，在编译时会自动导入。Object类没有定义属性，一共有13个方法，具体的类定义结构如下图：<br><img src="https://github.com/slamke/image/blob/master/java/object_methods.jpg?raw=true" alt=""></p>
 <h1 id="Object类中的方法"><a href="#Object类中的方法" class="headerlink" title="Object类中的方法"></a>Object类中的方法</h1><p>Java中的每个类都具有定义在Object类中的这些方法。</p>
 <h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><figure class="highlight plain"><figcaption><span>Object()```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，Java中通过形如 new A(args..)形式创建一个属于该类型的对象。其中A即是类名，A(args..)即此类定义中相对应的构造函数。通过此种形式创建的对象都是通过类中的构造函数完成。为体现此特性，Java中规定：在类定义过程中，对于未定义构造函数的类，默认会有一个无参数的构造函数，作为所有类的基类，Object类自然要反映出此特性，在源码中，未给出Object类构造函数定义，但实际上，此构造函数是存在的。</span><br><span class="line"> </span><br><span class="line">当然，并不是所有的类都是通过此种方式去构建，也自然的，并不是所有的类构造函数都是public。</span><br><span class="line"></span><br><span class="line">## private static native void registerNatives();</span><br><span class="line"> </span><br><span class="line">registerNatives函数前面有native关键字修饰，Java中，用native关键字修饰的函数表明该方法的实现并不是在Java中去完成，而是由C/C++去完成，并被编译成了.dll，由Java去调用。方法的具体实现体在dll文件中，对于不同平台，其具体实现应该有所不同。用native修饰，即表示操作系统，需要提供此方法，Java本身需要使用。具体到registerNatives()方法本身，其主要作用是将C/C++中的方法映射到Java中的native方法，实现方法命名的解耦。</span><br><span class="line"></span><br><span class="line">## protected Object clone()</span><br><span class="line"></span><br><span class="line">Creates and returns a copy of this object.</span><br><span class="line"></span><br><span class="line">Object类中的说明是：</span><br><span class="line">``` java</span><br><span class="line">　　protected Object clone() throws CloneNotSupportedException</span><br></pre></td></tr></table></figure>
 <p>这个方法比较特殊：<br>首先，使用这个方法的类必须实现java.lang.Cloneable接口，否则会抛出CloneNotSupportedException异常。<br>Cloneable接口中不包含任何方法，所以实现它时只要在类声明中加上implements语句即可。</p>
@@ -614,130 +770,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/05/Http-Servlet汇总/" title="Http Servlet汇总" itemprop="url">Http Servlet汇总</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> Published 2016-04-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-servlet/" title="Servlet 工作原理解析" target="_blank" rel="external">Servlet 工作原理解析</a></p>
-<p><a href="http://www.ibm.com/developerworks/cn/java/j-lo-jetty/" title="Jetty 的工作原理以及与 Tomcat 的比较" target="_blank" rel="external">Jetty 的工作原理以及与 Tomcat 的比较</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/03/https是如何确保安全的/" title="https是如何确保安全的" itemprop="url">https是如何确保安全的</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> Published 2016-04-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="https是如何确保安全的"><a href="#https是如何确保安全的" class="headerlink" title="https是如何确保安全的"></a>https是如何确保安全的</h1><h2 id="什么是Https"><a href="#什么是Https" class="headerlink" title="什么是Https"></a>什么是Https</h2><p>HTTPS（全称：Hypertext Transfer Protocol over Secure Socket Layer），是以安全为目标的HTTP通道，简单讲是HTTP的安全版。即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL</p>
-<h2 id="Https的作用"><a href="#Https的作用" class="headerlink" title="Https的作用"></a>Https的作用</h2><p>内容加密 建立一个信息安全通道，来保证数据传输的安全；<br>身份认证 确认网站的真实性<br>数据完整性 防止内容被第三方冒充或者篡改</p>
-<h2 id="Https的劣势"><a href="#Https的劣势" class="headerlink" title="Https的劣势"></a>Https的劣势</h2><p>对数据进行加解密决定了它比http慢<br>需要进行非对称的加解密，且需要三次握手。首次连接比较慢点，当然现在也有很多的优化。</p>
-<p>出于安全考虑，浏览器不会在本地保存HTTPS缓存。实际上，只要在HTTP头中使用特定命令，HTTPS是可以缓存的。Firefox默认只在内存中缓存HTTPS。但是，只要头命令中有Cache-Control: Public，缓存就会被写到硬盘上。 IE只要http头允许就可以缓存https内容，缓存策略与是否使用HTTPS协议无关。</p>
-<h2 id="HTTPS和HTTP的区别"><a href="#HTTPS和HTTP的区别" class="headerlink" title="HTTPS和HTTP的区别"></a>HTTPS和HTTP的区别</h2><p>https协议需要到CA申请证书。<br>http是超文本传输协议，信息是明文传输；https 则是具有安全性的ssl加密传输协议。<br>http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。<br>http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
-<h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><ul>
-<li>为什么要有数字证书？</li>
-</ul>
-<p>对于请求方来说，它怎么能确定它所得到的公钥一定是从目标主机那里发布的，而且没有被篡改过呢？亦或者请求的目标主机本本身就从事窃取用户信息的不正当行为呢？这时候，我们需要有一个权威的值得信赖的第三方机构(一般是由政府审核并授权的机构)来统一对外发放主机机构的公钥，只要请求方这种机构获取公钥，就避免了上述问题的发生。</p>
-<h2 id="SSL、TLS的握手过程"><a href="#SSL、TLS的握手过程" class="headerlink" title="SSL、TLS的握手过程"></a>SSL、TLS的握手过程</h2><p>SSL与TLS握手整个过程如下图所示，下面会详细介绍每一步的具体内容：<br><img src="https://segmentfault.com/image?src=http://sean-images.qiniudn.com/tls-ssl.svg&amp;objectId=1190000002554673&amp;token=ec9df05ae1ad4ca98daa795a168ea462" alt="握手"></p>
-<p>现在的https基本都使用TLS了，因为更加安全.</p>
-<p>SSL协议在握手阶段使用的是非对称加密，在传输阶段使用的是对称加密，也就是说在SSL上传送的数据是使用对称密钥加密的！因为非对称加密的速度缓慢，耗费资源。其实当客户端和主机使用非对称加密方式建立连接后，客户端和主机已经决定好了在传输过程使用的对称加密算法和关键的对称加密密钥，由于这个过程本身是安全可靠的，也即对称加密密钥是不可能被窃取盗用的，因此，保证了在传输过程中对数据进行对称加密也是安全可靠的，因为除了客户端和主机之外，不可能有第三方窃取并解密出对称加密密钥！如果有人窃听通信，他可以知道双方选择的加密方法，以及三个随机数中的两个。整个通话的安全，只取决于第三个随机数（Premaster secret）能不能被破解。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>https实际就是在TCP层与http层之间加入了SSL/TLS来为上层的安全保驾护航，主要用到对称加密、非对称加密、证书，等技术进行客户端与服务器的数据加密传输，最终达到保证整个通信的安全性。</p>
-<p>流程:<br>前提：CA证书<br>握手阶段: 生成随机数 + 数据摘要 + 数字签名 + 非对称加密算法 ==&gt; 对称机密的密钥<br>数据传输阶段： 基于对称加密密钥的交流</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Https/">Https</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/7/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/9/">Next<span></span></a>
@@ -774,11 +806,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -810,7 +842,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -851,7 +883,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -859,11 +891,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -871,19 +907,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -891,11 +915,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -904,26 +956,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

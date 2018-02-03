@@ -21,16 +21,16 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 <meta property="og:description" content="参考:how-to-tune-your-apache-spark-jobs-part-1how-to-tune-your-apache-spark-jobs-part-2tuning_spark_streamingSpark Streaming性能调优详解
 Spark性能优化：shuffle调优Spark性能优化：数据倾斜调优
 Spark性能优化：开发调优篇top-5-mistakes-when-">
-<meta property="og:image" content="http://blog.cloudera.com/wp-content/uploads/2015/03/spark-tuning2-f1.png">
-<meta property="og:image" content="http://www.iteblog.com/pic/reduce_by.png">
-<meta property="og:image" content="http://www.iteblog.com/pic/group_by.png">
-<meta property="og:updated_time" content="2016-08-04T04:34:29.944Z">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/spark/spark-memory.png?raw=true">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/spark/reduce_by.png?raw=true">
+<meta property="og:image" content="https://github.com/slamke/image/blob/master/spark/group_by.png?raw=true">
+<meta property="og:updated_time" content="2018-01-17T07:20:06.637Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark性能优化">
 <meta name="twitter:description" content="参考:how-to-tune-your-apache-spark-jobs-part-1how-to-tune-your-apache-spark-jobs-part-2tuning_spark_streamingSpark Streaming性能调优详解
 Spark性能优化：shuffle调优Spark性能优化：数据倾斜调优
 Spark性能优化：开发调优篇top-5-mistakes-when-">
-<meta name="twitter:image" content="http://blog.cloudera.com/wp-content/uploads/2015/03/spark-tuning2-f1.png">
+<meta name="twitter:image" content="https://github.com/slamke/image/blob/master/spark/spark-memory.png?raw=true">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -120,7 +120,7 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 <h2 id="二-Tuning-Resource-Allocation"><a href="#二-Tuning-Resource-Allocation" class="headerlink" title="二 Tuning Resource Allocation"></a>二 Tuning Resource Allocation</h2><p><a href="http://www.infoq.com/cn/presentations/gc-tuning-of-spark-application" target="_blank" rel="external">Spark应用的GC调优</a> –&gt;重点讲解了G1垃圾回收器的调优工作<br><a href="http://www.iteblog.com/archives/1659" target="_blank" rel="external">Spark性能优化：资源调优篇</a><br>Every Spark executor in an application has the same fixed number of cores and same fixed heap size.</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--executor-cores/ spark.executor.cores 提交时通过该参数设置每个executor的core数量，决定了<span class="type">Task</span>的并行度</span><br><span class="line">--executor-memory/spark.executor.memory 设置executor的<span class="type">JVM</span> memory</span><br><span class="line">--num-executors/spark.executor.instances 设置executor的数量</span><br><span class="line">spark.dynamicAllocation.enabled 设置动态申请资源(value设为<span class="literal">true</span>)，此时不要设置num-executors</span><br><span class="line">spark.yarn.executor.memoryOverhead 设置堆外的memory大小</span><br></pre></td></tr></table></figure>
 <h3 id="spark-dynamicAllocation-enabled"><a href="#spark-dynamicAllocation-enabled" class="headerlink" title="spark.dynamicAllocation.enabled"></a>spark.dynamicAllocation.enabled</h3><p>executor空闲超时后，会被移除<br>对于Spark Streaming，数据按时间段到达，为了防止executor频繁出现添加移除现象，应该禁用该功能。</p>
-<h3 id="内存格局"><a href="#内存格局" class="headerlink" title="内存格局"></a>内存格局</h3><p><img src="http://blog.cloudera.com/wp-content/uploads/2015/03/spark-tuning2-f1.png" alt="enter image description here"></p>
+<h3 id="内存格局"><a href="#内存格局" class="headerlink" title="内存格局"></a>内存格局</h3><p><img src="https://github.com/slamke/image/blob/master/spark/spark-memory.png?raw=true" alt=""></p>
 <p>说明:</p>
 <ul>
 <li><p>The application master, which is a non-executor container with the special capability of requesting containers from YARN, takes up resources of its own that must be budgeted in. In yarn-client mode, it defaults to a 1024MB and one vcore. In yarn-cluster mode, the application master runs the driver, so it’s often useful to bolster its resources with the –driver-memory and –driver-cores properties.</p>
@@ -145,7 +145,7 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 <h2 id="减少shuffle以及shuffle的数据量"><a href="#减少shuffle以及shuffle的数据量" class="headerlink" title="减少shuffle以及shuffle的数据量"></a>减少shuffle以及shuffle的数据量</h2><ul>
 <li><p>操作<strong>repartition</strong> , <strong>join</strong>, <strong>cogroup</strong>, and any of the <strong>*By</strong> or <strong>*ByKey</strong> transformations can result in shuffles. </p>
 </li>
-<li><p>Avoid <strong>groupByKey</strong> when performing an associative reductive operation. For example, <strong>rdd.groupByKey().mapValues(_.sum)</strong> will produce the same results as <strong>rdd.reduceByKey(<em> + </em>)</strong><br>However, the former will transfer the entire dataset across the network, while the latter will compute local sums for each key in each partition and combine those local sums into larger sums after shuffling.<br><img src="http://www.iteblog.com/pic/reduce_by.png" alt="enter image description here"><br><img src="http://www.iteblog.com/pic/group_by.png" alt="enter image description here"><br>以下函数应该优先于 groupByKey ：</p>
+<li><p>Avoid <strong>groupByKey</strong> when performing an associative reductive operation. For example, <strong>rdd.groupByKey().mapValues(_.sum)</strong> will produce the same results as <strong>rdd.reduceByKey(<em> + </em>)</strong><br>However, the former will transfer the entire dataset across the network, while the latter will compute local sums for each key in each partition and combine those local sums into larger sums after shuffling.<br><img src="https://github.com/slamke/image/blob/master/spark/reduce_by.png?raw=true" alt=""><br><img src="https://github.com/slamke/image/blob/master/spark/group_by.png?raw=true" alt=""><br>以下函数应该优先于 groupByKey ：</p>
 </li>
 </ul>
 <ol>
@@ -220,10 +220,10 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/08/10/scala-mutable和immutable类型转换/" title="scala mutable和immutable类型转换">
+ <a href="/2016/08/10/Scala-mutable和immutable类型转换/" title="Scala mutable和immutable类型转换">
   <strong>上一篇：</strong><br/>
   <span>
-  scala mutable和immutable类型转换</span>
+  Scala mutable和immutable类型转换</span>
 </a>
 </div>
 
@@ -278,11 +278,11 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -314,7 +314,7 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -355,7 +355,7 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -363,11 +363,15 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -375,19 +379,7 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -395,11 +387,39 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -408,26 +428,6 @@ Spark性能优化：开发调优篇top-5-mistakes-when-">
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

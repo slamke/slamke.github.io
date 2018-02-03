@@ -11,16 +11,16 @@
     
 
     
-    <meta name="description" content="初探抽象类代表hadoop的一个文件系统，目前系统已经有很多个具体实现:12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem ||">
+    <meta name="description" content="初探抽象类12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem || HDFS  | hdfs | hdfs.Distribute">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HFTP文件系统解析">
 <meta property="og:url" content="slamke.github.io/2017/01/05/HFTP文件系统解析/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="初探抽象类代表hadoop的一个文件系统，目前系统已经有很多个具体实现:12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem ||">
-<meta property="og:updated_time" content="2017-01-05T08:48:44.878Z">
+<meta property="og:description" content="初探抽象类12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem || HDFS  | hdfs | hdfs.Distribute">
+<meta property="og:updated_time" content="2018-02-03T08:01:49.925Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HFTP文件系统解析">
-<meta name="twitter:description" content="初探抽象类代表hadoop的一个文件系统，目前系统已经有很多个具体实现:12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem ||">
+<meta name="twitter:description" content="初探抽象类12345678910111213141516171819202122232425262728293031323334353637383940|  文件系统  |  URI前缀  |  hadoop的具体实现类 || --- | --- | --- || Local | file | fs.LocalFileSystem || HDFS  | hdfs | hdfs.Distribute">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -100,7 +100,7 @@
 		
 		</div>
 		
-		<h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><figcaption><span>代表hadoop的一个文件系统，目前系统已经有很多个具体实现:</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+		<h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
 <p>spark-client关于filesystem实现的配置<figure class="highlight plain"><figcaption><span>```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">``` xml</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">    &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.DFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">   &lt;name&gt;fs.webhdfs.impl&lt;/name&gt;</span><br><span class="line">   &lt;value&gt;org.apache.hadoop.smw.hdfs.web.WebHdfsFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
 <h2 id="HFTP介绍"><a href="#HFTP介绍" class="headerlink" title="HFTP介绍"></a>HFTP介绍</h2><p>HFTP 是hadoop文件系统用来让你从一个远程的hadoop HDFS集群中读取数据的组件。这个读取是通过HTTP，并且数据源是DataNodes。HFTP是一个只读的文件系统，当你试图用来写入数据或者修改文件系统状态时，会抛出异常。</p>
 <p>HFTP 主要的帮助在有多个HDFS集群，并存在多个版本时，将数据从一个集群迁移到另一个。HFTP 在不同版本的HDFS中是兼容写的。你可以操作例如：</p>
@@ -123,7 +123,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/HDFS/">HDFS</a><a href="/tags/HFTP/">HFTP</a>
+  <span></span> <a href="/tags/HDFS/">HDFS</a><a href="/tags/HFTP/">HFTP</a><a href="/tags/Hadoop/">Hadoop</a>
   </div>
 
 </div>
@@ -204,11 +204,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -240,7 +240,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -281,7 +281,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -289,11 +289,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -301,19 +305,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -321,11 +313,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -334,26 +354,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>

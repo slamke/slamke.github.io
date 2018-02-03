@@ -81,6 +81,126 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/09/13/深入解析Spark中的RPC/" title="深入解析Spark中的RPC" itemprop="url">深入解析Spark中的RPC</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-09-13T03:51:40.000Z" itemprop="datePublished"> Published 2017-09-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://zhuanlan.zhihu.com/p/28893155?hmsr=toutiao.io" target="_blank" rel="external">深入解析Spark中的RPC</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/RPC/">RPC</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/09/12/维基百科简体中文语料的获取/" title="维基百科简体中文语料的获取" itemprop="url">维基百科简体中文语料的获取</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-09-12T03:21:00.000Z" itemprop="datePublished"> Published 2017-09-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://licstar.net/archives/262" target="_blank" rel="external">维基百科简体中文语料的获取</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/ML/">ML</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ML/">ML</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/09/11/Kafka相关/" title="Kafka相关" itemprop="url">Kafka相关</a>
   </h1>
   <p class="article-author">By
@@ -735,199 +855,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/04/10/流式计算概述和Spark-Streaming-tips/" title="流式计算概述和Spark Streaming tips" itemprop="url">流式计算概述和Spark Streaming tips</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-04-10T08:05:54.000Z" itemprop="datePublished"> Published 2017-04-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="常规计算引擎分类"><a href="#常规计算引擎分类" class="headerlink" title="常规计算引擎分类"></a>常规计算引擎分类</h2><ol>
-<li>批处理<br>• 高吞吐，低延迟<br>• 面向静态数据集合的处理<br>• 分钟甚至小时级别延迟<br>• 比如MR, Spark</li>
-<li>流式计算<br>• 面向行级别数据处理<br>• 毫秒级延迟<br>• 比如storm</li>
-</ol>
-<h2 id="流式计算分类"><a href="#流式计算分类" class="headerlink" title="流式计算分类"></a>流式计算分类</h2><ol>
-<li>面向行<br>Apache Flink — 收集一堆数据，然后一行一行处理<br>Storm</li>
-<li>面向micro-Batch<br>Spark Streaming — 收集一堆数据，然后一起处理 </li>
-</ol>
-<h2 id="流式计算通用户环节"><a href="#流式计算通用户环节" class="headerlink" title="流式计算通用户环节"></a>流式计算通用户环节</h2><p>数据源 —&gt; 数据缓存 —&gt; 流式引擎 —&gt; 结果存储</p>
-<h2 id="流式计算计算方式"><a href="#流式计算计算方式" class="headerlink" title="流式计算计算方式"></a>流式计算计算方式</h2><ol>
-<li>固定窗口<br>Spark Streaming 常规支持的方式</li>
-<li><p>滑动窗口( window )</p>
-</li>
-<li><p>会话计算( mapWithStates )<br>存储Spark Streaming的状态信息（类似session），可以进行过期处理</p>
-<h2 id="Spark-Streaming编程要点"><a href="#Spark-Streaming编程要点" class="headerlink" title="Spark Streaming编程要点"></a>Spark Streaming编程要点</h2></li>
-</ol>
-<blockquote>
-<p>Spark Streaming: exactly once delivery<br>特殊情况：故障重算，推测执行等</p>
-</blockquote>
-<ol>
-<li>Monitoring and managing jobs</li>
-</ol>
-<ul>
-<li>where to run the driver?<br><strong>Yarn cluster mode</strong>. Driver will continue to running when the client machine goes down.</li>
-<li>How to restart driver ?<br>set up <strong>automatic restart</strong>.<br>In spark configuration (e.g. spark-defaults.conf): </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spark.yarn.maxAppAttempts=2  // 重试尝试次数</span><br><span class="line">spark.yarn.am.attemptFailuresValidityInterval=1h  // 重置尝试次数的时间</span><br><span class="line">spark.yarn.max.executor.failures=&#123;8 * num_executors&#125;  // executor失败的最大次数</span><br><span class="line">spark.yarn.executor.failuresValidityInterval=1h	// 重置失败的时间</span><br><span class="line">spark.task.maxFailures=8   // task重试次数 默认是4</span><br><span class="line">spark.speculation=true  //预测执行， 前提：task是幂等</span><br></pre></td></tr></table></figure>
-<ul>
-<li>Summary<br>各种<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">2. Graceful shutting down your streaming app</span><br><span class="line">思路： Thread hooks – Check for an external flag every N seconds</span><br><span class="line"> </span><br><span class="line">``` scala</span><br><span class="line">/** * Stop the execution of the streams, with option of ensuring all received data </span><br><span class="line">	* has been processed. </span><br><span class="line">	*</span><br><span class="line">	* * @param stopSparkContext if true, stops the associated SparkContext. The underlying SparkContext </span><br><span class="line">	* will be stopped regardless of whether this StreamingContext has been </span><br><span class="line">	* started. </span><br><span class="line">	* @param stopGracefully if true, stops gracefully by waiting for the processing of all </span><br><span class="line">	* received data to be completed </span><br><span class="line">	*/ </span><br><span class="line">	def stop(stopSparkContext: Boolean, stopGracefully: Boolean): Unit = &#123;</span><br><span class="line">	receiverTracker.stop(processAllReceivedData) //default is to wait 10 second, grace waits until done jobGenerator.stop(processAllReceivedData) // Will use spark.streaming.gracefulStopTimeout </span><br><span class="line">	jobExecutor.shutdown() </span><br><span class="line">	val terminated = if (processAllReceivedData) &#123; </span><br><span class="line">		jobExecutor.awaitTermination(1, TimeUnit.HOURS) // just a very large period of time </span><br><span class="line">	&#125; else &#123; </span><br><span class="line">		jobExecutor.awaitTermination(2, TimeUnit.SECONDS) </span><br><span class="line">	&#125; </span><br><span class="line">	if (!terminated) &#123; jobExecutor.shutdownNow() </span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>How to be graceful?<br>• cmd line<br>– $SPARK_HOME_DIR/bin/spark-submit –master $MASTER_REST_URL –kill $DRIVER_ID<br>– spark.streaming.stopGracefullyOnShutdown=true </p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">stopOnShutdown</span></span>(): <span class="type">Unit</span> = &#123; </span><br><span class="line"><span class="keyword">val</span> stopGracefully = conf.getBoolean(<span class="string">"spark.streaming.stopGracefullyOnShutdown"</span>, <span class="literal">false</span>) </span><br><span class="line">logInfo(<span class="string">s"Invoking stop(stopGracefully=<span class="subst">$stopGracefully</span>) from shutdown hook"</span>) </span><br><span class="line"><span class="comment">// Do not stop SparkContext, let its own shutdown hook stop it </span></span><br><span class="line">stop(stopSparkContext = <span class="literal">false</span>, stopGracefully = stopGracefully) &#125;</span><br></pre></td></tr></table></figure>
-<p>• By marker file<br>– Touch a file when starting the app on HDFS<br>– Remove the file when you want to stop<br>– Separate thread in Spark app, calls </p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">streamingContext.stop(stopSparkContext = <span class="literal">true</span>, stopGracefully = <span class="literal">true</span>)</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark-Streaming/">Spark Streaming</a><a href="/tags/流式计算/">流式计算</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/04/06/Structured-Streaming介绍/" title="Structured Streaming介绍" itemprop="url">Structured Streaming介绍</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-04-06T05:42:35.000Z" itemprop="datePublished"> Published 2017-04-06</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="中文入门编程指南"><a href="#中文入门编程指南" class="headerlink" title="中文入门编程指南"></a><a href="https://www.iteblog.com/archives/2084.html" target="_blank" rel="external">中文入门编程指南</a></h2><h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><a href="http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="external">官方文档</a></h2><h2 id="Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><a href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1" class="headerlink" title="Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1"></a><a href="https://databricks.com/blog/2017/01/19/real-time-streaming-etl-structured-streaming-apache-spark-2-1.html" target="_blank" rel="external">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</a></h2><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于event_time的window及watermark功能，虽然还在Alapha阶段，但从实现的完备程度及反馈来看已具备初步的功能需求。</p>
-<h2 id="设计理念及所解决的问题"><a href="#设计理念及所解决的问题" class="headerlink" title="设计理念及所解决的问题"></a>设计理念及所解决的问题</h2><p>从Spark 0.7版本发布DStream接口及Spark Streaming模块以来，Spark具备流式处理功能且在业界有了一系列应用，但依旧存在一些问题，诟病较多的是如下几点：</p>
-<ul>
-<li>不支持event_time，按照到达绝对时间切分records组成DStream的方式对很多场景不适合</li>
-<li>不支持流式window操作</li>
-<li>不支持watermark，无法对乱序数据做容错</li>
-</ul>
-<p>2.1版本的Spark不但解决上述问题，并将Spark Streaming的流处理方式和1.x版本中集中开发的SQL模块、DataFrame\DataSet API相融合，推出Structured Streaming引擎。其设计思路在于将持续不断的上游数据抽象为unbounded table，对流式的处理看作是表中不同部分的数据(complete\append\update mode)进行处理：<br><img src="http://spark.apache.org/docs/latest/img/structured-streaming-stream-as-a-table.png" alt=""><br>从代码层面看，Structured Streaming代码放在sql模块中，与原有SQL的datasource api、logical plan、physical plan做了诸多兼容操作，将流式处理的上游下游分别抽象为Source与Sink，基于DataFrame抽象出输入输出流DataStreamReader、DataStreamWriter。DataStreamReader中打通datasource api，支持多种上游的读取支持，DataStreamWriter中遵循惰性计算的思路实现多种触发操作及不同类型的写出模式。</p>
-<h2 id="Demo-for-struct-streaming"><a href="#Demo-for-struct-streaming" class="headerlink" title="Demo for struct streaming"></a>Demo for struct streaming</h2><p>一个完整的struct streaming示例及分布解释如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// 与其他spark作业一致，获取build spark session,对应旧版本中的spark context</span></span><br><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">  .builder</span><br><span class="line">  .appName(<span class="string">"StructuredNetworkWordCount"</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"><span class="comment">// 创建一个基于stream source的dataframe</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">val</span> lines = spark.readStream</span><br><span class="line">  .format(<span class="string">"socket"</span>)    # 对应基本概念：<span class="type">Source</span></span><br><span class="line">  .option(<span class="string">"host"</span>, host)</span><br><span class="line">  .option(<span class="string">"port"</span>, port)</span><br><span class="line">  .load()</span><br><span class="line"> </span><br><span class="line"><span class="comment">// WordCount逻辑，与dataframe/dataset api用法完全一致，</span></span><br><span class="line"><span class="keyword">val</span> words = lines.as[<span class="type">String</span>].flatMap(_.split(<span class="string">" "</span>))</span><br><span class="line"><span class="keyword">val</span> wordCounts = words.groupBy(<span class="string">"value"</span>).count()</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 调用dataset的writeStream创建写出流，设置对应的sink mode及类型</span></span><br><span class="line"><span class="keyword">val</span> query = wordCounts.writeStream</span><br><span class="line">  .outputMode(<span class="string">"complete"</span>)   # 对应基本概念：<span class="type">Output</span> <span class="type">Mode</span></span><br><span class="line">  .format(<span class="string">"console"</span>)        # 对应基本概念：<span class="type">Sink</span></span><br><span class="line">  .start()</span><br><span class="line"> </span><br><span class="line">query.awaitTermination()</span><br></pre></td></tr></table></figure></p>
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h3><p>Struct Streaming的输入源，每种输入源对应自己的dataSource实现，当前支持如下三种Source：</p>
-<ul>
-<li><strong>File Source</strong>: 输入数据源为hdfs目录中的文件，天然支持的文件格式和dataset一致(json csv text parquet)，将文件不断mv至指定目录中作为持续数据源</li>
-<li><strong>Kafka Source</strong>: 将kafka作为struct streaming source，目前支持的版本为0.10.0</li>
-<li><strong>Socket Source</strong>: 将socket输入数据作为streaming source，只用来做调试和demo使用<h3 id="Output-Mode"><a href="#Output-Mode" class="headerlink" title="Output Mode"></a>Output Mode</h3>Output Mode都是对于每次trigger过后的result table而言的</li>
-<li><strong>Complete Mode</strong> : 从开始到目前为止的所有数据视为一张大表，query作用于整个表上的结果整体写入</li>
-<li><strong>Append Mode</strong> : 从上次trigger到目前为止，不会在发生变化的数据append到最终的sink端</li>
-<li><strong>Update Mode</strong> : 从上次trigger到目前为止，发生变化的条目写入到最终的sink端</li>
-</ul>
-<p>简单用自带的StructuredNetworkWordCountWindowed实例对比下Complete mode与Update Mode:<br>数据输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[liyuanjian@MacBook~Pro ~]$ nc -l 9999</span><br><span class="line">apache spark</span><br><span class="line">apache hadoop</span><br><span class="line">baidu inf spark</span><br></pre></td></tr></table></figure></p>
-<p>Complete mode output:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">| baidu| 1|</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 2|</span><br><span class="line">| inf| 1|</span><br><span class="line">+------+-----+</span><br></pre></td></tr></table></figure></p>
-<p>Update mode output:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+-----+-----+</span><br><span class="line">|value|count|</span><br><span class="line">+-----+-----+</span><br><span class="line">|baidu| 1|</span><br><span class="line">| inf| 1|</span><br><span class="line">|spark| 2|</span><br><span class="line">+-----+-----+</span><br></pre></td></tr></table></figure></p>
-<h3 id="Sink"><a href="#Sink" class="headerlink" title="Sink"></a>Sink</h3><p>作为struct streaming的下游抽象，sink代表将最终处理完成的dataframe写出的方式，目前支持：</p>
-<ol>
-<li><strong>File sink</strong> : 将数据写入hdfs目录，可以支持带partition的table写入</li>
-<li><strong>Console sink</strong> : 将数据直接调用dataframe.show()打印在stdout，调试作用，demo中使用的都是console sink</li>
-<li><strong>Memory sink</strong> : 将所有下游存储在driver的内存中，抽象为一张表，也只能做调试使用</li>
-<li><strong>Foreach sink</strong> : 依赖用户实现ForeachWriter接口配合使用，foreach sink中对每次触发的dataframe，按逐个partition调用ForeachWriter的接口进行处理，可以实现ForeachWriter写入任何需要的下游存储或处理系统，接口如下：<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ForeachWriter</span>[<span class="type">T</span>] <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// <span class="doctag">TODO:</span> Move this to org.apache.spark.sql.util or consolidate this with batch API.</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called when starting to process one partition of new data in the executor. The `version` is</span><br><span class="line">   * for data deduplication when there are failures. When recovering from a failure, some data may</span><br><span class="line">   * be generated multiple times but they will always have the same version.</span><br><span class="line">   *</span><br><span class="line">   * If this method finds using the `partitionId` and `version` that this partition has already been</span><br><span class="line">   * processed, it can return `false` to skip the further data processing. However, `close` still</span><br><span class="line">   * will be called for cleaning up resources.</span><br><span class="line">   *</span><br><span class="line">   * @param partitionId the partition id.</span><br><span class="line">   * @param version a unique id for data deduplication.</span><br><span class="line">   * @return `true` if the corresponding partition and version id should be processed. `false`</span><br><span class="line">   *         indicates the partition should be skipped.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">open</span></span>(partitionId: <span class="type">Long</span>, version: <span class="type">Long</span>): <span class="type">Boolean</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called to process the data in the executor side. This method will be called only when `open`</span><br><span class="line">   * returns `true`.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process</span></span>(value: <span class="type">T</span>): <span class="type">Unit</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called when stopping to process one partition of new data in the executor side. This is</span><br><span class="line">   * guaranteed to be called either `open` returns `true` or `false`. However,</span><br><span class="line">   * `close` won't be called in the following cases:</span><br><span class="line">   *  - JVM crashes without throwing a `Throwable`</span><br><span class="line">   *  - `open` throws a `Throwable`.</span><br><span class="line">   *</span><br><span class="line">   * @param errorOrNull the error thrown during processing data or null if there was no error.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>(errorOrNull: <span class="type">Throwable</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="Window"><a href="#Window" class="headerlink" title="Window"></a>Window</h3><p>和其他流式系统一样，基于滑动时间窗的数据统计、聚合是必不可少的需求，2.1实现了基于event-time的window定义，接口如下：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Bucketize rows into one or more time windows given a timestamp specifying column. Window</span><br><span class="line"> * starts are inclusive but the window ends are exclusive, e.g. 12:05 will be in the window</span><br><span class="line"> * [12:05,12:10) but not in [12:00,12:05). Windows can support microsecond precision. Windows in</span><br><span class="line"> * the order of months are not supported. The windows start beginning at 1970-01-01 00:00:00 UTC.</span><br><span class="line"> * The following example takes the average stock price for a one minute window every 10 seconds:</span><br><span class="line"> *</span><br><span class="line"> * &#123;&#123;&#123;</span><br><span class="line"> *   val df = ... // schema =&gt; timestamp: TimestampType, stockId: StringType, price: DoubleType</span><br><span class="line"> *   df.groupBy(window($"time", "1 minute", "10 seconds"), $"stockId")</span><br><span class="line"> *     .agg(mean("price"))</span><br><span class="line"> * &#125;&#125;&#125;</span><br><span class="line"> *</span><br><span class="line"> * The windows will look like:</span><br><span class="line"> *</span><br><span class="line"> * &#123;&#123;&#123;</span><br><span class="line"> *   09:00:00-09:01:00</span><br><span class="line"> *   09:00:10-09:01:10</span><br><span class="line"> *   09:00:20-09:01:20 ...</span><br><span class="line"> * &#125;&#125;&#125;</span><br><span class="line"> *</span><br><span class="line"> * For a streaming query, you may use the function `current_timestamp` to generate windows on</span><br><span class="line"> * processing time.</span><br><span class="line"> *</span><br><span class="line"> * @param timeColumn The column or the expression to use as the timestamp for windowing by time.</span><br><span class="line"> *                   The time column must be of TimestampType.</span><br><span class="line"> * @param windowDuration A string specifying the width of the window, e.g. `10 minutes`,</span><br><span class="line"> *                       `1 second`. Check [[org.apache.spark.unsafe.types.CalendarInterval]] for</span><br><span class="line"> *                       valid duration identifiers. Note that the duration is a fixed length of</span><br><span class="line"> *                       time, and does not vary over time according to a calendar. For example,</span><br><span class="line"> *                       `1 day` always means 86,400,000 milliseconds, not a calendar day.</span><br><span class="line"> * @param slideDuration A string specifying the sliding interval of the window, e.g. `1 minute`.</span><br><span class="line"> *                      A new window will be generated every `slideDuration`. Must be less than</span><br><span class="line"> *                      or equal to the `windowDuration`. Check</span><br><span class="line"> *                      [[org.apache.spark.unsafe.types.CalendarInterval]] for valid duration</span><br><span class="line"> *                      identifiers. This duration is likewise absolute, and does not vary</span><br><span class="line"> *                     according to a calendar.</span><br><span class="line"> *</span><br><span class="line"> * @group datetime_funcs</span><br><span class="line"> * @since 2.0.0</span><br><span class="line"> */</span></span><br><span class="line"><span class="meta">@Experimental</span></span><br><span class="line"><span class="meta">@InterfaceStability</span>.<span class="type">Evolving</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">window</span></span>(timeColumn: <span class="type">Column</span>, windowDuration: <span class="type">String</span>, slideDuration: <span class="type">String</span>): <span class="type">Column</span> = &#123;</span><br><span class="line">  window(timeColumn, windowDuration, slideDuration, <span class="string">"0 second"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>window通常与groupBy算子连用，通过设置dataframe中的timeColumn，windowDuration(window大小)，sildeDuration(步长)，来定义整个window的行为，如windowDuration = 10min, slideDuration = 5min，则代表由event-time触发每5分钟计算一次，计算的对象是当前window中10min的数据</p>
-<h3 id="Watermark"><a href="#Watermark" class="headerlink" title="Watermark"></a>Watermark</h3><p>接上述window的介绍，对于任何基于window\event-time的聚合场景，我们都需要考虑对于乱序的过期event-time数据到达的处理行为。watermark用来给用户提供一个接口，让用户能够定义”比当前处理时间慢多久的数据可以丢弃，不再处理”，祥设文档参见：<a href="https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2" target="_blank" rel="external">https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2</a></p>
-<p><img src="http://spark.apache.org/docs/latest/img/structured-streaming-watermark.png" alt=""></p>
-<ul>
-<li>watermark的计算规则</li>
-</ul>
-<ol>
-<li>在每次trigger触发计算时，先找到trigger data中的最大(近)event-time</li>
-<li>trigger结束后，   <code>new watermark = MAX(event-time before trigger, max event-time in trigger[步骤1]) - threashold</code><br>watermark的限制<br>watermark操作只能在logical plan中有一个，而且只能应用在从sink出发的单child关系链，简单理解就是处理不了复杂的多留join、union的各自设置watermark</li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Streaming/">Streaming</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
@@ -964,11 +891,11 @@
 		  
 		
 		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>5</sup></a></li>
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>11</sup></a></li>
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
 		  
 		
 		  
@@ -1000,7 +927,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
 		  
 		
 		  
@@ -1041,7 +968,7 @@
 			
 		
 			
-				<li><a href="/tags/Java/" title="Java">Java<sup>10</sup></a></li>
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
 			
 		
 			
@@ -1049,11 +976,15 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -1061,19 +992,7 @@
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
 			
 		
 			
@@ -1081,11 +1000,39 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
@@ -1094,26 +1041,6 @@
 		
 			
 				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
 			
 		
 		</ul>
