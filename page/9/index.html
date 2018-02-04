@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,267 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/04/10/Tomcat系统架构和设计模式/" title="Tomcat系统架构和设计模式" itemprop="url">Tomcat系统架构和设计模式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-10T14:02:09.000Z" itemprop="datePublished"> 發表於 2016-04-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Tomcat-的总体结构"><a href="#Tomcat-的总体结构" class="headerlink" title="Tomcat 的总体结构"></a>Tomcat 的总体结构</h2><p><img src="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/image001.gif" alt="Tomcat 的总体结构"></p>
+<p>从上图中可以看出 Tomcat 的心脏是两个组件：Connector 和 Container，关于这两个组件将在后面详细介绍。Connector 组件是可以被替换，这样可以提供给服务器设计者更多的选择，因为这个组件是如此重要，不仅跟服务器的设计的本身，而且和不同的应用场景也十分相关，所以一个 Container 可以选择对应多个 Connector。多个 Connector 和一个 Container 就形成了一个 Service，Service 的概念大家都很熟悉了，有了 Service 就可以对外提供服务了，但是 Service 还要一个生存的环境，必须要有人能够给她生命、掌握其生死大权，那就非 Server 莫属了。所以整个 Tomcat 的生命周期由 Server 控制。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 1 部分: 工作原理</a></li>
+<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="external">Tomcat 系统架构与设计模式，第 2 部分: 设计模式分析</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Tomcat/">Tomcat</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Tomcat/">Tomcat</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/07/Spring实现数据库读写分离/" title="Spring实现数据库读写分离" itemprop="url">Spring实现数据库读写分离</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-07T01:53:26.000Z" itemprop="datePublished"> 發表於 2016-04-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://github.com/slamke/spring_read_write" target="_blank" rel="external">Github</a></p>
+<p>参考：<br><a href="http://wiki.xby1993.net/doku.php?id=spring:spring%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB" target="_blank" rel="external">spring实现数据库读写分离</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/07/hadoop相关记录/" title="hadoop相关记录" itemprop="url">hadoop相关记录</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-07T01:28:09.000Z" itemprop="datePublished"> 發表於 2016-04-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://jiangbo.me/blog/2012/10/23/mount-hdfs-with-fuse-dfs/" target="_blank" rel="external">使用FUSE-DFS mount HDFS</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/Hdfs/">Hdfs</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/06/SpringMVC记录/" title="SpringMVC记录" itemprop="url">SpringMVC记录</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-06T13:08:18.000Z" itemprop="datePublished"> 發表於 2016-04-06</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="http://neoremind.com/2016/02/springmvc%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" target="_blank" rel="external">springmvc的一些常用最佳实践</a><br>内容概要：</p>
+<ul>
+<li>SpringMVC的源代码执行流程</li>
+<li>使用WebDataBinder进行参数的个性化绑定和验证<ul>
+<li>基于annotation进行参数验证，<a href="http://www.cnblogs.com/HD/p/4123146.html" target="_blank" rel="external">地址</a></li>
+<li>基于@InitBinder进行参数验证，<a href="http://www.cnblogs.com/HD/p/4123686.html" target="_blank" rel="external">地址</a></li>
+</ul>
+</li>
+<li>使用高级的HandlerMethodArgumentResolver来实现参数的个性化解析</li>
+<li>使用aspectj拦截器进行全局参数校验</li>
+<li>全局错误处理，隐藏后端异常以及友好提示</li>
+<li>使用Spring自带拦截器HandlerInterceptor进行权限控制</li>
+</ul>
+<h2 id="数据验证"><a href="#数据验证" class="headerlink" title="数据验证"></a>数据验证</h2><p><a href="http://www.cnblogs.com/HD/p/4123686.html" target="_blank" rel="external">InitBinder验证</a><br><a href="http://www.cnblogs.com/HD/p/4123146.html" target="_blank" rel="external">Annotation验证</a></p>
+<h2 id="Filter实现"><a href="#Filter实现" class="headerlink" title="Filter实现"></a>Filter实现</h2><p><a href="http://blog.csdn.net/liuwenbo0920/article/details/7283757" target="_blank" rel="external">Spring MVC 中 HandlerInterceptorAdapter的使用</a></p>
+<h2 id="参数提取"><a href="#参数提取" class="headerlink" title="参数提取"></a>参数提取</h2><p><a href="http://stackoverflow.com/questions/12393937/spring-mvc-implementation-of-webargumentresolver" target="_blank" rel="external">自定义WebArgumentResolver/HandlerMethodArgumentResolver从session中提取参数</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Spring/">Spring</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/04/05/Http-Servlet汇总/" title="Http Servlet汇总" itemprop="url">Http Servlet汇总</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +349,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> Published 2016-04-05</time>
+    <time datetime="2016-04-05T06:25:30.000Z" itemprop="datePublished"> 發表於 2016-04-05</time>
     
   </p>
 </header>
@@ -139,7 +400,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    <time datetime="2016-04-03T12:13:48.000Z" itemprop="datePublished"> 發表於 2016-04-03</time>
     
   </p>
 </header>
@@ -212,7 +473,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-03T11:24:27.000Z" itemprop="datePublished"> Published 2016-04-03</time>
+    <time datetime="2016-04-03T11:24:27.000Z" itemprop="datePublished"> 發表於 2016-04-03</time>
     
   </p>
 </header>
@@ -279,7 +540,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> 發表於 2016-04-01</time>
     
   </p>
 </header>
@@ -364,6 +625,80 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> 發表於 2016-04-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
+<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
+<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
+<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
+<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
+<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
+<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
+<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
+<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
+<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
+<p>参考：</p>
+<ul>
+<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
+<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/04/01/HTTP Session 攻击与防护/" title="HTTP Session 攻击与防护" itemprop="url">HTTP Session 攻击与防护</a>
   </h1>
   <p class="article-author">By
@@ -371,7 +706,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> 發表於 2016-04-01</time>
     
   </p>
 </header>
@@ -473,356 +808,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
-<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
-<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
-<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
-<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
-<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
-<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
-<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
-<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
-<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
-<p>参考：</p>
-<ul>
-<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
-<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Java中一个线程可以多次start吗"><a href="#Java中一个线程可以多次start吗" class="headerlink" title="Java中一个线程可以多次start吗?"></a>Java中一个线程可以多次start吗?</h1><p><strong>不可以</strong><br>通过Thread实例的start()，一个Thread的实例只能产生一个线程。一个Thread的实例一旦调用start()方法，这个实例的started标记就标记为true，事实中不管这个线程后来有没有执行到底，只要调用了一次start()就再也没有机会运行了。<br>一个线程对象只能调用一次start方法.从new到等待运行是单行道,所以如果你对一个已经启动的线程对象再调用一次start方法的话,会产生:IllegalThreadStateException异常. 可以被重复调用的是run()方法。<br>Thread类中run()和start()方法的区别如下:<br>run()方法: 在本线程内调用该Runnable对象的run()方法，可以重复多次调用；<br>start()方法: 启动一个线程，调用该Runnable对象的run()方法，不能多次启动一个线程</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/多线程/">多线程</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Java-IO"><a href="#Java-IO" class="headerlink" title="Java IO"></a>Java IO</h1><h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><p>Java IO流是既可以从中读取，也可以写入到其中的数据流。正如这个系列教程之前提到过的，流通常会与数据源、数据流向目的地相关联，比如文件、网络等等。</p>
-<p>流和数组不一样，不能通过索引读写数据。在流中，你也不能像数组那样前后移动读取数据，除非使用RandomAccessFile 处理文件。流仅仅只是一个连续的数据流。</p>
-<p>某些类似PushbackInputStream 流的实现允许你将数据重新推回到流中，以便重新读取。然而你只能把有限的数据推回流中，并且你不能像操作数组那样随意读取数据。流中的数据只能够顺序访问。</p>
-<p>Java IO流通常是基于字节或者基于字符的。字节流通常以“stream”命名，比如InputStream和OutputStream。除了DataInputStream 和DataOutputStream 还能够读写int, long, float和double类型的值以外，其他流在一个操作时间内只能读取或者写入一个原始字节。</p>
-<p>字符流通常以“Reader”或者“Writer”命名。字符流能够读写字符(比如Latin1或者Unicode字符)。可以浏览Java Readers and Writers获取更多关于字符流输入输出的信息。</p>
-<ul>
-<li>InputStream</li>
-</ul>
-<p>java.io.InputStream类是所有Java IO输入流的基类。如果你正在开发一个从流中读取数据的组件，请尝试用InputStream替代任何它的子类(比如FileInputStream)进行开发。这么做能够让你的代码兼容任何类型而非某种确定类型的输入流。</p>
-<p>然而仅仅依靠InputStream并不总是可行。如果你需要将读过的数据推回到流中，你必须使用PushbackInputStream，这意味着你的流变量只能是这个类型，否则在代码中就不能调用PushbackInputStream的unread()方法。</p>
-<p>通常使用输入流中的read()方法读取数据。read()方法返回一个整数，代表了读取到的字节的内容(译者注：0 ~ 255)。当达到流末尾没有更多数据可以读取的时候，read()方法返回-1。</p>
-<ul>
-<li>OutputStream</li>
-</ul>
-<p>java.io.OutputStream是Java IO中所有输出流的基类。如果你正在开发一个能够将数据写入流中的组件，请尝试使用OutputStream替代它的所有子类。<br>-组合流</p>
-<p>你可以将流整合起来以便实现更高级的输入和输出操作。比如，一次读取一个字节是很慢的，所以可以从磁盘中一次读取一大块数据，然后从读到的数据块中获取字节。为了实现缓冲，可以把InputStream包装到BufferedInputStream中。</p>
-<h2 id="字节和字符数组"><a href="#字节和字符数组" class="headerlink" title="字节和字符数组"></a>字节和字符数组</h2><p>Java中的字节和字符数组，经常被用于临时存储应用程序内部的数据，所以数组也是常见的数据来源以及数据流目的地。如果你在程序执行过程中需要频繁访问文件的内容，你可能会愿意将文件加载到数组中去。当然你可以通过索引直接访问这些数组。但是如果你有一个组件的设计初衷是从InputStream或者Reader而非数组中读取某些数据呢？</p>
-<ul>
-<li>通过InputStream或者Reader读取数组</li>
-</ul>
-<p>为了让你的组件能够从数组中读取数据，你需要把字节或者字符数组包装到一个ByteArrayInputStream或者CharArrayReader中。这种方式允许通过包装好的stream或者reader读取数组中的字节或者字符数据。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>]; </span><br><span class="line"><span class="comment">//write data into byte array...  </span></span><br><span class="line">InputStream input = <span class="keyword">new</span> ByteArrayInputStream(bytes);  </span><br><span class="line"><span class="comment">//read first byte </span></span><br><span class="line"><span class="keyword">int</span> data = input.read(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(data != -<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">//do something with data</span></span><br><span class="line">    <span class="comment">//read next byte      </span></span><br><span class="line">    data = input.read(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>通过InputStream或者Reader写入数组</li>
-</ul>
-<p>同样可以将数据写入到ByteArrayOutputStream或者CharArrayWriter中。你所需要做的是创建一个ByteArrayOutputStream或者CharArrayWriter，然后写入数据，就像你操作其他类型的stream或者writer一样。当所有的数据都写入完毕，只需调用toByteArray()或者toCharArray()，即可得到写入数据的数组形式。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">output.write(<span class="string">"This text is converted to bytes"</span>.toBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line"><span class="keyword">byte</span>[] bytes = output.toByteArray();</span><br></pre></td></tr></table></figure></p>
-<p>操作一个字符数组的代码也与本例类似，只需要将字符数组包装到CharArrayWriter中。</p>
-<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>Java IO中的管道为运行在同一个JVM中的两个线程提供了通信的能力。所以管道也可以作为数据源以及目标媒介。</p>
-<p>你不能利用管道与不同的JVM中的线程通信(不同的进程)。在概念上，Java的管道不同于Unix/Linux系统中的管道。在Unix/Linux中，运行在不同地址空间的两个进程可以通过管道通信。在Java中，通信的双方应该是运行在同一进程中的不同线程。</p>
-<ul>
-<li>通过Java IO创建管道</li>
-</ul>
-<p>可以通过Java IO中的PipedOutputStream和PipedInputStream创建管道。一个PipedInputStream流应该和一个PipedOutputStream流相关联。一个线程通过PipedOutputStream写入的数据可以被另一个线程通过相关联的PipedInputStream读取出来。<br>你也可以使用两个管道共有的connect()方法使之相关联。PipedInputStream和PipedOutputStream都拥有一个可以互相关联的connect()方法。</p>
-<ul>
-<li>管道和线程</li>
-</ul>
-<p>请记得，当使用两个相关联的管道流时，务必将它们分配给不同的线程。read()方法和write()方法调用时会导致流阻塞，这意味着如果你尝试在一个线程中同时进行读和写，可能会导致线程死锁。</p>
-<ul>
-<li>管道的替代</li>
-</ul>
-<p>除了管道之外，一个JVM中不同线程之间还有许多通信的方式。实际上，线程在大多数情况下会传递完整的对象信息而非原始的字节数据。但是，如果你需要在线程之间传递字节数据，Java IO的管道是一个不错的选择。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/IO/">IO</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/03/Hystrix学习笔记比较/" title="Hystrix学习笔记" itemprop="url">Hystrix学习笔记</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> Published 2016-02-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h1><p>学习资料：<a href="https://github.com/Netflix/Hystrix/wiki" target="_blank" rel="external">https://github.com/Netflix/Hystrix/wiki</a></p>
-<h2 id="What-Is-Hystrix-For"><a href="#What-Is-Hystrix-For" class="headerlink" title="What Is Hystrix For?"></a>What Is Hystrix For?</h2><p>Hystrix is designed to do the following:</p>
-<ul>
-<li>Give protection from and control over latency and failure from dependencies accessed (typically over the network) via third-party client libraries.   让程序具有处理调用外部服务失败的能力</li>
-<li>Stop cascading failures in a complex distributed system.</li>
-<li>Fail fast and rapidly recover.</li>
-<li>Fallback and gracefully degrade when possible.</li>
-<li>Enable near real-time monitoring, alerting, and operational control.<h2 id="Hystrix-works-by"><a href="#Hystrix-works-by" class="headerlink" title="Hystrix works by:"></a>Hystrix works by:</h2></li>
-<li>Preventing any single dependency from using up all container (such as Tomcat) user threads.</li>
-<li>Shedding load and failing fast instead of queueing.</li>
-<li>Providing fallbacks wherever feasible to protect users from failure.</li>
-<li>Using isolation techniques (such as bulkhead, swimlane, and circuit breaker patterns) to limit the impact of any one dependency.</li>
-<li>Optimizing for time-to-discovery through near real-time metrics, monitoring, and alerting</li>
-<li>Optimizing for time-to-recovery by means of low latency propagation of configuration changes and support for dynamic property changes in most aspects of Hystrix, which allows you to make real-time operational modifications with low latency feedback loops.</li>
-<li>Protecting against failures in the entire dependency client execution, not just in the network traffic.</li>
-</ul>
-<p>Hystrix使用命令模式HystrixCommand(Command)包装依赖调用逻辑，每个命令在单独线程中/信号授权下执行</p>
-<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><p>下面是一个HystrixCommand的简单的“hello world”实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommandHelloWorld</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> String name;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>));</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> String <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// a real example would do work like a network call here</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"Hello "</span> + name + <span class="string">"!"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>###同步执行<br>Hystrix commands能通过execute()方法调用被同步的执行<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).execute();</span><br></pre></td></tr></table></figure></p>
-<p>###异步执行<br>异步执行通过调用queue()方法实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Future&lt;String&gt; fs = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).queue();</span><br></pre></td></tr></table></figure></p>
-<p>###响应式执行<br>响应式执行（异步回调）通过使用observe() 执行<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Observable&lt;String&gt; fs = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).observe();</span><br></pre></td></tr></table></figure></p>
-<p>返回值可以通过订阅Observable获得<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">fs.subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// value emitted here</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<h2 id="Fallback"><a href="#Fallback" class="headerlink" title="Fallback"></a>Fallback</h2><p>优美的降级可以通过增加一个getFallback()实现来达到。该方法在各种类型的失败后执行。如： run（）方<br>法调用失败，超时，线程池，信号丢弃以及熔断器短路。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> String <span class="title">getFallback</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"Hello Failure "</span> + name + <span class="string">"!"</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="错误传播"><a href="#错误传播" class="headerlink" title="错误传播"></a>错误传播</h2><p>从run（）方法中抛出的所以异常(除了HystrixBadRequestException)都被计为异常。将触发getFallback()<br>和熔断逻辑。在HystrixBadRequestException中抛出的例外，你可以根据你的喜好进行包装，然后通过<br>getCause()获取。<br>HystrixBadRequestException设计的使用场景为，报告不合法的参数或非系统性错误。这些都不能计入失<br>败次数的度量，也不应当触发回退逻辑</p>
-<h2 id="Command-Name"><a href="#Command-Name" class="headerlink" title="Command Name"></a>Command Name</h2><h2 id="Command-Group"><a href="#Command-Group" class="headerlink" title="Command Group"></a>Command Group</h2><p>group进行统一管理<br>command组键名被用于将command分组，如报表，警告，面板或者组包的所以者。<br>默认情况下，它被用于command的线程池的命名，除非有单独的定义<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Setter cachedSetter = </span><br><span class="line">        Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>))</span><br><span class="line">            .andCommandKey(HystrixCommandKey.Factory.asKey(<span class="string">"HelloWorld"</span>));    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(cachedSetter);</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="Command线程池"><a href="#Command线程池" class="headerlink" title="Command线程池"></a>Command线程池</h2><p>线程池的键被用于监控HystrixThreadPool时的呈现，度量的发布，缓存等其它应用。一个<br>HystrixCommand 是和一个单个的HystrixThreadPool相关联，通过注入它的HystrixThreadPoolKey可以取<br>得HystrixThreadPool 或者它默认情况下用HystrixCommandGroupKey创建一个。</p>
-<h1 id="请求缓存"><a href="#请求缓存" class="headerlink" title="请求缓存"></a>请求缓存</h1><p>请求缓存通过实现<figure class="highlight plain"><figcaption><span>```或者```HystrixObservableCommand```中的``` getCacheKey() ```方法完成：依赖于request context 的某些东西，必须实例化HystrixRequestContext</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">``` java</span><br><span class="line">public class CommandUsingRequestCache extends HystrixCommand&lt;Boolean&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private final int value;</span><br><span class="line"></span><br><span class="line">    protected CommandUsingRequestCache(int value) &#123;</span><br><span class="line">        super(HystrixCommandGroupKey.Factory.asKey(&quot;ExampleGroup&quot;));</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected Boolean run() &#123;</span><br><span class="line">        return value == 0 || value % 2 == 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected String getCacheKey() &#123;</span><br><span class="line">        return String.valueOf(value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="请求合并"><a href="#请求合并" class="headerlink" title="请求合并"></a>请求合并</h2><p>请求合并是一个特性，它能自动将一批请求合并到单一的HystrixCommand实例中执行。<br>可以设定批次的大小和时间作为促发器来执行一个批次<br>两种style的请求合并</p>
-<ul>
-<li>request-scoped </li>
-<li>globally-scoped.<br>This is configured at collapser construction, and defaulted to request-scoped.<h2 id="Request-Context-Setup"><a href="#Request-Context-Setup" class="headerlink" title="Request Context Setup"></a>Request Context Setup</h2>为了能使用request的scoped特性（请求缓存，请求折叠，请求日记）HystrixRequestContext 的生命周期<br>必须被管理起来。（或者一个替代的HystrixConcurrencyStrategy 实现）<br>这就意味着下面代码必须在一个请求之前执行<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HystrixRequestContext context = HystrixRequestContext.initializeContext();</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>然后在请求的最后调用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context.shutdown();</span><br></pre></td></tr></table></figure></p>
-<h1 id="常见模式"><a href="#常见模式" class="headerlink" title="常见模式"></a>常见模式</h1><h2 id="快速失败-Fail-Fast"><a href="#快速失败-Fail-Fast" class="headerlink" title="快速失败 Fail Fast"></a>快速失败 Fail Fast</h2><h2 id="无声失败-Fail-Silent"><a href="#无声失败-Fail-Silent" class="headerlink" title="无声失败 Fail Silent"></a>无声失败 Fail Silent</h2><p>无声的失败等同于返回一个空的响应或者删除功能,它通过返回null，空的map对象，空的list或者其他类似<br>的响应实现。 通常通过HystrixCommand实例中的getFallback() 方法实现</p>
-<h2 id="回退：静态的-Fallback-Static"><a href="#回退：静态的-Fallback-Static" class="headerlink" title="回退：静态的 Fallback:Static"></a>回退：静态的 Fallback:Static</h2><p>一些回退能返回在代码中硬编码的值。它不能引起特性或将被移除服务（如同无声失败经常处理的方<br>法），但是执行默认的行为逻辑。</p>
-<h2 id="Fallback-Stubbed"><a href="#Fallback-Stubbed" class="headerlink" title="Fallback: Stubbed"></a>Fallback: Stubbed</h2><p>一个存根回退典型的被用于包含多个字段的一个组合对象被返回时。它们其中的一部分能被其它请求状态<br>来决定。当其它字段被设置为默认值。</p>
-<h2 id="Fallback-Cache-via-Network"><a href="#Fallback-Cache-via-Network" class="headerlink" title="Fallback: Cache via Network"></a>Fallback: Cache via Network</h2><p>由于回退如果重掉网络可能导致另外的失败，因此需要通过另外的HystrixCommand转换。<br>另外重要的是，回退command应当在独立的线程池中执行。如果两个command共享相同的线程池，会导<br>致主command将变的延迟并且占用整个的线程池，从而阻止回退。</p>
-<h2 id="主从都失效"><a href="#主从都失效" class="headerlink" title="主从都失效"></a>主从都失效</h2><p><img src="https://github.com/Netflix/Hystrix/wiki/images/primary-secondary-example-640.png" alt="enter image description here"><br>通过两个Command进行隔离</p>
-<p>##Client Doesn’t Perform Network Access</p>
-<h1 id="迁移"><a href="#迁移" class="headerlink" title="迁移"></a>迁移</h1><p><img src="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-without-640.png" alt="enter image description here"><br>to<br><img src="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-with-640.png" alt="enter image description here"></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/8/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span>
+    <a class="extend prev" rel="prev" href="/page/8/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/10/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -832,8 +832,12 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
+		
+		  
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+		  
 		
 		  
 			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
@@ -913,7 +917,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
@@ -933,11 +937,15 @@
 			
 		
 			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
 			
 		
 			
@@ -945,7 +953,7 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -953,15 +961,11 @@
 			
 		
 			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -969,23 +973,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 			
@@ -993,7 +985,19 @@
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1001,7 +1005,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -1017,11 +1021,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1173,7 +1177,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

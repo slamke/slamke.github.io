@@ -1,0 +1,666 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>有类型Actor | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="有类型Actor
+通过接口明确actor可以接收的消息目标和行为。
+
+TypedActor是Akka基于Active对象（Active Object）设计模式的一个实现，关于Active对象模式，可以看维基百科的定义：Active对象模式解耦了在一个对象上执行方法和调用方法的逻辑，执行方法和调用方法分别在各自的线程执行上下文中。该模式的目标是通过使用异步方法调用和一个调度器来处理请求，从而实现并行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有类型Actor">
+<meta property="og:url" content="slamke.github.io/2018/02/04/有类型Actor/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="有类型Actor
+通过接口明确actor可以接收的消息目标和行为。
+
+TypedActor是Akka基于Active对象（Active Object）设计模式的一个实现，关于Active对象模式，可以看维基百科的定义：Active对象模式解耦了在一个对象上执行方法和调用方法的逻辑，执行方法和调用方法分别在各自的线程执行上下文中。该模式的目标是通过使用异步方法调用和一个调度器来处理请求，从而实现并行">
+<meta property="og:updated_time" content="2018-02-04T05:47:55.694Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="有类型Actor">
+<meta name="twitter:description" content="有类型Actor
+通过接口明确actor可以接收的消息目标和行为。
+
+TypedActor是Akka基于Active对象（Active Object）设计模式的一个实现，关于Active对象模式，可以看维基百科的定义：Active对象模式解耦了在一个对象上执行方法和调用方法的逻辑，执行方法和调用方法分别在各自的线程执行上下文中。该模式的目标是通过使用异步方法调用和一个调度器来处理请求，从而实现并行">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/04/有类型Actor/" title="有类型Actor" itemprop="url">有类型Actor</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-04T05:47:30.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#有类型Actor"><span class="toc-number">1.</span> <span class="toc-text">有类型Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#工具箱"><span class="toc-number">1.1.</span> <span class="toc-text">工具箱</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建有类型Actor"><span class="toc-number">1.2.</span> <span class="toc-text">创建有类型Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方法返回"><span class="toc-number">1.2.1.</span> <span class="toc-text">方法返回:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#终止有类型Actor"><span class="toc-number">1.2.2.</span> <span class="toc-text">终止有类型Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有类型Actor监管树"><span class="toc-number">1.2.3.</span> <span class="toc-text">有类型Actor监管树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#监管策略"><span class="toc-number">1.2.4.</span> <span class="toc-text">监管策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#生命周期回调"><span class="toc-number">1.2.5.</span> <span class="toc-text">生命周期回调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接收任意消息"><span class="toc-number">1.2.6.</span> <span class="toc-text">接收任意消息</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="有类型Actor"><a href="#有类型Actor" class="headerlink" title="有类型Actor"></a>有类型Actor</h1><ul>
+<li>通过接口明确actor可以接收的消息目标和行为。</li>
+</ul>
+<p>TypedActor是Akka基于Active对象（Active Object）设计模式的一个实现，关于Active对象模式，可以看维基百科的定义：<br>Active对象模式解耦了在一个对象上执行方法和调用方法的逻辑，执行方法和调用方法分别在各自的线程执行上下文中。该模式的目标是通过使用异步方法调用和一个调度器来处理请求，从而实现并行计算处理，该模式由6个元素组成：</p>
+<ul>
+<li>一个Proxy对象，提供一个面向客户端的接口和一组公共的方法</li>
+<li>一个接口，定义了请求一个Active对象上的方法的集合</li>
+<li>一个来自客户端请求的列表</li>
+<li>一个调度器，确定下一次处理哪一个请求</li>
+<li>Active对象上方法的实现</li>
+<li>一个回调或者变量，供客户端接收请求被处理后的结果<br>通过前面对Actor的了解，我们知道Actor更适用于在Akka的Actor系统之间来实现并行计算处理，而TypedActor适用于桥接Actor系统和非Actor系统。TypedActor是基于JDK的Proxy来实现的，与Actor不同的是，Actor一次处理一个消息，而TypedActor一次处理一个调用（Call）。关于更多关于TypedActor，可以查看Akka文档。</li>
+</ul>
+<p>有类型Actor由两 “部分” 组成, <strong><em>一个公开的接口和一个实现,</em></strong> 对普通actor来说，你拥有一个外部API（公开接口的实例）来将方法调用异步地委托给其实现的私有实例。</p>
+<p>有类型Actor相对于普通Actor的优势在于有类型Actor拥有静态的契约，你不需要定义你自己的消息；它的劣势在于对你能做什么和不能做什么进行了一些限制，即你不能使用become/unbecome。</p>
+<p>有类型Actor是使用JDK Proxies实现的，JDK Proxies提供了非常简单的api来拦截方法调用。</p>
+<blockquote>
+<p>注意<br>和普通Akka actor一样，有类型actor一次也只处理一个消息。</p>
+</blockquote>
+<h2 id="工具箱"><a href="#工具箱" class="headerlink" title="工具箱"></a>工具箱</h2><p>在创建第一个有类型Actor之前，我们先了解一下我们手上可供使用的工具，它位于akka.actor.TypedActor中。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">TypedActor</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//返回有类型actor扩展</span></span><br><span class="line"><span class="keyword">val</span> extension = <span class="type">TypedActor</span>(system) <span class="comment">//system是一个Actor系统实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//判断一个引用是否是有类型actor代理</span></span><br><span class="line"><span class="type">TypedActor</span>(system).isTypedActor(someReference)</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回一个外部有类型actor代理所代表的Akka actor</span></span><br><span class="line"><span class="type">TypedActor</span>(system).getActorRefFor(someReference)</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回当前的ActorContext,</span></span><br><span class="line"><span class="comment">// 此方法仅在一个TypedActor 实现的方法中有效</span></span><br><span class="line"><span class="keyword">val</span> c: <span class="type">ActorContext</span> = <span class="type">TypedActor</span>.context</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回当前有类型actor的外部代理,</span></span><br><span class="line"><span class="comment">// 此方法仅在一个TypedActor 实现的方法中有效</span></span><br><span class="line"><span class="keyword">val</span> s: <span class="type">Squarer</span> = <span class="type">TypedActor</span>.self[<span class="type">Squarer</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回一个有类型Actor扩展的上下文实例</span></span><br><span class="line"><span class="comment">//这意味着如果你用它创建其它的有类型actor，它们会成为当前有类型actor的子actor</span></span><br><span class="line"><span class="type">TypedActor</span>(<span class="type">TypedActor</span>.context)</span><br></pre></td></tr></table></figure></p>
+<h2 id="创建有类型Actor"><a href="#创建有类型Actor" class="headerlink" title="创建有类型Actor"></a>创建有类型Actor</h2><p>要创建有类型Actor，需要一个或多个接口，和一个实现。<br>创建我们的Squarer的有类型actor实例的最简单方法是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> mySquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(system).typedActorOf(<span class="type">TypedProps</span>[<span class="type">SquarerImpl</span>]())</span><br></pre></td></tr></table></figure></p>
+<p>第一个类型是代理的类型，第二个类型是实现的类型。如果要调用某特定的构造方法要这样做：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> otherSquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(system).typedActorOf(<span class="type">TypedProps</span>(classOf[<span class="type">Squarer</span>],</span><br><span class="line">    <span class="keyword">new</span> <span class="type">SquarerImpl</span>(<span class="string">"foo"</span>)), <span class="string">"name"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>由于你提供了一个 Props, 你可以指定使用哪个派发器, 缺省的超时时间等。</p>
+<p>方法派发语义</p>
+<h3 id="方法返回"><a href="#方法返回" class="headerlink" title="方法返回:"></a>方法返回:</h3><ul>
+<li>Unit 会以 fire-and-forget语义进行派发，与ActorRef.tell完全一致。</li>
+<li>akka.dispatch.Future[_] 会以 send-request-reply语义进行派发，与 ActorRef.ask完全一致。</li>
+<li>scala.Option[<em>]会以send-request-reply语义派发，但是会阻塞等待应答, 如果在超时时限内没有应答则返回scala.None，否则返回包含结果的scala.Some[</em>]。在这个调用中发生的异常将被重新抛出。</li>
+<li>任何其它类型的值将以send-request-reply语义进行派发，但会阻塞地等待应答, 如果超时会抛出java.util.concurrent.TimeoutException，如果发生异常则将异常重新抛出。</li>
+</ul>
+<h3 id="终止有类型Actor"><a href="#终止有类型Actor" class="headerlink" title="终止有类型Actor"></a>终止有类型Actor</h3><p>由于有类型actor底层还是Akka actor，所以在不需要的时候要终止它。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">TypedActor</span>(system).stop(mySquarer)</span><br><span class="line">这将会尽快地异步终止与指定的代理关联的有类型<span class="type">Actor</span>。</span><br><span class="line"></span><br><span class="line"><span class="type">TypedActor</span>(system).poisonPill(otherSquarer)</span><br><span class="line">这将会在有类型actor完成所有入队的调用后异步地终止它。</span><br></pre></td></tr></table></figure></p>
+<h3 id="有类型Actor监管树"><a href="#有类型Actor监管树" class="headerlink" title="有类型Actor监管树"></a>有类型Actor监管树</h3><p>你可以通过传入一个ActorContext来获得有类型Actor上下文，所以你可以对它调用typedActorOf(..)来创建有类型子actor。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Inside your Typed Actor</span></span><br><span class="line"><span class="keyword">val</span> childSquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(<span class="type">TypedActor</span>.context).typedActorOf(<span class="type">TypedProps</span>[<span class="type">SquarerImpl</span>]())</span><br><span class="line"><span class="comment">//Use "childSquarer" as a Squarer</span></span><br><span class="line">通过将<span class="type">ActorContext</span>作为参数传给<span class="type">TypedActor</span>.get(…)，也可以为普通的<span class="type">Akka</span> actor创建有类型子actor。</span><br></pre></td></tr></table></figure></p>
+<h3 id="监管策略"><a href="#监管策略" class="headerlink" title="监管策略"></a>监管策略</h3><p>通过让你的有类型Actor的具体实现类实现TypedActor.Supervisor方法，你可以定义用来监管子actor的策略，就像监管与监控 和容错(Scala)所描述的。</p>
+<h3 id="生命周期回调"><a href="#生命周期回调" class="headerlink" title="生命周期回调"></a>生命周期回调</h3><p>通过使你的有类型actor实现类实现以下方法:</p>
+<ul>
+<li>TypedActor.PreStart</li>
+<li>TypedActor.PostStop</li>
+<li>TypedActor.PreRestart</li>
+<li>TypedActor.PostRestart<br>你可以hook进有类型actor的整个生命周期。</li>
+</ul>
+<h3 id="接收任意消息"><a href="#接收任意消息" class="headerlink" title="接收任意消息"></a>接收任意消息</h3><p>如果你的有类型actor的实现类扩展了akka.actor.TypedActor.Receiver，所有非方法调用MethodCall的消息会被传给onReceive方法.</p>
+<p>这使你能够对DeathWatch的Terminated消息及其它类型的消息进行处理，例如，与无类型actor进行交互的场合。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2018/02/04/有类型Actor/" data-title="有类型Actor | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2018/02/04/Akka邮箱-路由器-调度器关键点说明/"  title="Akka邮箱&amp;路由器&amp;调度器关键点说明">
+ <strong>下一篇：</strong><br/> 
+ <span>Akka邮箱&amp;路由器&amp;调度器关键点说明
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#有类型Actor"><span class="toc-number">1.</span> <span class="toc-text">有类型Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#工具箱"><span class="toc-number">1.1.</span> <span class="toc-text">工具箱</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建有类型Actor"><span class="toc-number">1.2.</span> <span class="toc-text">创建有类型Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方法返回"><span class="toc-number">1.2.1.</span> <span class="toc-text">方法返回:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#终止有类型Actor"><span class="toc-number">1.2.2.</span> <span class="toc-text">终止有类型Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有类型Actor监管树"><span class="toc-number">1.2.3.</span> <span class="toc-text">有类型Actor监管树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#监管策略"><span class="toc-number">1.2.4.</span> <span class="toc-text">监管策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#生命周期回调"><span class="toc-number">1.2.5.</span> <span class="toc-text">生命周期回调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接收任意消息"><span class="toc-number">1.2.6.</span> <span class="toc-text">接收任意消息</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

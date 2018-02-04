@@ -1,0 +1,751 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Akka Actor的创建&amp;引用&amp;声明周期 | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
+定义一个Actor类
+
+要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Akka Actor的创建&引用&声明周期">
+<meta property="og:url" content="slamke.github.io/2018/02/04/Akka Actor的创建-引用-声明周期/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
+定义一个Actor类
+
+要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta property="og:image" content="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png">
+<meta property="og:updated_time" content="2018-02-04T04:10:37.811Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Akka Actor的创建&引用&声明周期">
+<meta name="twitter:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
+定义一个Actor类
+
+要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta name="twitter:image" content="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/04/Akka Actor的创建-引用-声明周期/" title="Akka Actor的创建&amp;引用&amp;声明周期" itemprop="url">Akka Actor的创建&amp;引用&amp;声明周期</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-04T04:09:54.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Actor的创建-amp-引用-amp-声明周期"><a href="#Actor的创建-amp-引用-amp-声明周期" class="headerlink" title="Actor的创建&amp;引用&amp;声明周期"></a>Actor的创建&amp;引用&amp;声明周期</h1><h2 id="1-创建actor"><a href="#1-创建actor" class="headerlink" title="1.创建actor"></a>1.创建actor</h2><ul>
+<li>定义一个Actor类</li>
+</ul>
+<p>要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。<br>如下例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>Props</li>
+</ul>
+<p>Props是一个用来在创建actor时指定选项的配置类，可以把它看作是不可变的，因此在创建包含相关部署信息的actor时（例如使用哪一个调度器(dispatcher)，详见下文），是可以自由共享的。以下是如何创建Props实例的示例.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> props1 = <span class="type">Props</span>[<span class="type">MyActor</span>]</span><br><span class="line"><span class="keyword">val</span> props2 = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">ActorWithArgs</span>(<span class="string">"arg"</span>)) <span class="comment">// careful, see below</span></span><br><span class="line"><span class="keyword">val</span> props3 = <span class="type">Props</span>(classOf[<span class="type">ActorWithArgs</span>], <span class="string">"arg"</span>)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>警告<br>在另一个actor中声明一个actor是非常危险的，会打破actor的封装。永远不要将一个actor的this引用传进Props！<br>推荐做法</p>
+</blockquote>
+<p>在每一个Actor的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的Props，尽可能接近actor的定义。这也避免了使用Props.apply(…)方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">DemoActor</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Create Props for an actor of this type.</span><br><span class="line">   * @param magciNumber The magic number to be passed to this actor’s constructor.</span><br><span class="line">   * @return a Props for creating this actor, which can then be further configured</span><br><span class="line">   *         (e.g. calling `.withDispatcher()` on it)</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">props</span></span>(magicNumber: <span class="type">Int</span>): <span class="type">Props</span> = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">DemoActor</span>(magicNumber))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemoActor</span>(<span class="params">magicNumber: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> x: <span class="type">Int</span> =&gt; sender() ! (x + magicNumber)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeOtherActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Props(new DemoActor(42)) would not be safe</span></span><br><span class="line">  context.actorOf(<span class="type">DemoActor</span>.props(<span class="number">42</span>), <span class="string">"demo"</span>)</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>使用Props创建Actor</li>
+</ul>
+<p>Actor可以通过将Props实例传入actorOf工厂方法来创建，ActorSystem和ActorContext中都有该方法。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">ActorSystem</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ActorSystem is a heavy object: create only one per application</span></span><br><span class="line"><span class="keyword">val</span> system = <span class="type">ActorSystem</span>(<span class="string">"mySystem"</span>)</span><br><span class="line"><span class="keyword">val</span> myActor = system.actorOf(<span class="type">Props</span>[<span class="type">MyActor</span>], <span class="string">"myactor2"</span>)</span><br><span class="line">使用<span class="type">ActorSystem</span>将创建顶级actor，由actor系统提供的守护actor监管；如果使用的是actor的上下文，则创建一个该actor的子actor。</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> child = context.actorOf(<span class="type">Props</span>[<span class="type">MyActor</span>], name = <span class="string">"myChild"</span>)</span><br><span class="line">  <span class="comment">// plus some behavior ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>推荐创建一个树形结构，包含子actor、孙子等等，使之符合应用的逻辑错误处理结构</p>
+<ul>
+<li>依赖注入</li>
+</ul>
+<p>如果你的actor有带参数的构造函数，则这些参数也需要成为Props的一部分，如上文所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">IndirectActorProducer</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DependencyInjector</span>(<span class="params">applicationContext: <span class="type">AnyRef</span>, beanName: <span class="type">String</span></span>)</span></span><br><span class="line">  <span class="keyword">extends</span> <span class="type">IndirectActorProducer</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">actorClass</span> </span>= classOf[<span class="type">Actor</span>]</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">produce</span> </span>=</span><br><span class="line">    <span class="comment">// obtain fresh Actor instance from DI framework ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> actorRef = system.actorOf(</span><br><span class="line">  <span class="type">Props</span>(classOf[<span class="type">DependencyInjector</span>], applicationContext, <span class="string">"hello"</span>),</span><br><span class="line">  <span class="string">"helloBean"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-Actor-API"><a href="#2-Actor-API" class="headerlink" title="2.Actor API"></a>2.Actor API</h2><p>Actor trait只定义了一个抽象方法，就是上面提到的receive，用来实现actor的行为。</p>
+<p><strong>如果当前actor的行为与收到的消息不匹配，则会调用 unhandled，其缺省实现是向actor系统的事件流中发布一条akka.actor.UnhandledMessage(message, sender, recipient)</strong>（将配置项akka.actor.debug.unhandled设置为on来将它们转换为实际的调试消息）。</p>
+<p>另外，它还包括:</p>
+<ul>
+<li><strong>self引用代表本actor的ActorRef</strong></li>
+<li><strong>sender引用代表最近收到消息的发送actor，通常用于下面将讲到的消息回应中</strong></li>
+<li><strong>supervisorStrategy 用户可重写它来定义对子actor的监管策略</strong></li>
+</ul>
+<p>该策略通常在actor内声明，这样决定函数就可以访问actor的内部状态：因为失败通知作为消息发送给监管者，并像普通消息一样被处理（尽管不是正常行为），所有的值和actor变量都是可用的，以及sender引用 （报告失败的将是直接子actor；如果原始失败发生在遥远的后裔，它仍然是一次向上报告一层）。</p>
+<ul>
+<li>context暴露actor和当前消息的上下文信息，如：<ul>
+<li>用于创建子actor的工厂方法（actorOf）</li>
+<li>actor所属的系统</li>
+<li>父监管者</li>
+<li>所监管的子actor</li>
+<li>生命周期监控</li>
+<li>hotswap行为栈，见Become/Unbecome</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-Actor生命周期"><a href="#3-Actor生命周期" class="headerlink" title="3.Actor生命周期"></a>3.Actor生命周期</h2><p><img src="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png" alt="enter image description here"></p>
+<p>actor系统中的路径代表一个”地方”，这里可能会被活着的actor占据。最初（除了系统初始化actor）路径都是空的。在调用actorOf()时它将为指定路径分配根据传入Props创建的一个actor化身。<strong>actor化身是由路径和一个UID标识的</strong>。重新启动只会替换有Props定义的Actor实例，但不会替换化身，因此UID保持不变。</p>
+<p>当actor停止时，其化身的生命周期结束。在这一时间点上相关的生命周期事件被调用，监视该actor的actor都会获得终止通知。当化身停止后，路径可以重复使用，通过actorOf()创建一个actor。在这种情况下，除了UID不同外，新化身与老化身是相同的。</p>
+<p><strong>ActorRef始终表示化身（路径和UID）而不只是一个给定的路径。因此如果actor停止，并且创建一个新的具有相同名称的actor，则指向老化身的ActorRef将不会指向新的化身。</strong></p>
+<p>相对地，ActorSelection指向路径（或多个路径，如果使用了通配符），且完全不关注有没有化身占据它。因此ActorSelection 不能被监视。获取某路径下的当前化身ActorRef是可能的，只要向该ActorSelection发送Identify，如果收到ActorIdentity回应，则正确的引用就包含其中（详见通过Actor Selection确定Actor）。也可以使用ActorSelection的resolveOne方法，它会返回一个包含匹配ActorRef的Future。</p>
+<ul>
+<li>使用DeathWatch进行生命周期监控</li>
+</ul>
+<p>为了在其它actor终止时 (即永久停止，而不是临时的失败和重启)收到通知，actor可以将自己注册为其它<strong>actor在终止时所发布的Terminated消息</strong>的接收者（见停止 Actor）。这个服务是由actor系统的DeathWatch组件提供的。</p>
+<p>注册一个监视器很简单：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Actor</span>, <span class="type">Props</span>, <span class="type">Terminated</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WatchActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> child = context.actorOf(<span class="type">Props</span>.empty, <span class="string">"child"</span>)</span><br><span class="line">  context.watch(child) <span class="comment">// &lt;-- this is the only call needed for registration</span></span><br><span class="line">  <span class="keyword">var</span> lastSender = system.deadLetters</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"kill"</span> =&gt;</span><br><span class="line">      context.stop(child); lastSender = sender()</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`child`) =&gt; lastSender ! <span class="string">"finished"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>要注意Terminated消息的产生与注册和终止行为所发生的顺序无关。特别地，即使在注册时，被观察的actor已经终止了，监视actor仍然会受到一个Terminated消息。</p>
+<p>多次注册并不表示会有多个消息产生，也不保证有且只有一个这样的消息被接收到：如果被监控的actor已经生成了消息并且已经进入了队列，在这个消息被处理之前又发生了另一次注册，则会有第二个消息进入队列，因为对一个已经终止的actor的监控注册操作会立刻导致Terminated消息的产生。</p>
+<p>可以使用context.unwatch(target)来停止对另一个actor生存状态的监控。即使Terminated已经加入邮箱，该操作仍有效；一旦调用unwatch，则被观察的actor的Terminated消息就都不会再被处理。</p>
+<ul>
+<li>启动Hook</li>
+</ul>
+<p>actor启动后，它的preStart方法会被立即执行。</p>
+<p>override def preStart() {<br>  // registering with other actors<br>  someService ! Register(self)<br>}<br>在actor第一次创建时，将调用此方法。在重新启动期间，它被postRestart的默认实现调用，这意味着通过重写该方法，你可以选择是仅仅在初始化该actor时调用一次，还是为每次重新启动都调用。actor构造函数中的初始化代码将在每个actor实例创建的时候被调用，这也发生在每次重启时。</p>
+<ul>
+<li>重启Hook</li>
+</ul>
+<p>所有的actor都是被监管的，即与另一个使用某种失败处理策略的actor绑定在一起。如果在处理一个消息的时候抛出了异常，Actor将被重启（详见监管与监控）。这个重启过程包括上面提到的Hook：</p>
+<p>要被重启的actor被通知是通过调用preRestart，包含着导致重启的异常以及触发异常的消息；如果重启并不是因为消息处理而发生的，则所携带的消息为None，例如，当一个监管者没有处理某个异常继而被其监管者重启时，或者因其兄弟节点的失败导致的重启。如果消息可用，则消息的发送者通常也可用（即通过调用sender）。</p>
+<p>这个方法是用来完成清理、准备移交给新actor实例等操作的最佳位置。其缺省实现是终止所有子actor并调用postStop。</p>
+<p>最初调用actorOf的工厂将被用来创建新的实例。<br>新的actor的postRestart方法被调用时，将携带着导致重启的异常信息。默认实现中，preStart被调用时，就像一个正常的启动一样。<br>actor的重启只会替换掉原来的actor对象；重启不影响邮箱的内容，所以对消息的处理将在postRestart hook返回后继续。触发异常的消息不会被重新接收。在actor重启过程中，所有发送到该actor的消息将象平常一样被放进邮箱队列中。</p>
+<blockquote>
+<p>警告<br>要知道失败通知与用户消息的相关顺序不是决定性的。尤其是，在失败以前收到的最后一条消息被处理之前，父节点可能已经重启其子节点了。详细信息请参见“讨论：消息顺序”。</p>
+</blockquote>
+<ul>
+<li>终止 Hook</li>
+</ul>
+<p>一个Actor终止后，其postStop hook将被调用，它可以用来，例如取消该actor在其它服务中的注册。这个hook保证在该actor的消息队列被禁止后才运行，即之后发给该actor的消息将被重定向到ActorSystem的deadLetters中。</p>
+<h2 id="3-通过Actor-Selection定位Actor"><a href="#3-通过Actor-Selection定位Actor" class="headerlink" title="3. 通过Actor Selection定位Actor"></a>3. 通过Actor Selection定位Actor</h2><p>如Actor引用, 路径与地址中所述，每个actor都拥有一个唯一的逻辑路径，此路径是由从actor系统的根开始的父子链构成；它还拥有一个物理路径，如果监管链包含有远程监管者，此路径可能会与逻辑路径不同。这些路径用来在系统中查找actor，例如，当收到一个远程消息时查找收件者，但是它们更直接的用处在于：actor可以通过指定绝对或相对路径（逻辑的或物理的）来查找其它的actor，并随结果获取一个ActorSelection：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// will look up this absolute path</span></span><br><span class="line">context.actorSelection(<span class="string">"/user/serviceA/aggregator"</span>)</span><br><span class="line"><span class="comment">// will look up sibling beneath same supervisor</span></span><br><span class="line">context.actorSelection(<span class="string">"../joe"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>其中指定的路径被解析为一个java.net.URI，它以/分隔成路径段。如果路径以/开始，表示一个绝对路径，且从根监管者（”/user”的父亲）开始查找；否则是从当前actor开始。如果某一个路径段为..，会找到当前所遍历到的actor的上一级，否则则会向下一级寻找具有该名字的子actor。 必须注意的是actor路径中的..总是表示逻辑结构，即其监管者。</p>
+<p><strong>一个actor selection的路径元素中可能包含通配符，从而允许向匹配模式的集合广播该条消息</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// will look all children to serviceB with names starting with worker</span></span><br><span class="line">context.actorSelection(<span class="string">"/user/serviceB/worker*"</span>)</span><br><span class="line"><span class="comment">// will look up all siblings beneath same supervisor</span></span><br><span class="line">context.actorSelection(<span class="string">"../*"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>消息可以通过ActorSelection发送，并且在投递每条消息时 ActorSelection的路径都会被查找。如果selection不匹配任何actor，则消息将被丢弃。</p>
+<p>要获得ActorSelection的ActorRef，你需要发送一条消息到selection，然后使用答复消息的sender()引用即可。有一个内置的Identify消息，所有actor会理解它并自动返回一个包含ActorRef的ActorIdentity消息。此消息被遍历到的actor特殊处理为，如果一个具体的名称查找失败（即一个不含通配符的路径没有对应的活动actor），则会生成一个否定结果。请注意这并不意味着应答消息有到达保证，它仍然是一个普通的消息。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Actor</span>, <span class="type">Props</span>, <span class="type">Identify</span>, <span class="type">ActorIdentity</span>, <span class="type">Terminated</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Follower</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> identifyId = <span class="number">1</span></span><br><span class="line">  context.actorSelection(<span class="string">"/user/another"</span>) ! <span class="type">Identify</span>(identifyId)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">ActorIdentity</span>(`identifyId`, <span class="type">Some</span>(ref)) =&gt;</span><br><span class="line">      context.watch(ref)</span><br><span class="line">      context.become(active(ref))</span><br><span class="line">    <span class="keyword">case</span> <span class="type">ActorIdentity</span>(`identifyId`, <span class="type">None</span>) =&gt; context.stop(self)</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">active</span></span>(another: <span class="type">ActorRef</span>): <span class="type">Actor</span>.<span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`another`) =&gt; context.stop(self)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>你也可以通过ActorSelection的resolveOne方法获取ActorSelection的一个ActorRef。如果存在这样的actor，它将返回一个包含匹配的ActorRef的Future。如果没有这样的actor 存在或识别没有在指定的时间内完成，它将以失败告终——akka.actor.ActorNotFound。</p>
+<p>如果开启了远程调用，则远程actor地址也可以被查找:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context.actorSelection(<span class="string">"akka.tcp://app@otherhost:1234/user/serviceB"</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-发送消息"><a href="#4-发送消息" class="headerlink" title="4.发送消息"></a>4.发送消息</h3><p>向actor发送消息需使用下列方法之一。</p>
+<ul>
+<li>!意思是“fire-and-forget”，即异步发送一个消息并立即返回。也称为tell。</li>
+<li>?异步发送一条消息并返回一个Future代表一个可能的回应。也称为ask。<br>对每一个消息发送者，分别有消息顺序保证。</li>
+</ul>
+<blockquote>
+<p>注意<br>使用ask有一些性能内涵，因为需要跟踪超时，需要有桥梁将Promise转为ActorRef，并且需要在远程情况下可访问。所以为了性能应该总选择tell，除非只能选择ask。</p>
+</blockquote>
+<h4 id="Tell-Fire-forget"><a href="#Tell-Fire-forget" class="headerlink" title="Tell: Fire-forget"></a>Tell: Fire-forget</h4><p>这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">actorRef ! message</span><br></pre></td></tr></table></figure></p>
+<p>如果是在一个Actor中调用 ，那么发送方的actor引用会被隐式地作为消息的sender(): ActorRef成员一起发送。目的actor可以使用它来向源actor发送回应， 使用sender() ! replyMsg。</p>
+<p>如果不是从Actor实例发送的，sender成员缺省为 deadLetters actor引用。</p>
+<h4 id="Ask-Send-And-Receive-Future"><a href="#Ask-Send-And-Receive-Future" class="headerlink" title="Ask: Send-And-Receive-Future"></a>Ask: Send-And-Receive-Future</h4><p>ask模式既包含actor也包含future，所以它是一种使用模式，而不是ActorRef的方法:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.&#123; ask, pipe &#125;</span><br><span class="line"><span class="keyword">import</span> system.dispatcher <span class="comment">// The ExecutionContext that will be used</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span>(<span class="params">x: <span class="type">Int</span>, s: <span class="type">String</span>, d: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Request</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> timeout = <span class="type">Timeout</span>(<span class="number">5</span> seconds) <span class="comment">// needed for `?` below</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f: <span class="type">Future</span>[<span class="type">Result</span>] =</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    x &lt;- ask(actorA, <span class="type">Request</span>).mapTo[<span class="type">Int</span>] <span class="comment">// call pattern directly</span></span><br><span class="line">    s &lt;- (actorB ask <span class="type">Request</span>).mapTo[<span class="type">String</span>] <span class="comment">// call by implicit conversion</span></span><br><span class="line">    d &lt;- (actorC ? <span class="type">Request</span>).mapTo[<span class="type">Double</span>] <span class="comment">// call by symbolic name</span></span><br><span class="line">  &#125; <span class="keyword">yield</span> <span class="type">Result</span>(x, s, d)</span><br><span class="line"></span><br><span class="line">f pipeTo actorD <span class="comment">// .. or ..</span></span><br><span class="line">pipe(f) to actorD</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-接收消息"><a href="#5-接收消息" class="headerlink" title="5.接收消息"></a>5.接收消息</h3><p>Actor必须实现receive方法来接收消息：</p>
+<p>protected def receive: PartialFunction[Any, Unit]<br>这个方法应返回一个PartialFunction，例如一个“match/case”子句，消息可以与其中的不同分支进行scala模式匹配。如下例:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="6-终止Actor"><a href="#6-终止Actor" class="headerlink" title="6.终止Actor"></a>6.终止Actor</h3><p>通过调用ActorRefFactory（即ActorContext或ActorSystem）的stop方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即stop可能在actor被终止之前返回。</p>
+<p>actor的终止分两步: 第一步actor将挂起对邮箱的处理，并向所有子actor发送终止命令，然后处理来自子actor的终止消息直到所有的子actor都完成终止，最后终止自己（调用postStop，清空邮箱，向DeathWatch发布Terminated，通知其监管者）。这个过程保证actor系统中的子树以一种有序的方式终止，将终止命令传播到叶子结点并收集它们回送的确认消息给被终止的监管者。如果其中某个actor没有响应（即由于处理消息用了太长时间以至于没有收到终止命令），整个过程将会被阻塞。</p>
+<p>在ActorSystem.shutdown()被调用时，系统根监管actor会被终止，以上的过程将保证整个系统的正确终止。</p>
+<p>postStop() hook 是在actor被完全终止以后调用的。这是为了清理资源:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">postStop</span></span>() &#123;</span><br><span class="line">  <span class="comment">// clean up some resources ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>注意<br>由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致InvalidActorNameException。你应该 监视watch()正在终止的actor，并在Terminated最终到达后作为回应创建它的替代者。</p>
+</blockquote>
+<p>优雅地终止</p>
+<p>如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用gracefulStop：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.gracefulStop</span><br><span class="line"><span class="keyword">import</span> scala.concurrent.<span class="type">Await</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">val</span> stopped: <span class="type">Future</span>[<span class="type">Boolean</span>] = gracefulStop(actorRef, <span class="number">5</span> seconds, <span class="type">Manager</span>.<span class="type">Shutdown</span>)</span><br><span class="line">  <span class="type">Await</span>.result(stopped, <span class="number">6</span> seconds)</span><br><span class="line">  <span class="comment">// the actor has been stopped</span></span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">  <span class="comment">// the actor wasn't stopped within 5 seconds</span></span><br><span class="line">  <span class="keyword">case</span> e: akka.pattern.<span class="type">AskTimeoutException</span> =&gt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Manager</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Shutdown</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Manager</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">import</span> <span class="type">Manager</span>._</span><br><span class="line">  <span class="keyword">val</span> worker = context.watch(context.actorOf(<span class="type">Props</span>[<span class="type">Cruncher</span>], <span class="string">"worker"</span>))</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; worker ! <span class="string">"crunch"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Shutdown</span> =&gt;</span><br><span class="line">      worker ! <span class="type">PoisonPill</span></span><br><span class="line">      context become shuttingDown</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">shuttingDown</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; sender() ! <span class="string">"service unavailable, shutting down"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`worker`) =&gt;</span><br><span class="line">      context stop self</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当gracefulStop()成功返回时，actor的postStop() hook将会被执行：在postStop()结束和gracefulStop()返回之间存在happens-before边界。</p>
+<p>在上面的示例中自定义的Manager.Shutdown消息是发送到目标actor来启动actor的终止过程。你可以使用PoisonPill，但之后在停止目标actor之前，你与其他actor的互动的机会有限。在postStop中，可以处理简单的清理任务。</p>
+<blockquote>
+<p>警告<br>请记住，actor停止和其名称被注销是彼此异步发生的独立事件。因此，在gracefulStop()返回后。你会发现其名称仍可能在使用中。为了保证正确注销，只在你控制的监管者内，并且只在响应Terminated消息时重用名称，即不是用于顶级actor。</p>
+</blockquote>
+<h3 id="7-Become-Unbecome"><a href="#7-Become-Unbecome" class="headerlink" title="7.Become/Unbecome"></a>7.Become/Unbecome</h3><p>升级</p>
+<p>Akka支持在运行时对Actor消息循环（即其实现）进行实时替换：在actor中调用context.become方法。become要求一个PartialFunction[Any, Unit]参数作为新的消息处理实现。 被替换的代码被保存在一个栈中，可以被push和pop。</p>
+<blockquote>
+<p>警告<br>请注意actor被其监管者重启后将恢复其最初的行为。</p>
+</blockquote>
+<h3 id="8-使用PartialFunction链来扩展actor"><a href="#8-使用PartialFunction链来扩展actor" class="headerlink" title="8.使用PartialFunction链来扩展actor"></a>8.使用PartialFunction链来扩展actor</h3><p>有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的receive方法返回一个Actor.Receive（PartialFunction[Any,Unit]的类型别名）而使之成为可能，多个偏函数可以使用PartialFunction#orElse链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记”第一个匹配”获胜——这在组合可以处理同一类型的消息的功能时会很重要。</p>
+<p>例如，假设你有一组actor是生产者Producers或消费者Consumers，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的receive实现为这些偏函数的组合。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> producerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">GiveMeThings</span> =&gt;</span><br><span class="line">      sender() ! <span class="type">Give</span>(<span class="string">"thing"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> <span class="keyword">with</span> <span class="type">ActorLogging</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> consumerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> ref: <span class="type">ActorRef</span> =&gt;</span><br><span class="line">      ref ! <span class="type">GiveMeThings</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Give</span>(thing) =&gt;</span><br><span class="line">      log.info(<span class="string">"Got a thing! It's &#123;&#125;"</span>, thing)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span> <span class="keyword">with</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProducerConsumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span></span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ProducerBehavior</span> <span class="keyword">with</span> <span class="type">ConsumerBehavior</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior orElse consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// protocol</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">GiveMeThings</span></span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Give</span>(<span class="params">thing: <span class="type">Any</span></span>)</span></span><br></pre></td></tr></table></figure></p>
+<p>不同于继承，相同的模式可以通过组合实现——可以简单地通过委托的偏函数组合成receive方法。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2018/02/04/Akka Actor的创建-引用-声明周期/" data-title="Akka Actor的创建&amp;引用&amp;声明周期 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/02/04/Akka的监管和监控/" title="Akka的监管和监控">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Akka的监管和监控</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/01/16/Spark遇到中文乱码问题如何解决/"  title="Spark遇到中文乱码问题如何解决">
+ <strong>下一篇：</strong><br/> 
+ <span>Spark遇到中文乱码问题如何解决
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

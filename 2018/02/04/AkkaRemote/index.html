@@ -1,0 +1,681 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>AkkaRemote | 雁渡寒潭 风吹疏竹</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Sun Ke">
+    
+
+    
+    <meta name="description" content="Akka远程Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的
+远程交互的类型Akka 远程调用有两种方式:
+
+查找 : 使用actorSelection(path)在远程主机上查找一个actor
+创建 : 使用actorOf(Props(…), actorName)在远程主机上创建一个actor
+
+查找远程 ActorsactorSelection(path)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AkkaRemote">
+<meta property="og:url" content="slamke.github.io/2018/02/04/AkkaRemote/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="Akka远程Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的
+远程交互的类型Akka 远程调用有两种方式:
+
+查找 : 使用actorSelection(path)在远程主机上查找一个actor
+创建 : 使用actorOf(Props(…), actorName)在远程主机上创建一个actor
+
+查找远程 ActorsactorSelection(path)">
+<meta property="og:updated_time" content="2018-02-04T04:41:08.096Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AkkaRemote">
+<meta name="twitter:description" content="Akka远程Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的
+远程交互的类型Akka 远程调用有两种方式:
+
+查找 : 使用actorSelection(path)在远程主机上查找一个actor
+创建 : 使用actorOf(Props(…), actorName)在远程主机上创建一个actor
+
+查找远程 ActorsactorSelection(path)">
+
+    
+    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:slamke.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/04/AkkaRemote/" title="AkkaRemote" itemprop="url">AkkaRemote</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-04T04:40:53.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Akka远程"><span class="toc-number">1.</span> <span class="toc-text">Akka远程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程交互的类型"><span class="toc-number">2.</span> <span class="toc-text">远程交互的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#查找远程-Actors"><span class="toc-number">2.1.</span> <span class="toc-text">查找远程 Actors</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用代码进行远程部署"><span class="toc-number">2.2.</span> <span class="toc-text">用代码进行远程部署</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列化"><span class="toc-number">2.3.</span> <span class="toc-text">序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#自定义-创建新的-Serializer"><span class="toc-number">2.3.1.</span> <span class="toc-text">自定义 创建新的 Serializer</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程事件"><span class="toc-number">2.4.</span> <span class="toc-text">远程事件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程安全"><span class="toc-number">2.5.</span> <span class="toc-text">远程安全</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="Akka远程"><a href="#Akka远程" class="headerlink" title="Akka远程"></a>Akka远程</h2><p>Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的</p>
+<h2 id="远程交互的类型"><a href="#远程交互的类型" class="headerlink" title="远程交互的类型"></a>远程交互的类型</h2><p>Akka 远程调用有两种方式:</p>
+<ul>
+<li>查找 : 使用actorSelection(path)在远程主机上查找一个actor</li>
+<li>创建 : 使用actorOf(Props(…), actorName)在远程主机上创建一个actor</li>
+</ul>
+<h3 id="查找远程-Actors"><a href="#查找远程-Actors" class="headerlink" title="查找远程 Actors"></a>查找远程 Actors</h3><p>actorSelection(path)会获得远程结点上一个Actor的ActorSelection, 例如:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> selection =</span><br><span class="line">  context.actorSelection(<span class="string">"akka.tcp://actorSystemName@10.0.0.1:2552/user/actorName"</span>)</span><br><span class="line">可以看到以下模式被用来在远程结点上查找一个actor:</span><br><span class="line"></span><br><span class="line">akka.&lt;protocol&gt;:<span class="comment">//&lt;actor system&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;actor path&gt;</span></span><br><span class="line">一旦得到了actor的selection，你就可以像与本地actor通讯一样与它进行通迅, 例如:</span><br><span class="line"></span><br><span class="line">selection ! <span class="string">"Pretty awesome feature"</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="用代码进行远程部署"><a href="#用代码进行远程部署" class="headerlink" title="用代码进行远程部署"></a>用代码进行远程部署</h3><p>要允许动态部署系统，也可以在用来创建actor的Props中包含deployment配置 : 这一部分信息与配置文件中的deployment部分是等价的, 如果两者都有，则外部配置拥有更高的优先级.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">加入这些<span class="keyword">import</span>:</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Props</span>, <span class="type">Deploy</span>, <span class="type">Address</span>, <span class="type">AddressFromURIString</span> &#125;</span><br><span class="line"><span class="keyword">import</span> akka.remote.<span class="type">RemoteScope</span></span><br><span class="line">和一个像这样的远程地址:</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> one = <span class="type">AddressFromURIString</span>(<span class="string">"akka.tcp://sys@host:1234"</span>)</span><br><span class="line"><span class="keyword">val</span> two = <span class="type">Address</span>(<span class="string">"akka.tcp"</span>, <span class="string">"sys"</span>, <span class="string">"host"</span>, <span class="number">1234</span>) <span class="comment">// this gives the same</span></span><br><span class="line">你可以像这样建议系统在此远程结点上创建一个子actor:</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> ref = system.actorOf(<span class="type">Props</span>[<span class="type">SampleActor</span>].</span><br><span class="line">  withDeploy(<span class="type">Deploy</span>(scope = <span class="type">RemoteScope</span>(address))))</span><br></pre></td></tr></table></figure>
+<h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><p>对actor使用远程调用时，你必须保证这些actor所使用的props和messages是可序列化的. 如果不能保证会导致系统产生意料之外的行为.<br>配置</p>
+<ol>
+<li><p>为了让 Akka 知道对什么任务使用哪个Serializer, 你需要编辑你的 配置文件, 在 “akka.actor.serializers”一节将名称绑定为akka.serialization.Serializer的实现</p>
+</li>
+<li><p>在将名称与Serializer的不同实现绑定后，你需要指定哪些类的序列化使用哪种Serializer, 这部分配置写在“akka.actor.serialization-bindings”一节中:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">akka &#123;</span><br><span class="line">  actor &#123;</span><br><span class="line">    serializers &#123;</span><br><span class="line">      java = "akka.serialization.JavaSerializer"</span><br><span class="line">      proto = "akka.remote.serialization.ProtobufSerializer"</span><br><span class="line">      myown = "docs.serialization.MyOwnSerializer"</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    serialization-bindings &#123;</span><br><span class="line">      "java.lang.String" = java</span><br><span class="line">      "docs.serialization.Customer" = java</span><br><span class="line">      "com.google.protobuf.Message" = proto</span><br><span class="line">      "docs.serialization.MyOwnSerializable" = myown</span><br><span class="line">      "java.lang.Boolean" = myown</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="自定义-创建新的-Serializer"><a href="#自定义-创建新的-Serializer" class="headerlink" title="自定义 创建新的 Serializer"></a>自定义 创建新的 Serializer</h4><p>首先你需要为你的 Serializer 写一个类定义，像这样:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">ActorRef</span>, <span class="type">ActorSystem</span> &#125;</span><br><span class="line"><span class="keyword">import</span> akka.serialization._</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyOwnSerializer</span> <span class="keyword">extends</span> <span class="title">Serializer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// This is whether "fromBinary" requires a "clazz" or not</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">includeManifest</span></span>: <span class="type">Boolean</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Pick a unique identifier for your Serializer,</span></span><br><span class="line">  <span class="comment">// you've got a couple of billions to choose from,</span></span><br><span class="line">  <span class="comment">// 0 - 16 is reserved by Akka itself</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">identifier</span> </span>= <span class="number">1234567</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// "toBinary" serializes the given object to an Array of Bytes</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">toBinary</span></span>(obj: <span class="type">AnyRef</span>): <span class="type">Array</span>[<span class="type">Byte</span>] = &#123;</span><br><span class="line">    <span class="comment">// Put the code that serializes the object here</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// "fromBinary" deserializes the given array,</span></span><br><span class="line">  <span class="comment">// using the type hint (if any, see "includeManifest" above)</span></span><br><span class="line">  <span class="comment">// into the optionally provided classLoader.</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">fromBinary</span></span>(bytes: <span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                 clazz: <span class="type">Option</span>[<span class="type">Class</span>[_]]): <span class="type">AnyRef</span> = &#123;</span><br><span class="line">    <span class="comment">// Put your code that deserializes here</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="远程事件"><a href="#远程事件" class="headerlink" title="远程事件"></a>远程事件</h3><p>可以监听Akka远程调用中发生的事件，也可以订阅/取消订阅这些事情，你只需要在ActorSystem.eventStream中为下面所列出类型的事件注册监听器.</p>
+<blockquote>
+<p>注意<br>若要订阅任意远程事件，订阅RemotingLifecycleEvent。若要订阅只涉及链接的生命周期的事件，请订阅akka.remote.AssociationEvent。</p>
+<p>注意<br>使用”链接”而不是”连接”一词，反映了远程处理子系统可能使用无连接传输，但链接类似于运输层连接，来维持点到点之间的Akka协议。</p>
+</blockquote>
+<h3 id="远程安全"><a href="#远程安全" class="headerlink" title="远程安全"></a>远程安全</h3><p>Akka提供了几种方式来加强远程节点（客户端/服务器）之间的安全：</p>
+<ul>
+<li>不受信任的模式</li>
+<li>安全 Cookie 握手</li>
+</ul>
+<ol>
+<li>配置为不受信任模式的系统通过远程处理层传入的以下操作将被忽略：<ul>
+<li>远程部署 （这也意味着没有远程监控）</li>
+<li>远程DeathWatch</li>
+<li>system.stop(), PoisonPill, Kill</li>
+<li>发送任何继承自PossiblyHarmful标记接口的消息，包括Terminated</li>
+<li>通过actor selection发送的消息，除非目标定义在trusted-selection-paths中。</li>
+</ul>
+</li>
+<li>安全 Cookie 握手<br>Akka远程处理还允许你指定一个安全cookie，它将被交换并确保在客户端和服务器之间的连接握手中是相同的。如果他们不相同，则客户端将被拒绝连接到服务器。</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="slamke.github.io/2018/02/04/AkkaRemote/" data-title="AkkaRemote | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/02/04/Akka邮箱-路由器-调度器关键点说明/" title="Akka邮箱&amp;路由器&amp;调度器关键点说明">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Akka邮箱&amp;路由器&amp;调度器关键点说明</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/02/04/Akka的监管和监控/"  title="Akka的监管和监控">
+ <strong>下一篇：</strong><br/> 
+ <span>Akka的监管和监控
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Akka远程"><span class="toc-number">1.</span> <span class="toc-text">Akka远程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程交互的类型"><span class="toc-number">2.</span> <span class="toc-text">远程交互的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#查找远程-Actors"><span class="toc-number">2.1.</span> <span class="toc-text">查找远程 Actors</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用代码进行远程部署"><span class="toc-number">2.2.</span> <span class="toc-text">用代码进行远程部署</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列化"><span class="toc-number">2.3.</span> <span class="toc-text">序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#自定义-创建新的-Serializer"><span class="toc-number">2.3.1.</span> <span class="toc-text">自定义 创建新的 Serializer</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程事件"><span class="toc-number">2.4.</span> <span class="toc-text">远程事件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程安全"><span class="toc-number">2.5.</span> <span class="toc-text">远程安全</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

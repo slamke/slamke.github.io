@@ -4,36 +4,22 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Hystrix学习笔记 | 雁渡寒潭 风吹疏竹</title>
+    <title>雁渡寒潭 风吹疏竹</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Sun Ke">
     
 
     
-    <meta name="description" content="Hystrix学习资料：https://github.com/Netflix/Hystrix/wiki
-What Is Hystrix For?Hystrix is designed to do the following:
-
-Give protection from and control over latency and failure from dependencies accessed (">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Hystrix学习笔记">
-<meta property="og:url" content="slamke.github.io/2016/02/03/Hystrix学习笔记比较/index.html">
+    <meta name="description" content="人生不止眼前的苟且">
+<meta property="og:type" content="website">
+<meta property="og:title" content="雁渡寒潭 风吹疏竹">
+<meta property="og:url" content="slamke.github.io/page/10/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="Hystrix学习资料：https://github.com/Netflix/Hystrix/wiki
-What Is Hystrix For?Hystrix is designed to do the following:
-
-Give protection from and control over latency and failure from dependencies accessed (">
-<meta property="og:image" content="https://github.com/Netflix/Hystrix/wiki/images/primary-secondary-example-640.png">
-<meta property="og:image" content="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-without-640.png">
-<meta property="og:image" content="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-with-640.png">
-<meta property="og:updated_time" content="2018-02-03T09:36:36.591Z">
+<meta property="og:description" content="人生不止眼前的苟且">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hystrix学习笔记">
-<meta name="twitter:description" content="Hystrix学习资料：https://github.com/Netflix/Hystrix/wiki
-What Is Hystrix For?Hystrix is designed to do the following:
-
-Give protection from and control over latency and failure from dependencies accessed (">
-<meta name="twitter:image" content="https://github.com/Netflix/Hystrix/wiki/images/primary-secondary-example-640.png">
+<meta name="twitter:title" content="雁渡寒潭 风吹疏竹">
+<meta name="twitter:description" content="人生不止眼前的苟且">
 
     
     <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
@@ -61,7 +47,7 @@ Give protection from and control over latency and failure from dependencies acce
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -77,7 +63,7 @@ Give protection from and control over latency and failure from dependencies acce
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -87,33 +73,189 @@ Give protection from and control over latency and failure from dependencies acce
 </div>
     </header>
     <div id="container">
-      <div id="main" class="post" itemscope itemprop="blogPost">
-  
-	<article itemprop="articleBody"> 
-		<header class="article-info clearfix">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/02/03/Hystrix学习笔记比较/" title="Hystrix学习笔记" itemprop="url">Hystrix学习笔记</a>
+      <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> Published 2016-02-03</time>
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> 發表於 2016-03-23</time>
     
   </p>
 </header>
-	<div class="article-content">
+    <div class="article-content">
+        
+        <h1 id="Java-IO"><a href="#Java-IO" class="headerlink" title="Java IO"></a>Java IO</h1><h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><p>Java IO流是既可以从中读取，也可以写入到其中的数据流。正如这个系列教程之前提到过的，流通常会与数据源、数据流向目的地相关联，比如文件、网络等等。</p>
+<p>流和数组不一样，不能通过索引读写数据。在流中，你也不能像数组那样前后移动读取数据，除非使用RandomAccessFile 处理文件。流仅仅只是一个连续的数据流。</p>
+<p>某些类似PushbackInputStream 流的实现允许你将数据重新推回到流中，以便重新读取。然而你只能把有限的数据推回流中，并且你不能像操作数组那样随意读取数据。流中的数据只能够顺序访问。</p>
+<p>Java IO流通常是基于字节或者基于字符的。字节流通常以“stream”命名，比如InputStream和OutputStream。除了DataInputStream 和DataOutputStream 还能够读写int, long, float和double类型的值以外，其他流在一个操作时间内只能读取或者写入一个原始字节。</p>
+<p>字符流通常以“Reader”或者“Writer”命名。字符流能够读写字符(比如Latin1或者Unicode字符)。可以浏览Java Readers and Writers获取更多关于字符流输入输出的信息。</p>
+<ul>
+<li>InputStream</li>
+</ul>
+<p>java.io.InputStream类是所有Java IO输入流的基类。如果你正在开发一个从流中读取数据的组件，请尝试用InputStream替代任何它的子类(比如FileInputStream)进行开发。这么做能够让你的代码兼容任何类型而非某种确定类型的输入流。</p>
+<p>然而仅仅依靠InputStream并不总是可行。如果你需要将读过的数据推回到流中，你必须使用PushbackInputStream，这意味着你的流变量只能是这个类型，否则在代码中就不能调用PushbackInputStream的unread()方法。</p>
+<p>通常使用输入流中的read()方法读取数据。read()方法返回一个整数，代表了读取到的字节的内容(译者注：0 ~ 255)。当达到流末尾没有更多数据可以读取的时候，read()方法返回-1。</p>
+<ul>
+<li>OutputStream</li>
+</ul>
+<p>java.io.OutputStream是Java IO中所有输出流的基类。如果你正在开发一个能够将数据写入流中的组件，请尝试使用OutputStream替代它的所有子类。<br>-组合流</p>
+<p>你可以将流整合起来以便实现更高级的输入和输出操作。比如，一次读取一个字节是很慢的，所以可以从磁盘中一次读取一大块数据，然后从读到的数据块中获取字节。为了实现缓冲，可以把InputStream包装到BufferedInputStream中。</p>
+<h2 id="字节和字符数组"><a href="#字节和字符数组" class="headerlink" title="字节和字符数组"></a>字节和字符数组</h2><p>Java中的字节和字符数组，经常被用于临时存储应用程序内部的数据，所以数组也是常见的数据来源以及数据流目的地。如果你在程序执行过程中需要频繁访问文件的内容，你可能会愿意将文件加载到数组中去。当然你可以通过索引直接访问这些数组。但是如果你有一个组件的设计初衷是从InputStream或者Reader而非数组中读取某些数据呢？</p>
+<ul>
+<li>通过InputStream或者Reader读取数组</li>
+</ul>
+<p>为了让你的组件能够从数组中读取数据，你需要把字节或者字符数组包装到一个ByteArrayInputStream或者CharArrayReader中。这种方式允许通过包装好的stream或者reader读取数组中的字节或者字符数据。</p>
+<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>]; </span><br><span class="line"><span class="comment">//write data into byte array...  </span></span><br><span class="line">InputStream input = <span class="keyword">new</span> ByteArrayInputStream(bytes);  </span><br><span class="line"><span class="comment">//read first byte </span></span><br><span class="line"><span class="keyword">int</span> data = input.read(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(data != -<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">//do something with data</span></span><br><span class="line">    <span class="comment">//read next byte      </span></span><br><span class="line">    data = input.read(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>通过InputStream或者Reader写入数组</li>
+</ul>
+<p>同样可以将数据写入到ByteArrayOutputStream或者CharArrayWriter中。你所需要做的是创建一个ByteArrayOutputStream或者CharArrayWriter，然后写入数据，就像你操作其他类型的stream或者writer一样。当所有的数据都写入完毕，只需调用toByteArray()或者toCharArray()，即可得到写入数据的数组形式。</p>
+<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">output.write(<span class="string">"This text is converted to bytes"</span>.toBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line"><span class="keyword">byte</span>[] bytes = output.toByteArray();</span><br></pre></td></tr></table></figure></p>
+<p>操作一个字符数组的代码也与本例类似，只需要将字符数组包装到CharArrayWriter中。</p>
+<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>Java IO中的管道为运行在同一个JVM中的两个线程提供了通信的能力。所以管道也可以作为数据源以及目标媒介。</p>
+<p>你不能利用管道与不同的JVM中的线程通信(不同的进程)。在概念上，Java的管道不同于Unix/Linux系统中的管道。在Unix/Linux中，运行在不同地址空间的两个进程可以通过管道通信。在Java中，通信的双方应该是运行在同一进程中的不同线程。</p>
+<ul>
+<li>通过Java IO创建管道</li>
+</ul>
+<p>可以通过Java IO中的PipedOutputStream和PipedInputStream创建管道。一个PipedInputStream流应该和一个PipedOutputStream流相关联。一个线程通过PipedOutputStream写入的数据可以被另一个线程通过相关联的PipedInputStream读取出来。<br>你也可以使用两个管道共有的connect()方法使之相关联。PipedInputStream和PipedOutputStream都拥有一个可以互相关联的connect()方法。</p>
+<ul>
+<li>管道和线程</li>
+</ul>
+<p>请记得，当使用两个相关联的管道流时，务必将它们分配给不同的线程。read()方法和write()方法调用时会导致流阻塞，这意味着如果你尝试在一个线程中同时进行读和写，可能会导致线程死锁。</p>
+<ul>
+<li>管道的替代</li>
+</ul>
+<p>除了管道之外，一个JVM中不同线程之间还有许多通信的方式。实际上，线程在大多数情况下会传递完整的对象信息而非原始的字节数据。但是，如果你需要在线程之间传递字节数据，Java IO的管道是一个不错的选择。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/IO/">IO</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
-		<div id="toc" class="toc-article">
-			<strong class="toc-title">Contents</strong>
+  <p class="article-time">
+    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> 發表於 2016-03-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Java中一个线程可以多次start吗"><a href="#Java中一个线程可以多次start吗" class="headerlink" title="Java中一个线程可以多次start吗?"></a>Java中一个线程可以多次start吗?</h1><p><strong>不可以</strong><br>通过Thread实例的start()，一个Thread的实例只能产生一个线程。一个Thread的实例一旦调用start()方法，这个实例的started标记就标记为true，事实中不管这个线程后来有没有执行到底，只要调用了一次start()就再也没有机会运行了。<br>一个线程对象只能调用一次start方法.从new到等待运行是单行道,所以如果你对一个已经启动的线程对象再调用一次start方法的话,会产生:IllegalThreadStateException异常. 可以被重复调用的是run()方法。<br>Thread类中run()和start()方法的区别如下:<br>run()方法: 在本线程内调用该Runnable对象的run()方法，可以重复多次调用；<br>start()方法: 启动一个线程，调用该Runnable对象的run()方法，不能多次启动一个线程</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/多线程/">多线程</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/03/Hystrix学习笔记/" title="Hystrix学习笔记" itemprop="url">Hystrix学习笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hystrix"><span class="toc-number">1.</span> <span class="toc-text">Hystrix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-Is-Hystrix-For"><span class="toc-number">1.1.</span> <span class="toc-text">What Is Hystrix For?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hystrix-works-by"><span class="toc-number">1.2.</span> <span class="toc-text">Hystrix works by:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hello-World"><span class="toc-number">1.3.</span> <span class="toc-text">Hello World</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback"><span class="toc-number">1.4.</span> <span class="toc-text">Fallback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误传播"><span class="toc-number">1.5.</span> <span class="toc-text">错误传播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Name"><span class="toc-number">1.6.</span> <span class="toc-text">Command Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Group"><span class="toc-number">1.7.</span> <span class="toc-text">Command Group</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command线程池"><span class="toc-number">1.8.</span> <span class="toc-text">Command线程池</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#请求缓存"><span class="toc-number">2.</span> <span class="toc-text">请求缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#请求合并"><span class="toc-number">2.1.</span> <span class="toc-text">请求合并</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Request-Context-Setup"><span class="toc-number">2.2.</span> <span class="toc-text">Request Context Setup</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常见模式"><span class="toc-number">3.</span> <span class="toc-text">常见模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#快速失败-Fail-Fast"><span class="toc-number">3.1.</span> <span class="toc-text">快速失败 Fail Fast</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#无声失败-Fail-Silent"><span class="toc-number">3.2.</span> <span class="toc-text">无声失败 Fail Silent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回退：静态的-Fallback-Static"><span class="toc-number">3.3.</span> <span class="toc-text">回退：静态的 Fallback:Static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Stubbed"><span class="toc-number">3.4.</span> <span class="toc-text">Fallback: Stubbed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Cache-via-Network"><span class="toc-number">3.5.</span> <span class="toc-text">Fallback: Cache via Network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主从都失效"><span class="toc-number">3.6.</span> <span class="toc-text">主从都失效</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#迁移"><span class="toc-number">4.</span> <span class="toc-text">迁移</span></a></li></ol>
-		
-		</div>
-		
-		<h1 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h1><p>学习资料：<a href="https://github.com/Netflix/Hystrix/wiki" target="_blank" rel="external">https://github.com/Netflix/Hystrix/wiki</a></p>
+  <p class="article-time">
+    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> 發表於 2016-02-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h1><p>学习资料：<a href="https://github.com/Netflix/Hystrix/wiki" target="_blank" rel="external">https://github.com/Netflix/Hystrix/wiki</a></p>
 <h2 id="What-Is-Hystrix-For"><a href="#What-Is-Hystrix-For" class="headerlink" title="What Is Hystrix For?"></a>What Is Hystrix For?</h2><p>Hystrix is designed to do the following:</p>
 <ul>
 <li>Give protection from and control over latency and failure from dependencies accessed (typically over the network) via third-party client libraries.   让程序具有处理调用外部服务失败的能力</li>
@@ -154,9 +296,14 @@ Give protection from and control over latency and failure from dependencies acce
 <h2 id="主从都失效"><a href="#主从都失效" class="headerlink" title="主从都失效"></a>主从都失效</h2><p><img src="https://github.com/Netflix/Hystrix/wiki/images/primary-secondary-example-640.png" alt="enter image description here"><br>通过两个Command进行隔离</p>
 <p>##Client Doesn’t Perform Network Access</p>
 <h1 id="迁移"><a href="#迁移" class="headerlink" title="迁移"></a>迁移</h1><p><img src="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-without-640.png" alt="enter image description here"><br>to<br><img src="https://github.com/Netflix/Hystrix/wiki/images/library-migration-to-hystrix-with-640.png" alt="enter image description here"></p>
-  
-	</div>
-		<footer class="article-footer clearfix">
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
@@ -174,51 +321,128 @@ Give protection from and control over latency and failure from dependencies acce
 
 
 
-	<div class="article-share" id="share">
-	
-	  <div data-url="slamke.github.io/2016/02/03/Hystrix学习笔记比较/" data-title="Hystrix学习笔记 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
-	  </div>
-	
-	</div>
 
+<div class="comments-count">
+	
+</div>
 
 </footer>
 
-   	       
-	</article>
-	
-<nav class="article-nav clearfix">
- 
- <div class="prev" >
- <a href="/2016/03/23/java-io/" title="Java IO">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Java IO</span>
-</a>
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/02/03/动态分区说明/" title="动态分区说明" itemprop="url">动态分区说明</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2015-02-03T09:32:12.000Z" itemprop="datePublished"> 發表於 2015-02-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Hive分区"><a href="#Hive分区" class="headerlink" title="Hive分区"></a>Hive分区</h1><p><a href="http://lxw1234.com/archives/2015/06/286.htm" target="_blank" rel="external">Hive的动态分区</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>hive中支持两种类型的分区：</p>
+<ul>
+<li>静态分区SP（static partition）</li>
+<li>动态分区DP（dynamic partition）</li>
+</ul>
+<p>静态分区与动态分区的主要区别在于静态分区是手动指定，而动态分区是通过数据来进行判断。详细来说，静态分区的列实在编译时期，通过用户传递来决定的；动态分区只有在SQL执行时才能决定。</p>
+<h2 id="动态分区说明"><a href="#动态分区说明" class="headerlink" title="动态分区说明"></a>动态分区说明</h2><p>关系型数据库（如Oracle）中，对分区表Insert数据时候，数据库自动会根据分区字段的值，将数据插入到相应的分区中，Hive中也提供了类似的机制，即动态分区(Dynamic Partition)，只不过，使用Hive的动态分区，需要进行相应的配置。</p>
+<p>按照常规的方法向分区表中插入数据，如果源数据量很大，那么针对一个分区就要写一个insert，非常麻烦，你必须先要知道源数据中都有什么样的数据才能创建分区。<br>例如:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; insert overwrite table partition_test partition(stat_date='20110728',province='henan') select member_id,name from partition_test_input where stat_date='20110728' and province='henan';</span><br></pre></td></tr></table></figure></p>
+<p>使用动态分区可以很好的解决上述问题。动态分区可以根据查询得到的数据自动匹配到相应的分区中去。<br>使用动态分区要先设置hive.exec.dynamic.partition参数值为true，默认值为false，即不允许使用：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; set hive.exec.dynamic.partition;</span><br><span class="line">hive.exec.dynamic.partition=false</span><br><span class="line">hive&gt; set hive.exec.dynamic.partition=true;</span><br><span class="line">hive&gt; set hive.exec.dynamic.partition;</span><br><span class="line">hive.exec.dynamic.partition=true</span><br></pre></td></tr></table></figure></p>
+<p>动态分区的使用方法很简单，假设我想向stat_date=’20110728’这个分区下面插入数据，至于province插入到哪个子分区下面让数据库自己来判断，那可以这样写：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; insert overwrite table partition_test partition(stat_date='20110728',province)</span><br><span class="line">&gt; select member_id,name,province from partition_test_input where stat_date='20110728';</span><br><span class="line">Total MapReduce jobs = 2</span><br><span class="line">...</span><br><span class="line">3 Rows loaded to partition_test</span><br><span class="line">OK</span><br></pre></td></tr></table></figure></p>
+<p>stat_date叫做<strong>静态分区列</strong>，province叫做<strong>动态分区列</strong>。select子句中需要把动态分区列按照分区的顺序写出来，静态分区列不用写出来。这样stat_date=’20110728’的所有数据，会根据province的不同分别插入到/user/hive/warehouse/partition_test/stat_date=20110728/下面的不同的子文件夹下，如果源数据对应的province子分区不存在，则会自动创建，非常方便，而且避免了人工控制插入数据与分区的映射关系存在的潜在风险。</p>
+<ul>
+<li>注意，动态分区不允许主分区采用动态列而副分区采用静态列，这样将导致所有的主分区都要创建副分区静态列所定义的分区</li>
+<li>动态分区可以允许所有的分区列都是动态分区列，但是要首先设置一个参数hive.exec.dynamic.partition.mode ：<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hive&gt; set hive.exec.dynamic.partition.mode;</span><br><span class="line">hive.exec.dynamic.partition.mode=strict</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="动态分区demo"><a href="#动态分区demo" class="headerlink" title="动态分区demo"></a>动态分区demo</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> hive.exec.dynamic.<span class="keyword">partition</span>=<span class="literal">true</span>;  </span><br><span class="line"><span class="keyword">SET</span> hive.exec.dynamic.<span class="keyword">partition</span>.<span class="keyword">mode</span>=nonstrict; </span><br><span class="line"><span class="keyword">SET</span> hive.exec.<span class="keyword">max</span>.dynamic.<span class="keyword">partitions</span>.pernode = <span class="number">1000</span>;</span><br><span class="line"><span class="keyword">SET</span> hive.exec.<span class="keyword">max</span>.dynamic.<span class="keyword">partitions</span>=<span class="number">1000</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">TABLE</span> t_lxw1234_partitioned <span class="keyword">PARTITION</span> (<span class="keyword">month</span>,<span class="keyword">day</span>) </span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">url</span>,<span class="keyword">substr</span>(<span class="keyword">day</span>,<span class="number">1</span>,<span class="number">7</span>) <span class="keyword">AS</span> <span class="keyword">month</span>,<span class="keyword">day</span> </span><br><span class="line"><span class="keyword">FROM</span> t_lxw1234;</span><br></pre></td></tr></table></figure>
+<h2 id="动态分区参数"><a href="#动态分区参数" class="headerlink" title="动态分区参数"></a>动态分区参数</h2><p>使用动态分区需要注意设定以下参数：</p>
+<ul>
+<li><p>hive.exec.dynamic.partition<br>默认值：false<br>是否开启动态分区功能，默认false关闭。<br>使用动态分区时候，该参数必须设置成true;</p>
+</li>
+<li><p>hive.exec.dynamic.partition.mode<br>默认值：strict<br>动态分区的模式，默认strict，表示必须指定至少一个分区为静态分区，nonstrict模式表示允许所有的分区字段都可以使用动态分区。<br>一般需要设置为nonstrict</p>
+</li>
+<li><p>hive.exec.max.dynamic.partitions.pernode<br>默认值：100<br>在每个执行MR的节点上，最大可以创建多少个动态分区。<br>该参数需要根据实际的数据来设定。<br>比如：源数据中包含了一年的数据，即day字段有365个值，那么该参数就需要设置成大于365，如果使用默认值100，则会报错。</p>
+</li>
+<li><p>hive.exec.max.dynamic.partitions<br>默认值：1000<br>在所有执行MR的节点上，最大一共可以创建多少个动态分区。<br>同上参数解释。</p>
+</li>
+<li><p>hive.exec.max.created.files<br>默认值：100000<br>整个MR Job中，最大可以创建多少个HDFS文件。<br>一般默认值足够了，除非你的数据量非常大，需要创建的文件数大于100000，可根据实际情况加以调整。</p>
+</li>
+<li><p>hive.error.on.empty.partition<br>默认值：false<br>当有空分区生成时，是否抛出异常。<br>一般不需要设置。</p>
+</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Hive/">Hive</a>
 </div>
 
 
-</nav>
-
-	
-
-</div>  
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
-
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">Contents</strong>
- 
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hystrix"><span class="toc-number">1.</span> <span class="toc-text">Hystrix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-Is-Hystrix-For"><span class="toc-number">1.1.</span> <span class="toc-text">What Is Hystrix For?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hystrix-works-by"><span class="toc-number">1.2.</span> <span class="toc-text">Hystrix works by:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hello-World"><span class="toc-number">1.3.</span> <span class="toc-text">Hello World</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback"><span class="toc-number">1.4.</span> <span class="toc-text">Fallback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误传播"><span class="toc-number">1.5.</span> <span class="toc-text">错误传播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Name"><span class="toc-number">1.6.</span> <span class="toc-text">Command Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Group"><span class="toc-number">1.7.</span> <span class="toc-text">Command Group</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command线程池"><span class="toc-number">1.8.</span> <span class="toc-text">Command线程池</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#请求缓存"><span class="toc-number">2.</span> <span class="toc-text">请求缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#请求合并"><span class="toc-number">2.1.</span> <span class="toc-text">请求合并</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Request-Context-Setup"><span class="toc-number">2.2.</span> <span class="toc-text">Request Context Setup</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常见模式"><span class="toc-number">3.</span> <span class="toc-text">常见模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#快速失败-Fail-Fast"><span class="toc-number">3.1.</span> <span class="toc-text">快速失败 Fail Fast</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#无声失败-Fail-Silent"><span class="toc-number">3.2.</span> <span class="toc-text">无声失败 Fail Silent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回退：静态的-Fallback-Static"><span class="toc-number">3.3.</span> <span class="toc-text">回退：静态的 Fallback:Static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Stubbed"><span class="toc-number">3.4.</span> <span class="toc-text">Fallback: Stubbed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Cache-via-Network"><span class="toc-number">3.5.</span> <span class="toc-text">Fallback: Cache via Network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主从都失效"><span class="toc-number">3.6.</span> <span class="toc-text">主从都失效</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#迁移"><span class="toc-number">4.</span> <span class="toc-text">迁移</span></a></li></ol>
- 
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hive/">Hive</a>
   </div>
 
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/9/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -228,8 +452,12 @@ Give protection from and control over latency and failure from dependencies acce
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
+		
+		  
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+		  
 		
 		  
 			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
@@ -309,7 +537,7 @@ Give protection from and control over latency and failure from dependencies acce
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
@@ -329,11 +557,15 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
 			
 		
 			
@@ -341,7 +573,7 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
 			
 		
 			
@@ -349,15 +581,11 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -365,23 +593,11 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/ML/" title="ML">ML<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 			
@@ -389,7 +605,19 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -397,7 +625,7 @@ Give protection from and control over latency and failure from dependencies acce
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -413,11 +641,11 @@ Give protection from and control over latency and failure from dependencies acce
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -510,89 +738,12 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
-      
-      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
 });
 </script>
 
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var ai = $('.article-content>iframe'),
-      ae = $('.article-content>embed'),
-      t  = $('#toc'),
-      ta = $('#toc.toc-aside'),
-      o  = $('.openaside'),
-      c  = $('.closeaside');
-  if(ai.length>0){
-    ai.wrap('<div class="video-container" />');
-  };
-  if(ae.length>0){
-   ae.wrap('<div class="video-container" />');
-  };
-  c.click(function(){
-    ta.css('display', 'block').addClass('fadeIn');
-  });
-  o.click(function(){
-    ta.css('display', 'none');
-  });
-  $(window).scroll(function(){
-    ta.css("top",Math.max(140,320-$(this).scrollTop()));
-  });
-});
-</script>
-
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var $this = $('.share'),
-      url = $this.attr('data-url'),
-      encodedUrl = encodeURIComponent(url),
-      title = $this.attr('data-title'),
-      tsina = $this.attr('data-tsina'),
-      description = $this.attr('description');
-  var html = [
-  '<div class="hoverqrcode clearfix"></div>',
-  '<a class="overlay" id="qrcode"></a>',
-  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
-  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
-  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
-  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
-  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
-  '<span title="Share to"></span>'
-  ].join('');
-  $this.append(html);
-
-  $('.hoverqrcode').hide();
-
-  var myWidth = 0;
-  function updatehoverqrcode(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-    var qrsize = myWidth > 1024 ? 200:100;
-    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
-    var p = $('.article-share-qrcode').position();
-    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
-                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
-                          .qrcode(options);
-  };
-  $(window).resize(function(){
-    $('.hoverqrcode').hide();
-  });
-  $('.article-share-qrcode').click(function(){
-    updatehoverqrcode();
-    $('.hoverqrcode').toggle();
-  });
-  $('.article-share-qrcode').hover(function(){}, function(){
-      $('.hoverqrcode').hide();
-  });
-});   
-</script>
 
 
 
@@ -646,7 +797,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
@@ -663,4 +814,4 @@ var _hmt = _hmt || [];
 <!-- Tiny_search End -->
 
   </body>
-</html>
+ </html>
