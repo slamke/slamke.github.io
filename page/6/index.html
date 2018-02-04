@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,146 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/01/05/HFTP文件系统解析/" title="HFTP文件系统解析" itemprop="url">HFTP文件系统解析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-05T07:57:58.000Z" itemprop="datePublished"> Published 2017-01-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<p>spark-client关于filesystem实现的配置<figure class="highlight plain"><figcaption><span>```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">``` xml</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">    &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.DFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">   &lt;name&gt;fs.webhdfs.impl&lt;/name&gt;</span><br><span class="line">   &lt;value&gt;org.apache.hadoop.smw.hdfs.web.WebHdfsFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="HFTP介绍"><a href="#HFTP介绍" class="headerlink" title="HFTP介绍"></a>HFTP介绍</h2><p>HFTP 是hadoop文件系统用来让你从一个远程的hadoop HDFS集群中读取数据的组件。这个读取是通过HTTP，并且数据源是DataNodes。HFTP是一个只读的文件系统，当你试图用来写入数据或者修改文件系统状态时，会抛出异常。</p>
+<p>HFTP 主要的帮助在有多个HDFS集群，并存在多个版本时，将数据从一个集群迁移到另一个。HFTP 在不同版本的HDFS中是兼容写的。你可以操作例如：</p>
+<blockquote>
+<p>hadoop distcp -i hftp://sourceFS:50070/src hdfs://destFS:8020/dest</p>
+</blockquote>
+<p>注意HFTP是只读的，所以目标端必须是HDFS文件系统。（在这个例子中，distcp会使用新文件系统的配置运行。）</p>
+<p>另外，HSFTP，默认使用HTTPS。这意味着数据在传输的时候会被加密。<br><a href="https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html" target="_blank" rel="external">https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html</a></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>HFTP的代码在java 类<code>org.apache.hadoop.hdfs.HftpFileSystem</code> 中。同样的，HSFTP也在<code>org.apache.hadoop.hdfs.HsftpFileSystem</code>中实现.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/HDFS/">HDFS</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/HDFS/">HDFS</a><a href="/tags/HFTP/">HFTP</a><a href="/tags/Hadoop/">Hadoop</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/01/02/SparkListener机制详解/" title="SparkListener机制详解" itemprop="url">SparkListener机制详解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-02T10:35:49.000Z" itemprop="datePublished"> Published 2017-01-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Spark源码注释中有下面一句话:</p>
+<blockquote>
+<p>Asynchronously passes SparkListenerEvents to registered SparkListeners</p>
+</blockquote>
+<p>即所有spark消息SparkListenerEvents 被异步的发送给已经注册过的SparkListeners.<br>在SparkContext中, 首先会创建LiveListenerBus实例,这个类主要功能如下:</p>
+<ul>
+<li>保存所有消息队列,负责消息的缓存</li>
+<li>保存所有注册过的listener,负责消息的分发<br><img src="http://img.blog.csdn.net/20150806141900394" alt=""></li>
+</ul>
+<p>listener链表保存在ListenerBus类中,为了保证并发访问的安全性,此处采用Java的CopyOnWriteArrayList类来存储listener. 当需要对listener链表进行更改时,CopyOnWriteArrayList的特性使得会先复制整个链表,然后在复制的链表上面进行修改.当一旦获得链表的迭代器,在迭代器的生命周期中,可以保证数据的一致性.</p>
+<p>消息队列实际上是保存在类AsynchronousListenerBus中的:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> <span class="type">EVENT_QUEUE_CAPACITY</span> = <span class="number">10000</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> eventQueue = <span class="keyword">new</span> <span class="type">LinkedBlockingQueue</span>[<span class="type">E</span>](<span class="type">EVENT_QUEUE_CAPACITY</span>)</span><br></pre></td></tr></table></figure>
+<p>事件队列的长度为10000,当缓存事件数量达到上限后,新来的事件会被丢弃,</p>
+<p>在SparkContext中,会</p>
+<ul>
+<li>创建LiveListenerBus类类型的成员变量listenerBus</li>
+<li>创建各种listener,并加入到listenerBus中</li>
+<li>post一些事件到listenerBus中</li>
+<li>调用listenerBus.start() 来启动事件处理程序</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20150806141223019" alt=""></p>
+<p>这里有一点需要注意的是, 在listenerBus.start() 调用之前, 可以向其中post消息, 这些消息会被缓存起来,等start函数调用之后, 消费者线程会分发这些缓存的消息.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/12/23/使用RCU技术实现读写线程无锁/" title="使用RCU技术实现读写线程无锁" itemprop="url">使用RCU技术实现读写线程无锁</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +228,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-12-23T06:56:16.000Z" itemprop="datePublished"> 發表於 2016-12-23</time>
+    <time datetime="2016-12-23T06:56:16.000Z" itemprop="datePublished"> Published 2016-12-23</time>
     
   </p>
 </header>
@@ -159,7 +299,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-12-23T03:53:53.000Z" itemprop="datePublished"> 發表於 2016-12-23</time>
+    <time datetime="2016-12-23T03:53:53.000Z" itemprop="datePublished"> Published 2016-12-23</time>
     
   </p>
 </header>
@@ -249,7 +389,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> 發表於 2016-11-29</time>
+    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> Published 2016-11-29</time>
     
   </p>
 </header>
@@ -341,7 +481,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> 發表於 2016-11-29</time>
+    <time datetime="2016-11-29T08:43:45.000Z" itemprop="datePublished"> Published 2016-11-29</time>
     
   </p>
 </header>
@@ -469,7 +609,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-27T14:30:08.000Z" itemprop="datePublished"> 發表於 2016-11-27</time>
+    <time datetime="2016-11-27T14:30:08.000Z" itemprop="datePublished"> Published 2016-11-27</time>
     
   </p>
 </header>
@@ -570,7 +710,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> 發表於 2016-10-26</time>
+    <time datetime="2016-10-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-10-26</time>
     
   </p>
 </header>
@@ -709,7 +849,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-09-26T03:31:58.000Z" itemprop="datePublished"> 發表於 2016-09-26</time>
+    <time datetime="2016-09-26T03:31:58.000Z" itemprop="datePublished"> Published 2016-09-26</time>
     
   </p>
 </header>
@@ -774,7 +914,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-09-19T00:47:51.000Z" itemprop="datePublished"> 發表於 2016-09-19</time>
+    <time datetime="2016-09-19T00:47:51.000Z" itemprop="datePublished"> Published 2016-09-19</time>
     
   </p>
 </header>
@@ -845,149 +985,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/08/24/Spark-Job任务提交-取消/" title="Spark Job任务提交,取消,查看进度" itemprop="url">Spark Job任务提交,取消,查看进度</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-08-24T03:29:45.000Z" itemprop="datePublished"> 發表於 2016-08-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>使用一个SparkContext时，可以针对不同Job进行分组提交和取消：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 提交任务</span></span><br><span class="line"><span class="keyword">private</span> <span class="type">SparkContext</span> sc;</span><br><span class="line"><span class="keyword">private</span> <span class="type">SQLContext</span> sqlc;</span><br><span class="line">sc.setJobGroup(jobGroup, description, <span class="literal">true</span>);</span><br><span class="line">sqlc.sql(st);</span><br><span class="line">sc.clearJobGroup();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消任务</span></span><br><span class="line">sc.cancelJobGroup(jobGroup）</span><br></pre></td></tr></table></figure>
-<p>获取任务执行进度信息：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> jobGroup = getJobGroup(context);</span><br><span class="line"><span class="type">SQLContext</span> sqlc = getSparkInterpreter().getSQLContext();</span><br><span class="line"><span class="type">SparkContext</span> sc = sqlc.sparkContext();</span><br><span class="line">int completedTasks = <span class="number">0</span>;</span><br><span class="line">int totalTasks = <span class="number">0</span>;</span><br><span class="line"><span class="type">JobProgressListener</span> sparkListener = <span class="keyword">new</span> <span class="type">JobProgressListener</span>(context.getConf());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">DAGScheduler</span> scheduler = sc.dagScheduler();</span><br><span class="line"><span class="type">HashSet</span>&lt;<span class="type">ActiveJob</span>&gt; jobs = scheduler.activeJobs();</span><br><span class="line"><span class="type">Iterator</span>&lt;<span class="type">ActiveJob</span>&gt; it = jobs.iterator();</span><br><span class="line"><span class="keyword">while</span> (it.hasNext()) &#123;</span><br><span class="line">      <span class="type">ActiveJob</span> job = it.next();</span><br><span class="line">      <span class="type">String</span> g = (<span class="type">String</span>) job.properties().get(<span class="string">"spark.jobGroup.id"</span>);</span><br><span class="line">      <span class="keyword">if</span> (jobGroup.equals(g)) &#123;</span><br><span class="line">      int[] progressInfo = <span class="literal">null</span>;</span><br><span class="line">        </span><br><span class="line">      progressInfo = getProgressFromStage_1_1x(sparkListener, job.finalStage());</span><br><span class="line">        </span><br><span class="line">      totalTasks += progressInfo[<span class="number">0</span>];</span><br><span class="line">      completedTasks += progressInfo[<span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (totalTasks == <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> completedTasks * <span class="number">100</span> / totalTasks;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> int[] getProgressFromStage_1_1x(<span class="type">JobProgressListener</span> sparkListener, <span class="type">Stage</span> stage) &#123;</span><br><span class="line">    int numTasks = stage.numTasks();</span><br><span class="line">    int completedTasks = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="type">Method</span> stageIdToData = sparkListener.getClass().getMethod(<span class="string">"stageIdToData"</span>);</span><br><span class="line">      <span class="type">HashMap</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;, <span class="type">Object</span>&gt; stageIdData =</span><br><span class="line">          (<span class="type">HashMap</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;, <span class="type">Object</span>&gt;) stageIdToData.invoke(sparkListener);</span><br><span class="line">      <span class="type">Class</span>&lt;?&gt; stageUIDataClass =</span><br><span class="line">          <span class="keyword">this</span>.getClass().forName(<span class="string">"org.apache.spark.ui.jobs.UIData$StageUIData"</span>);</span><br><span class="line"></span><br><span class="line">      <span class="type">Method</span> numCompletedTasks = stageUIDataClass.getMethod(<span class="string">"numCompleteTasks"</span>);</span><br><span class="line"></span><br><span class="line">      <span class="type">Set</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;&gt; keys =</span><br><span class="line">          <span class="type">JavaConverters</span>.asJavaSetConverter(stageIdData.keySet()).asJava();</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt; k : keys) &#123;</span><br><span class="line">        <span class="keyword">if</span> (stage.id() == (int) k._1()) &#123;</span><br><span class="line">          <span class="type">Object</span> uiData = stageIdData.get(k).get();</span><br><span class="line">          completedTasks += (int) numCompletedTasks.invoke(uiData);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="type">Exception</span> e) &#123;</span><br><span class="line">      logger.error(<span class="string">"Error on getting progress information"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">List</span>&lt;<span class="type">Stage</span>&gt; parents = <span class="type">JavaConversions</span>.asJavaList(stage.parents());</span><br><span class="line">    <span class="keyword">if</span> (parents != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">Stage</span> s : parents) &#123;</span><br><span class="line">        int[] p = getProgressFromStage_1_1x(sparkListener, s);</span><br><span class="line">        numTasks += p[<span class="number">0</span>];</span><br><span class="line">        completedTasks += p[<span class="number">1</span>];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> int[] &#123;numTasks, completedTasks&#125;;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/08/23/Hive-on-Spark-如何进行小文件merge/" title="Hive on Spark 如何进行小文件merge" itemprop="url">Hive on Spark 如何进行小文件merge</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-08-23T01:32:07.000Z" itemprop="datePublished"> 發表於 2016-08-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>Hive中有相关的属性property可以进行设置，对执行结果进行小文件merge；当使用Spark作为Hive的执行引擎时，遇到小文件合并需求时，也可以进行处理：</p>
-<ol>
-<li><p>配置属性 hive.merge.sparkfiles=true<br><a href="https://issues.apache.org/jira/browse/HIVE-8043" target="_blank" rel="external">https://issues.apache.org/jira/browse/HIVE-8043</a><br><a href="https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark%3A+Getting+Started" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark%3A+Getting+Started</a><br>ps： 奈何公司的Spark版本不支持，命令行设置&amp;hive-site.xml设置均无效</p>
-</li>
-<li><p>使用distribute by命令进行数据重分布<br>使用时间戳取模进行数据分布<br><a href="http://stackoverflow.com/questions/31009834/merge-multiple-small-files-in-to-few-larger-files-in-spark" target="_blank" rel="external">http://stackoverflow.com/questions/31009834/merge-multiple-small-files-in-to-few-larger-files-in-spark</a><br>Demo:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> table1 <span class="keyword">where</span> yymmdd=<span class="string">'20160816'</span> <span class="keyword">distribute</span> <span class="keyword">by</span> (<span class="keyword">column</span> % <span class="number">64</span>)</span><br></pre></td></tr></table></figure></li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hive/">Hive</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hive/">Hive</a><a href="/tags/Spark/">Spark</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/5/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/7/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -997,11 +1009,11 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -1082,7 +1094,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -1098,6 +1110,10 @@
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -1110,15 +1126,19 @@
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -1134,15 +1154,7 @@
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -1150,11 +1162,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -1162,7 +1174,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1170,7 +1182,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -1186,11 +1198,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1342,7 +1354,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

@@ -61,7 +61,7 @@ Give protection from and control over latency and failure from dependencies acce
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -77,7 +77,7 @@ Give protection from and control over latency and failure from dependencies acce
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -100,14 +100,14 @@ Give protection from and control over latency and failure from dependencies acce
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> 發表於 2016-02-03</time>
+    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> Published 2016-02-03</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
+			<strong class="toc-title">Contents</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hystrix"><span class="toc-number">1.</span> <span class="toc-text">Hystrix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-Is-Hystrix-For"><span class="toc-number">1.1.</span> <span class="toc-text">What Is Hystrix For?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hystrix-works-by"><span class="toc-number">1.2.</span> <span class="toc-text">Hystrix works by:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hello-World"><span class="toc-number">1.3.</span> <span class="toc-text">Hello World</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback"><span class="toc-number">1.4.</span> <span class="toc-text">Fallback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误传播"><span class="toc-number">1.5.</span> <span class="toc-text">错误传播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Name"><span class="toc-number">1.6.</span> <span class="toc-text">Command Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Group"><span class="toc-number">1.7.</span> <span class="toc-text">Command Group</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command线程池"><span class="toc-number">1.8.</span> <span class="toc-text">Command线程池</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#请求缓存"><span class="toc-number">2.</span> <span class="toc-text">请求缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#请求合并"><span class="toc-number">2.1.</span> <span class="toc-text">请求合并</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Request-Context-Setup"><span class="toc-number">2.2.</span> <span class="toc-text">Request Context Setup</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常见模式"><span class="toc-number">3.</span> <span class="toc-text">常见模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#快速失败-Fail-Fast"><span class="toc-number">3.1.</span> <span class="toc-text">快速失败 Fail Fast</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#无声失败-Fail-Silent"><span class="toc-number">3.2.</span> <span class="toc-text">无声失败 Fail Silent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回退：静态的-Fallback-Static"><span class="toc-number">3.3.</span> <span class="toc-text">回退：静态的 Fallback:Static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Stubbed"><span class="toc-number">3.4.</span> <span class="toc-text">Fallback: Stubbed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Cache-via-Network"><span class="toc-number">3.5.</span> <span class="toc-text">Fallback: Cache via Network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主从都失效"><span class="toc-number">3.6.</span> <span class="toc-text">主从都失效</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#迁移"><span class="toc-number">4.</span> <span class="toc-text">迁移</span></a></li></ol>
 		
@@ -190,10 +190,10 @@ Give protection from and control over latency and failure from dependencies acce
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?">
+ <a href="/2016/03/23/java-io/" title="Java IO">
   <strong>上一篇：</strong><br/>
   <span>
-  Java中一个线程可以多次start吗?</span>
+  Java IO</span>
 </a>
 </div>
 
@@ -211,22 +211,22 @@ Give protection from and control over latency and failure from dependencies acce
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
+  <strong class="toc-title">Contents</strong>
  
  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hystrix"><span class="toc-number">1.</span> <span class="toc-text">Hystrix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-Is-Hystrix-For"><span class="toc-number">1.1.</span> <span class="toc-text">What Is Hystrix For?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hystrix-works-by"><span class="toc-number">1.2.</span> <span class="toc-text">Hystrix works by:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hello-World"><span class="toc-number">1.3.</span> <span class="toc-text">Hello World</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback"><span class="toc-number">1.4.</span> <span class="toc-text">Fallback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误传播"><span class="toc-number">1.5.</span> <span class="toc-text">错误传播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Name"><span class="toc-number">1.6.</span> <span class="toc-text">Command Name</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command-Group"><span class="toc-number">1.7.</span> <span class="toc-text">Command Group</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Command线程池"><span class="toc-number">1.8.</span> <span class="toc-text">Command线程池</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#请求缓存"><span class="toc-number">2.</span> <span class="toc-text">请求缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#请求合并"><span class="toc-number">2.1.</span> <span class="toc-text">请求合并</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Request-Context-Setup"><span class="toc-number">2.2.</span> <span class="toc-text">Request Context Setup</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常见模式"><span class="toc-number">3.</span> <span class="toc-text">常见模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#快速失败-Fail-Fast"><span class="toc-number">3.1.</span> <span class="toc-text">快速失败 Fail Fast</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#无声失败-Fail-Silent"><span class="toc-number">3.2.</span> <span class="toc-text">无声失败 Fail Silent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回退：静态的-Fallback-Static"><span class="toc-number">3.3.</span> <span class="toc-text">回退：静态的 Fallback:Static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Stubbed"><span class="toc-number">3.4.</span> <span class="toc-text">Fallback: Stubbed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fallback-Cache-via-Network"><span class="toc-number">3.5.</span> <span class="toc-text">Fallback: Cache via Network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主从都失效"><span class="toc-number">3.6.</span> <span class="toc-text">主从都失效</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#迁移"><span class="toc-number">4.</span> <span class="toc-text">迁移</span></a></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -236,11 +236,11 @@ Give protection from and control over latency and failure from dependencies acce
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -321,7 +321,7 @@ Give protection from and control over latency and failure from dependencies acce
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -337,6 +337,10 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -349,15 +353,19 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -373,15 +381,7 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -389,11 +389,11 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -401,7 +401,7 @@ Give protection from and control over latency and failure from dependencies acce
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -409,7 +409,7 @@ Give protection from and control over latency and failure from dependencies acce
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -425,11 +425,11 @@ Give protection from and control over latency and failure from dependencies acce
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -658,7 +658,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

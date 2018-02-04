@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,188 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/05/23/Spark-on-yarn/" title="Spark on yarn" itemprop="url">Spark on yarn</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-23T06:33:43.000Z" itemprop="datePublished"> Published 2016-05-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="模式"><a href="#模式" class="headerlink" title="模式:"></a>模式:</h2><ul>
+<li>yarn-cluster：<br>Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。<br><a href="http://www.iteblog.com/archives/1189" target="_blank" rel="external">Spark on YARN集群模式作业运行全过程分析</a></li>
+<li>yarn-client：<br>Spark的driver运行在client进程中，而application master只用来向YARN申请资源。<br><a href="http://www.iteblog.com/archives/1191" target="_blank" rel="external">Spark on YARN客户端模式作业运行全过程分析</a></li>
+</ul>
+<h3 id="Deployment-Mode-Summary"><a href="#Deployment-Mode-Summary" class="headerlink" title="Deployment Mode Summary"></a>Deployment Mode Summary</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>YARN Client Mode</th>
+<th>YARN Cluster Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Driver runs in</td>
+<td>Client</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Requests resources</td>
+<td>ApplicationMaster</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Starts executor processes</td>
+<td>YARN NodeManager</td>
+<td>YARN NodeManager</td>
+</tr>
+<tr>
+<td>Persistent services</td>
+<td>YARN ResourceManager and NodeManagers</td>
+<td>YARN ResourceManager and NodeManagers</td>
+</tr>
+<tr>
+<td>Supports Spark Shell</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>参考:<br><a href="http://www.iteblog.com/archives/1223" target="_blank" rel="external">Spark:Yarn-cluster和Yarn-client区别与联系</a><br><a href="http://www.cloudera.com/documentation/enterprise/5-5-x/topics/cdh_ig_running_spark_on_yarn.html" target="_blank" rel="external">Running Spark Applications on YARN</a></p>
+<h2 id="启动App"><a href="#启动App" class="headerlink" title="启动App"></a>启动App</h2><p>在yarn-cluster模式中启动一个application：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit --class path.to.your.Class --master yarn-cluster [options] &lt;app jar&gt; [app options]</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line"></span><br><span class="line">SPARK_JAR=hdfs://hansight/libs/spark-assembly-<span class="number">1.0</span>.<span class="number">2</span>-hadoop2.<span class="number">4.0</span>.<span class="number">2.1</span>.<span class="number">4.0</span>-<span class="number">632</span>.jar \</span><br><span class="line">./bin/spark-submit --class org.apache.spark.examples.SparkPI \</span><br><span class="line">    --master yarn-cluster \</span><br><span class="line">    --num-executors <span class="number">3</span> \</span><br><span class="line">    --driver-memory <span class="number">4</span>g \</span><br><span class="line">    --executor-memory <span class="number">2</span>g \</span><br><span class="line">    --executor-cores <span class="number">1</span> \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    <span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="yarn的资源调度"><a href="#yarn的资源调度" class="headerlink" title="yarn的资源调度"></a>yarn的资源调度</h2><p><a href="http://debugo.com/yarn-scheduler/" target="_blank" rel="external">YARN Capacity Scheduler 简介</a><br>YARN Independent RM 指标:  Weight, Virtual Cores, Min and Max Memory, Max Running Apps, and Scheduling Policy</p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><p><a href="http://wuchong.me/blog/2015/04/04/spark-on-yarn-cluster-deploy/" target="_blank" rel="external">Spark On YARN 集群安装部署</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Yarn/">Yarn</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/23/Spark和MySQL交互/" title=" Spark和MySQL交互" itemprop="url"> Spark和MySQL交互</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-23T06:32:22.000Z" itemprop="datePublished"> Published 2016-05-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="external">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="external">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="external">改写Spark JdbcRDD，支持自己定义分区查询条件</a><br><a href="http://lswyyy.github.io/2015/12/16/%E6%8F%90%E9%AB%98spark-jdbc%E6%93%8D%E4%BD%9C%E5%B9%B6%E5%8F%91%E5%BA%A6/" target="_blank" rel="external">spark jdbc(mysql) 操作并发度优化</a></p>
+<h3 id="一、不指定查询条件"><a href="#一、不指定查询条件" class="headerlink" title="一、不指定查询条件"></a>一、不指定查询条件</h3><p>　　这个方式链接MySql的函数原型是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(url: <span class="type">String</span>, table: <span class="type">String</span>, properties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure></p>
+<p>我们只需要提供Driver的url，需要查询的表名，以及连接表相关属性properties。下面是具体例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, prop )</span><br><span class="line">println(df.count())</span><br><span class="line">println(df.rdd.partitions.size)</span><br></pre></td></tr></table></figure></p>
+<p>我们运行上面的程序，可以看到df.rdd.partitions.size输出结果是1，这个结果的含义是iteblog表的所有数据都是由RDD的一个分区处理的，所以说，如果你这个表很大，很可能会出现OOM<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSetManager: Lost task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">1.0</span> (TID <span class="number">14</span>, spark047219):</span><br><span class="line"> java.lang.OutOfMemoryError: GC overhead limit exceeded at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:<span class="number">3380</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这种方式在数据量大的时候不建议使用。</p>
+<h3 id="二、指定数据库字段的范围"><a href="#二、指定数据库字段的范围" class="headerlink" title="二、指定数据库字段的范围"></a>二、指定数据库字段的范围</h3><p>　　这种方式就是通过指定数据库中某个字段的范围，但是遗憾的是，这个字段必须是数字，来看看这个函数的函数原型：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    columnName: <span class="type">String</span>,</span><br><span class="line">    lowerBound: <span class="type">Long</span>,</span><br><span class="line">    upperBound: <span class="type">Long</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span>,</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>　　前两个字段的含义和方法一类似。columnName就是需要分区的字段，这个字段在数据库中的类型必须是数字；lowerBound就是分区的下界；upperBound就是分区的上界；numPartitions是分区的个数。同样，我们也来看看如何使用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lowerBound = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> upperBound = <span class="number">100000</span></span><br><span class="line"><span class="keyword">val</span> numPartitions = <span class="number">5</span></span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, <span class="string">"id"</span>, lowerBound, upperBound, numPartitions, prop)</span><br></pre></td></tr></table></figure>
+<p>这个方法可以将iteblog表的数据分布到RDD的几个分区中，分区的数量由numPartitions参数决定，在理想情况下，每个分区处理相同数量的数据，我们在使用的时候不建议将这个值设置的比较大，因为这可能导致数据库挂掉！但是根据前面介绍，这个函数的缺点就是只能使用整形数据字段作为分区关键字。</p>
+<p>　　这个函数在极端情况下，也就是设置将numPartitions设置为1，其含义和第一种方式一致。</p>
+<h3 id="三、根据任意字段进行分区"><a href="#三、根据任意字段进行分区" class="headerlink" title="三、根据任意字段进行分区"></a>三、根据任意字段进行分区</h3><p>　　基于前面两种方法的限制，Spark还提供了根据任意字段进行分区的方法，函数原型如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    predicates: <span class="type">Array</span>[<span class="type">String</span>],</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>这个函数相比第一种方式多了predicates参数，我们可以通过这个参数设置分区的依据，来看看例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> predicates = <span class="type">Array</span>[<span class="type">String</span>](<span class="string">"reportDate &lt;= '2014-12-31'"</span>, </span><br><span class="line">	<span class="string">"reportDate &gt; '2014-12-31' and reportDate &lt;= '2015-12-31'"</span>)</span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, predicates, prop)</span><br></pre></td></tr></table></figure>
+<p>最后rdd的分区数量就等于predicates.length。</p>
+<h3 id="四、通过load获取"><a href="#四、通过load获取" class="headerlink" title="四、通过load获取"></a>四、通过load获取</h3><p>Spark还提供通过load的方式来读取数据。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span>,</span><br><span class="line">    <span class="string">"dbtable"</span> -&gt; <span class="string">"iteblog"</span>)).load()</span><br></pre></td></tr></table></figure>
+<p>options函数支持url、driver、dbtable、partitionColumn、lowerBound、upperBound以及numPartitions选项，细心的同学肯定发现这个和方法二的参数一致。是的，其内部实现原理部分和方法二大体一致。同时load方法还支持json、orc等数据源的读取。</p>
+<h2 id="Spark-写入MySQL"><a href="#Spark-写入MySQL" class="headerlink" title="Spark 写入MySQL"></a>Spark 写入MySQL</h2><p><a href="http://www.iteblog.com/archives/1275" target="_blank" rel="external">Spark将计算结果写入到Mysql中</a><br><a href="http://www.iteblog.com/archives/1290" target="_blank" rel="external">Spark RDD写入RMDB(Mysql)方法二</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Spark/">Spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/MySQL/">MySQL</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/23/Spark-资料整理/" title="Spark 资料整理" itemprop="url">Spark 资料整理</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +270,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> 發表於 2016-05-23</time>
+    <time datetime="2016-05-23T06:29:17.000Z" itemprop="datePublished"> Published 2016-05-23</time>
     
   </p>
 </header>
@@ -177,7 +359,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> 發表於 2016-05-18</time>
+    <time datetime="2016-05-18T05:48:55.000Z" itemprop="datePublished"> Published 2016-05-18</time>
     
   </p>
 </header>
@@ -276,7 +458,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> 發表於 2016-05-05</time>
+    <time datetime="2016-05-05T08:59:40.000Z" itemprop="datePublished"> Published 2016-05-05</time>
     
   </p>
 </header>
@@ -336,7 +518,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> 發表於 2016-05-04</time>
+    <time datetime="2016-05-04T13:11:50.000Z" itemprop="datePublished"> Published 2016-05-04</time>
     
   </p>
 </header>
@@ -406,7 +588,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> 發表於 2016-05-03</time>
+    <time datetime="2016-05-03T09:03:56.000Z" itemprop="datePublished"> Published 2016-05-03</time>
     
   </p>
 </header>
@@ -502,7 +684,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> 發表於 2016-05-02</time>
+    <time datetime="2016-05-02T14:19:35.000Z" itemprop="datePublished"> Published 2016-05-02</time>
     
   </p>
 </header>
@@ -562,7 +744,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> 發表於 2016-05-02</time>
+    <time datetime="2016-05-02T07:09:47.000Z" itemprop="datePublished"> Published 2016-05-02</time>
     
   </p>
 </header>
@@ -626,7 +808,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> 發表於 2016-04-24</time>
+    <time datetime="2016-04-24T13:49:24.000Z" itemprop="datePublished"> Published 2016-04-24</time>
     
   </p>
 </header>
@@ -705,143 +887,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/24/Spring-Session学习笔记/" title="Spring Session学习笔记" itemprop="url">Spring Session学习笔记</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-24T11:02:47.000Z" itemprop="datePublished"> 發表於 2016-04-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://www.iflym.com/index.php/code/201503170001.html" target="_blank" rel="external">分布式cookie-session的实现(spring-session)</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spring/">Spring</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Java/">Java</a><a href="/tags/Spring/">Spring</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/21/正确操作Java集合/" title="正确操作Java集合" itemprop="url">正确操作Java集合</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-21T09:01:23.000Z" itemprop="datePublished"> 發表於 2016-04-21</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="java-对于collection操作"><a href="#java-对于collection操作" class="headerlink" title="java 对于collection操作"></a>java 对于collection操作</h1><h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>切记使用<strong>迭代器</strong></p>
-<p>正确的代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Iterator&lt;String&gt; it = famous.iterator(); it.hasNext();)&#123;</span><br><span class="line">    String s = it.next();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">"madehua"</span>))&#123;</span><br><span class="line">        it.remove();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>错误的代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Iterator&lt;String&gt; it = famous.iterator(); it.hasNext();)&#123;</span><br><span class="line">        String s = it.next();</span><br><span class="line">        <span class="keyword">if</span>(s.equals(<span class="string">"madehua"</span>))&#123;</span><br><span class="line">            famous.remove(s); <span class="comment">// 使用了错误的remove方法</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (String s : famous) &#123;</span><br><span class="line">    <span class="keyword">if</span> (s.equals(<span class="string">"madehua"</span>)) &#123;</span><br><span class="line">	    famous.remove(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Java/">Java</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/7/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/9/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -851,11 +911,11 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -936,7 +996,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -952,6 +1012,10 @@
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -964,15 +1028,19 @@
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -988,15 +1056,7 @@
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -1004,11 +1064,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -1016,7 +1076,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1024,7 +1084,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -1040,11 +1100,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1196,7 +1256,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

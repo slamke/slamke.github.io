@@ -59,7 +59,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -75,7 +75,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -98,14 +98,14 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:09:54.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T04:09:54.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
+			<strong class="toc-title">Contents</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
 		
@@ -284,22 +284,22 @@
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
+  <strong class="toc-title">Contents</strong>
  
  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -309,11 +309,11 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -394,7 +394,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -410,6 +410,10 @@
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -422,15 +426,19 @@
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -446,15 +454,7 @@
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -462,11 +462,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -474,7 +474,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -482,7 +482,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -498,11 +498,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -731,7 +731,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

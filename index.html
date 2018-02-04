@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,134 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/02/04/Akka学习笔记/" title="Akka学习笔记" itemprop="url">Akka学习笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-04T07:15:14.000Z" itemprop="datePublished"> Published 2018-02-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Akka学习笔记"><a href="#Akka学习笔记" class="headerlink" title="Akka学习笔记"></a>Akka学习笔记</h1><p><a href="http://www.ibm.com/developerworks/cn/java/j-jvmc5/index.html" target="_blank" rel="external">IBM   JVM 并发性: 使用 Akka 执行异步操作</a><br><a href="http://www.ibm.com/developerworks/cn/java/j-jvmc6/index.html" target="_blank" rel="external">IBM   JVM 并发性: 使用 Akka 构建 actor 应用程序</a></p>
+<p><a href="http://agiledon.github.io/blog/2014/02/18/remote-actor-in-akka/" target="_blank" rel="external">Remote Actor介绍</a><br><a href="http://shiyanjun.cn/archives/1178.html" target="_blank" rel="external">Akka入门编程实践</a><br><a href="http://shiyanjun.cn/archives/1168.html" target="_blank" rel="external">Akka框架基本要点介绍</a></p>
+<p><a href="https://www.toptal.com/scala/concurrency-and-fault-tolerance-made-easy-an-intro-to-akka" target="_blank" rel="external">Concurrency and Fault Tolerance Made Easy: An Akka Tutorial with Examples</a>  简单介绍Akka的使用，适合入门，包括actor模型，actor通信，容错等</p>
+<p><a href="http://shiyanjun.cn/archives/1186.html" target="_blank" rel="external">Akka Cluster原理与应用</a><br><a href="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/chapter7/howto_common_patterns.html" target="_blank" rel="external">Akka开发的常用模式</a><br><a href="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/index.html" target="_blank" rel="external">Akka开发指南</a><br><a href="http://www.gtan.com/akka_doc/" target="_blank" rel="external">Akka2.0官方文档中文版</a></p>
+<p><a href="http://blog.csdn.net/beliefer/article/details/53887181" target="_blank" rel="external">使用Akka构建集群（一）</a><br><a href="http://blog.csdn.net/beliefer/article/details/53887181" target="_blank" rel="external">使用Akka构建集群（二）</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/04/AkkaCluster/" title="AkkaCluster" itemprop="url">AkkaCluster</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-04T07:14:20.000Z" itemprop="datePublished"> Published 2018-02-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Akka集群原理"><a href="#Akka集群原理" class="headerlink" title="Akka集群原理"></a>Akka集群原理</h2><p>Akka集群支持去中心化的基于P2P的集群服务，没有单点故障（SPOF）问题，它主要是通过Gossip协议来实现。对于集群成员的状态，Akka提供了一种故障检测机制，能够自动发现出现故障而离开集群的成员节点，通过事件驱动的方式，将状态传播到整个集群的其它成员节点。</p>
+<h3 id="1-状态转移与故障检测"><a href="#1-状态转移与故障检测" class="headerlink" title="1. 状态转移与故障检测"></a>1. 状态转移与故障检测</h3><p>Akka内部为集群成员定义了一组有限状态（6种状态），并给出了一个状态转移矩阵，代码如下所示：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">private</span>[cluster] <span class="keyword">val</span> allowedTransitions: <span class="type">Map</span>[<span class="type">MemberStatus</span>, <span class="type">Set</span>[<span class="type">MemberStatus</span>]] =</span><br><span class="line">    <span class="type">Map</span>(</span><br><span class="line">      <span class="type">Joining</span> -&gt; <span class="type">Set</span>(<span class="type">Up</span>, <span class="type">Down</span>, <span class="type">Removed</span>),</span><br><span class="line">      <span class="type">Up</span> -&gt; <span class="type">Set</span>(<span class="type">Leaving</span>, <span class="type">Down</span>, <span class="type">Removed</span>),</span><br><span class="line">      <span class="type">Leaving</span> -&gt; <span class="type">Set</span>(<span class="type">Exiting</span>, <span class="type">Down</span>, <span class="type">Removed</span>),</span><br><span class="line">      <span class="type">Down</span> -&gt; <span class="type">Set</span>(<span class="type">Removed</span>),</span><br><span class="line">      <span class="type">Exiting</span> -&gt; <span class="type">Set</span>(<span class="type">Removed</span>, <span class="type">Down</span>),</span><br><span class="line">      <span class="type">Removed</span> -&gt; <span class="type">Set</span>.empty[<span class="type">MemberStatus</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Akka集群中的每个成员节点，都有可能处于上面的一种状态，在发生某些事件以后，会发生状态转移。需要注意的是，除了Down和Removed状态以外，节点处于其它任何一个状态时都有可能变成Down状态，即节点故障而无法提供服务，而在变成Down状态之前有一个虚拟的Unreachable状态，因为在Gossip收敛过程中，是无法到达或者经由Unreachable状态的节点，这个状态是由Akka实现的故障探测器（Failure Detector）来检测到的。处于Down状态的节点如果想要再次加入Akka集群，需要重新启动，并进入Joining状态，然后才能进行后续状态的转移变化。Akka集群成员节点状态及其转移情况，如下图所示：<br><img src="https://github.com/slamke/image/blob/master/akka/cluster.png?raw=true" alt=""><br>在Akka中，集群中每一个成员节点M会被集群中的其他另一组节点（默认是5个）G监控，这一组节点G并不是整个集群中的其他所有节点，只是整个集群全部节点的一个子集，组G中的节点会检测节点M是否处于Unreachable状态，这是通过发送心跳来确认节点M是否可达，如果不可达则组G中的节点会将节点M的Unreachable状态向集群中组G之外的其它节点传播，最终使得集群中的每个成员节点都知道节点M故障。</p>
+<h3 id="2-Akka事件集合"><a href="#2-Akka事件集合" class="headerlink" title="2.Akka事件集合"></a>2.Akka事件集合</h3><p>节点状态发生转移会触发某个事件，我们可以根据不同类型的事件来进行相应的处理，为了能够详细捕获到各种事件，我们先看一下Akka定义的事件集合，如图所示：<br><img src="https://github.com/slamke/image/blob/master/akka/cluster_events.png?raw=true" alt=""></p>
+<h3 id="3-Akka成员角色（Node-Role）"><a href="#3-Akka成员角色（Node-Role）" class="headerlink" title="3.Akka成员角色（Node Role）"></a>3.Akka成员角色（Node Role）</h3><p>Akka支持在每个成员节点加入集群的时候，设置成员自己的角色。通过角色划分，可以将使用Akka集群处理业务的系统划分为多个处理逻辑独立的子系统，每个子系统处理自己的业务逻辑，而且，划分得到的多个子系统都处于一个统一的Akka集群中。因此，每个子系统也具备了Akka集群所具有的特性，如故障检测、状态转移、状态传播等等。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/02/04/有类型Actor/" title="有类型Actor" itemprop="url">有类型Actor</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +216,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T05:47:30.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T05:47:30.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
@@ -188,7 +316,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:47:40.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T04:47:40.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
@@ -279,7 +407,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:40:53.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T04:40:53.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
@@ -377,7 +505,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:33:13.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T04:33:13.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
@@ -489,7 +617,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:09:54.000Z" itemprop="datePublished"> 發表於 2018-02-04</time>
+    <time datetime="2018-02-04T04:09:54.000Z" itemprop="datePublished"> Published 2018-02-04</time>
     
   </p>
 </header>
@@ -664,7 +792,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-16T10:18:38.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
+    <time datetime="2018-01-16T10:18:38.000Z" itemprop="datePublished"> Published 2018-01-16</time>
     
   </p>
 </header>
@@ -736,7 +864,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-16T09:36:32.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
+    <time datetime="2018-01-16T09:36:32.000Z" itemprop="datePublished"> Published 2018-01-16</time>
     
   </p>
 </header>
@@ -860,7 +988,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-16T09:33:58.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
+    <time datetime="2018-01-16T09:33:58.000Z" itemprop="datePublished"> Published 2018-01-16</time>
     
   </p>
 </header>
@@ -918,180 +1046,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/01/16/Yarn的基本结构和工作原理/" title="Yarn的基本结构和工作原理" itemprop="url">Yarn的基本结构和工作原理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2018-01-16T08:00:33.000Z" itemprop="datePublished"> 發表於 2018-01-16</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="1-YARN-基本架构"><a href="#1-YARN-基本架构" class="headerlink" title="1.YARN 基本架构"></a>1.YARN 基本架构</h1><p>YARN是Hadoop 2.0中的资源管理系统，它的基本设计思想是将MRv1中的<strong>JobTracker</strong>拆分成了两个独立的服务：一个全局的资源管理器 <strong>ResourceManager</strong>和每个应用程序特有的<strong>ApplicationMaster</strong>。其中ResourceManager负责整个系统的资源管理和分配，而ApplicationMaster负责单个应用程序的管理。</p>
-<h2 id="1-1-YARN基本组成结构"><a href="#1-1-YARN基本组成结构" class="headerlink" title="1.1 YARN基本组成结构"></a>1.1 YARN基本组成结构</h2><p>YARN总体上仍然是Master/Slave结构，在整个资源管理框架中，<strong>ResourceManager为Master</strong>，<strong>NodeManager为Slave</strong>，<strong>ResourceManager负责对各个NodeManager上的资源进行统一管理和调度</strong>。当用 户提交一个应用程序时，需要提供一个用以跟踪和管理这个程序的ApplicationMaster，它负责向ResourceManager申请资源，并要求NodeManger启动可以占用一定资源的任务。由于不同的ApplicationMaster被分布到不同的节点上，因此它们之间不会相互影响。</p>
-<p>下图描述了YARN的基本组成结构，YARN主要由ResourceManager、NodeManager、 ApplicationMaster和Container等几个组件构成。</p>
-<p><img src="https://github.com/slamke/image/blob/master/hadoop/yarn/yarn-artitechure.png?raw=true" alt=""></p>
-<ol>
-<li><code>ResourceManager</code>（RM）</li>
-</ol>
-<p>RM是一个全局的资源管理器，负责整个系统的资源管理和分配。它主要由两个组件构成：调度器（<code>Scheduler</code>）和应用程序管理器（<code>Applications Manager，ASM</code>）。</p>
-<p>（1） 调度器 调度器根据容量、队列等限制条件（如每个队列分配一定的资源，最多执行一定数量的作业等），将系统中的资源分配给各个正在运行的应用程序。需要注意的是， 该调度器是一个“纯调度器”，它不再从事任何与具体应用程序相关的工作，比如不负责监控或者跟踪应用的执行状态等，也不负责重新启动因应用执行失败或者硬 件故障而产生的失败任务，这些均交由应用程序相关的ApplicationMaster完成。调度器仅根据各个应用程序的资源需求进行资源分配，而资源分 配单位用一个抽象概念“资源容器”（Resource Container，简称Container）表示，Container是一个动态资源分配单位，它将内存、CPU、磁盘、网络等资源封装在一起，从而限 定每个任务使用的资源量。此外，该调度器是一个可插拔的组件，用户可根据自己的需要设计新的调度器，YARN提供了多种直接可用的调度器，比如<code>Fair Scheduler</code>和<code>Capacity Scheduler</code>等。</p>
-<p>（2） 应用程序管理器应用程序管理器负责管理整个系统中所有应用程序，包括应用程序提交、与调度器协商资源以启动ApplicationMaster、监控ApplicationMaster运行状态并在失败时重新启动它等。</p>
-<ol>
-<li>ApplicationMaster（AM） </li>
-</ol>
-<p>用户提交的每个应用程序均包含一个AM，主要功能包括：</p>
-<p>①与RM调度器协商以获取资源（用Container表示）；</p>
-<p>②将得到的任务进一步分配给内部的任务；</p>
-<p>③与NM通信以启动/停止任务；</p>
-<p>④监控所有任务运行状态，并在任务运行失败时重新为任务申请资源以重启任务。</p>
-<p>当前YARN自带了两个AM实现，一个是用于演示AM编写方法的实例程序distributedshell，它可以申请一定数目的Container以并 行运行一个Shell命令或者Shell脚本；另一个是运行MapReduce应用程序的AM—MRAppMaster。此外，一些其他的计算框架对应的 AM正在开发中，比如Open MPI、Spark等。</p>
-<ol>
-<li>NodeManager（NM） </li>
-</ol>
-<p>NM是每个节点上的资源和任务管理器，一方面，它会定时地向RM汇报本节点上的资源使用情况和各个Container的运行状态；另一方面，它接收并处理来自AM的Container启动/停止等各种请求。</p>
-<ol>
-<li>Container   </li>
-</ol>
-<p>Container是YARN中的资源抽象，它封装了某个节点上的多维度资源，如内存、CPU、磁盘、网络等，当AM向RM申请资源时，RM为AM返回的 资源便是用Container表示的。YARN会为每个任务分配一个Container，且该任务只能使用该Container中描述的资源。需要注意的 是，Container不同于MRv1中的slot，它是一个动态资源划分单位，是根据应用程序的需求动态生成的。截至本书完成时，YARN仅支持CPU 和内存两种资源，且使用了轻量级资源隔离机制Cgroups进行资源隔离。</p>
-<h1 id="2-Yarn的工作流程"><a href="#2-Yarn的工作流程" class="headerlink" title="2.Yarn的工作流程"></a>2.Yarn的工作流程</h1><p>运行在YARN上的应用程序主要分为两类：短应用程序和长应用程序，其中，短应用程序是指一定时间内（可能是秒级、分钟级或小时级，尽管天级别或者更长时 间的也存在，但非常少）可运行完成并正常退出的应用程序，比如MapReduce作业、Tez DAG作业等，长应用程序是指不出意外，永不终止运行的应用程序，通常是一些服务，比如Storm Service（主要包括Nimbus和Supervisor两类服务），HBase Service（包括Hmaster和RegionServer两类服务）等，而它们本身作为一个框架提供了编程接口供用户使用。尽管这两类应用程序作用 不同，一类直接运行数据处理程序，一类用于部署服务（服务之上再运行数据处理程序），但运行在YARN上的流程是相同的。</p>
-<p>当用户向YARN中提交一个应用程序后，YARN将分两个阶段运行该应用程序：</p>
-<p>第一个阶段是启动ApplicationMaster；</p>
-<p>第二个阶段是由ApplicationMaster创建应用程序，为它申请资源，并监控它的整个运行过程，直到运行完成。如下图所示，YARN的工作流程分为以下几个步骤：</p>
-<p><strong><em><img src="https://github.com/slamke/image/blob/master/hadoop/yarn/yarn-message.jpg?raw=true" alt=""></em></strong></p>
-<p>步骤1　用户向YARN中提交应用程序，其中包括ApplicationMaster程序、启动ApplicationMaster的命令、用户程序等。</p>
-<p>步骤2　ResourceManager为该应用程序分配第一个Container，并与对应的Node-Manager通信，要求它在这个Container中启动应用程序的ApplicationMaster。</p>
-<p>步骤3　ApplicationMaster首先向ResourceManager注册，这样用户可以直接通过ResourceManage查看应用程序的运行状态，然后它将为各个任务申请资源，并监控它的运行状态，直到运行结束，即重复步骤4~7。</p>
-<p>步骤4　ApplicationMaster采用轮询的方式通过RPC协议向ResourceManager申请和领取资源。</p>
-<p>步骤5　一旦ApplicationMaster申请到资源后，便与对应的NodeManager通信，要求它启动任务。</p>
-<p>步骤6　NodeManager为任务设置好运行环境（包括环境变量、JAR包、二进制程序等）后，将任务启动命令写到一个脚本中，并通过运行该脚本启动任务。</p>
-<p>步骤7　各个任务通过某个RPC协议向ApplicationMaster汇报自己的状态和进度，以让ApplicationMaster随时掌握各个任务 的运行状态，从而可以在任务失败时重新启动任务。在应用程序运行过程中，用户可随时通过RPC向  ApplicationMaster查询应用程序的当前运行状态。</p>
-<p>步骤8　应用程序运行完成后，ApplicationMaster向ResourceManager注销并关闭自己。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a><a href="/tags/Yarn/">Yarn</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/01/09/Livy/" title="Livy" itemprop="url">Livy</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2018-01-09T08:34:39.000Z" itemprop="datePublished"> 發表於 2018-01-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p><a href="http://geek.csdn.net/news/detail/208943" target="_blank" rel="external">Livy：基于Apache Spark的REST服务</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -1101,11 +1070,11 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -1186,7 +1155,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -1202,6 +1171,10 @@
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -1214,15 +1187,19 @@
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -1238,15 +1215,7 @@
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -1254,11 +1223,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -1266,7 +1235,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -1274,7 +1243,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -1290,11 +1259,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1446,7 +1415,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,6 +81,138 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/10/11/贝叶斯推断的原理和应用/" title="贝叶斯推断的原理和应用" itemprop="url">贝叶斯推断的原理和应用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-11T15:00:15.000Z" itemprop="datePublished"> Published 2017-10-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="原理说明"><a href="#原理说明" class="headerlink" title="原理说明"></a>原理说明</h2><p>朴素贝叶斯分类器（Naive Bayes classifier），它是一种简单有效的常用分类算法。</p>
+<p><a href="http://www.ruanyifeng.com/blog/2013/12/naive_bayes_classifier.html" target="_blank" rel="external">朴素贝叶斯分类器的应用</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2011/08/bayesian_inference_part_one.html" target="_blank" rel="external">贝叶斯推断及其互联网应用（一）：定理简介</a></p>
+<h3 id="条件概率"><a href="#条件概率" class="headerlink" title="条件概率"></a>条件概率</h3><p>贝叶斯定理实际上就是计算”条件概率”的公式。所谓”条件概率”（Conditional probability），就是指在事件B发生的情况下，事件A发生的概率，用P(A|B)来表示。</p>
+<p>对条件概率公式进行变形，可以得到如下形式：<br>P(A|B)=P(A)*P(B|A)/P(B)</p>
+<p>我们把P(A)称为”先验概率”（Prior probability），即在B事件发生之前，我们对A事件概率的一个判断。P(A|B)称为”后验概率”（Posterior probability），即在B事件发生之后，我们对A事件概率的重新评估。P(B|A)/P(B)称为”可能性函数”（Likelyhood），这是一个调整因子，使得预估概率更接近真实概率。<br>所以，条件概率可以理解成下面的式子：<br>　　后验概率　＝　先验概率 ｘ 调整因子<br>这就是贝叶斯推断的含义。我们先预估一个”先验概率”，然后加入实验结果，看这个实验到底是增强还是削弱了”先验概率”，由此得到更接近事实的”后验概率”。<br>在这里，如果”可能性函数”P(B|A)/P(B)&gt;1，意味着”先验概率”被增强，事件A的发生的可能性变大；如果”可能性函数”=1，意味着B事件无助于判断事件A的可能性；如果”可能性函数”&lt;1，意味着”先验概率”被削弱，事件A的可能性变小。</p>
+<h3 id="全概率公式"><a href="#全概率公式" class="headerlink" title="全概率公式"></a>全概率公式</h3><p>由于后面要用到，所以除了条件概率以外，这里还要推导全概率公式。<br>假定样本空间S，是两个事件A与A’的和。<br>P(B)=P(B∩A)+ P(B∩A`)<br>我们已知<br>P(B∩A) = P(B|A)P(A)<br>所以，<br>P(B) = P(B|A)P(A) + P(B|A’) P(A’)<br>这就是全概率公式。它的含义是，如果A和A’构成样本空间的一个划分，那么事件B的概率，就等于A和A’的概率分别乘以B对这两个事件的条件概率之和。<br>将这个公式代入上一节的条件概率公式，就得到了条件概率的另一种写法：</p>
+<h3 id="过滤垃圾邮件"><a href="#过滤垃圾邮件" class="headerlink" title="过滤垃圾邮件"></a>过滤垃圾邮件</h3><p><a href="http://www.ruanyifeng.com/blog/2011/08/bayesian_inference_part_two.html" target="_blank" rel="external">贝叶斯推断及其互联网应用（二）：过滤垃圾邮件</a></p>
+<p>用S表示垃圾邮件（spam），H表示正常邮件（healthy）。因此，P(S)和P(H)的先验概率，都是50%。<br>用W表示”sex”这个词，那么问题就变成了如何计算P(S|W)的值，即在某个词语（W）已经存在的条件下，垃圾邮件（S）的概率有多大。<br>根据条件概率公式，马上可以写出<br>P(S|W)= P(W|S)<em>P(S)/(P(W|S)</em>P(S) + P(W|H)*P(H)) </p>
+<p>选出这封信中P(S|W)最高的15个词，计算它们的联合概率。（【注释】如果有的词是第一次出现，无法计算P(S|W)，Paul Graham就假定这个值等于0.4。因为垃圾邮件用的往往都是某些固定的词语，所以如果你从来没见过某个词，它多半是一个正常的词。）<br>所谓联合概率，就是指在多个事件发生的情况下，另一个事件发生概率有多大。比如，已知W1和W2是两个不同的词语，它们都出现在某封电子邮件之中，那么这封邮件是垃圾邮件的概率，就是联合概率。</p>
+<h3 id="拼写检查"><a href="#拼写检查" class="headerlink" title="拼写检查"></a>拼写检查</h3><p><a href="http://www.ruanyifeng.com/blog/2012/10/spelling_corrector.html" target="_blank" rel="external">贝叶斯推断及其互联网应用（三）：拼写检查</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/算法/">算法</a><a href="/tags/贝叶斯/">贝叶斯</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/10/09/用Word2Vec进行文本分析/" title="用Word2Vec进行文本分析" itemprop="url">用Word2Vec进行文本分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-09T06:42:02.000Z" itemprop="datePublished"> Published 2017-10-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><a href="https://mp.weixin.qq.com/s?__biz=MzI1MTE2ODg4MA==&amp;mid=2650068134&amp;idx=1&amp;sn=c84bfd574f05ba02df7bf620bb5291ba&amp;chksm=f1f765b9c680ecaffba287c3cb1f8ca2d1a17328e8e7020759e6dffbfedf1f626acf7a82fd25&amp;scene=21#wechat_redirect" target="_blank" rel="external">用gensim库做文本相似性分析</a></p>
+<p><a href="https://mp.weixin.qq.com/s/VGgnoyMrPOKP5wkxtAMpyw" target="_blank" rel="external">用Word2Vec进行文本分析</a></p>
+<p><a href="https://spark.apache.org/docs/latest/mllib-feature-extraction.html#word2vec" target="_blank" rel="external">Spark进行word2vec</a><br><a href="https://spark.apache.org/docs/latest/ml-features.html#tf-idf" target="_blank" rel="external">Spark进行word2vec</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/算法/">算法</a><a href="/tags/文本分析/">文本分析</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/09/19/TF-IDF与余弦相似性的应用/" title="TF-IDF与余弦相似性的应用" itemprop="url">TF-IDF与余弦相似性的应用</a>
   </h1>
   <p class="article-author">By
@@ -88,7 +220,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-19T07:32:55.000Z" itemprop="datePublished"> 發表於 2017-09-19</time>
+    <time datetime="2017-09-19T07:32:55.000Z" itemprop="datePublished"> Published 2017-09-19</time>
     
   </p>
 </header>
@@ -172,7 +304,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-18T07:56:30.000Z" itemprop="datePublished"> 發表於 2017-09-18</time>
+    <time datetime="2017-09-18T07:56:30.000Z" itemprop="datePublished"> Published 2017-09-18</time>
     
   </p>
 </header>
@@ -232,7 +364,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-14T08:43:25.000Z" itemprop="datePublished"> 發表於 2017-09-14</time>
+    <time datetime="2017-09-14T08:43:25.000Z" itemprop="datePublished"> Published 2017-09-14</time>
     
   </p>
 </header>
@@ -301,7 +433,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-13T07:00:01.000Z" itemprop="datePublished"> 發表於 2017-09-13</time>
+    <time datetime="2017-09-13T07:00:01.000Z" itemprop="datePublished"> Published 2017-09-13</time>
     
   </p>
 </header>
@@ -375,7 +507,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-13T03:51:40.000Z" itemprop="datePublished"> 發表於 2017-09-13</time>
+    <time datetime="2017-09-13T03:51:40.000Z" itemprop="datePublished"> Published 2017-09-13</time>
     
   </p>
 </header>
@@ -435,7 +567,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-12T03:21:00.000Z" itemprop="datePublished"> 發表於 2017-09-12</time>
+    <time datetime="2017-09-12T03:21:00.000Z" itemprop="datePublished"> Published 2017-09-12</time>
     
   </p>
 </header>
@@ -495,7 +627,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-09-11T10:14:42.000Z" itemprop="datePublished"> 發表於 2017-09-11</time>
+    <time datetime="2017-09-11T10:14:42.000Z" itemprop="datePublished"> Published 2017-09-11</time>
     
   </p>
 </header>
@@ -560,7 +692,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2017-06-09T03:36:23.000Z" itemprop="datePublished"> 發表於 2017-06-09</time>
+    <time datetime="2017-06-09T03:36:23.000Z" itemprop="datePublished"> Published 2017-06-09</time>
     
   </p>
 </header>
@@ -619,176 +751,21 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/06/01/hadoop的安全机制和审计/" title="hadoop的安全机制和审计" itemprop="url">hadoop的安全机制和审计</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-06-01T06:33:09.000Z" itemprop="datePublished"> 發表於 2017-06-01</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Hadoop的安全机制"><a href="#Hadoop的安全机制" class="headerlink" title="Hadoop的安全机制"></a>Hadoop的安全机制</h2><p><a href="http://dongxicheng.org/mapreduce/hadoop-security/" target="_blank" rel="external">Hadoop安全机制介绍</a></p>
-<p>Hadoop安全机制现状<br>Hadoop 一直缺乏安全机制，主要表现在以下几个方面：</p>
-<p>(1) User to Service</p>
-<p>[1] Namenode或者jobtracker缺乏安全认证机制  Client的用户名和用户组名由自己指定。</p>
-<p>[2] DataNode缺乏安全授权机制<br>用户只要知道某个block的blockID，便可以绕过namenode直接从datanode上读取该block；用户可以向任意datanode上写block。</p>
-<p>[3] JobTracker缺乏安全授权机制<br>用户可以修改或者杀掉任意其他用户的作业；用户可以修改JobTracker的持久化状态。</p>
-<p>(2) Service to service安全认证<br>Datanode与TaskTracker缺乏安全授权机制，这使得用户可以随意启动假的datanode和tasktracker，如：你可以直接到已经启动的某个TaskTracker上启动另外一个tasktracker：<br>./hadoop-daemon.sh start datanode</p>
-<p>（3）磁盘或者通信连接没有经过加密</p>
-<p><a href="http://dongxicheng.org/mapreduce/hadoop-kerberos-introduction/?replytocom=41615" target="_blank" rel="external">Hadoop Kerberos安全机制介绍</a><br><img src="http://dongxicheng.org/wp-content/uploads/2012/03/kerbores_work_process.jpg" alt=""></p>
-<p><a href="http://dongxicheng.org/mapreduce-nextgen/hadoop-yarn-security/" target="_blank" rel="external">Hadoop 2.0 (YARN)中的安全机制概述</a></p>
-<p>一般而言，系统安全机制由认证(authentication)和授权(authorization)两大部分构成。认证就是简单地对一个实体的身份进行判断；而授权则是向实体授予对数据资源和信息访问权限的决策过程。同Hadoop 1.0一样，Hadoop 2.0中的认证机制采用Kerbero和Token两种方案，而授权则是通过引入访问控制列表（Access Control List，ACL）实现的。</p>
-<h2 id="Hadoop-2-0授权机制"><a href="#Hadoop-2-0授权机制" class="headerlink" title="Hadoop 2.0授权机制"></a>Hadoop 2.0授权机制</h2><ul>
-<li>队列访问控制列表，例如提交程序和管理程序</li>
-<li>应用程序访问控制列表</li>
-<li>服务访问控制列表，例如查看和修改app</li>
-</ul>
-<h2 id="Hadoop的安全管理"><a href="#Hadoop的安全管理" class="headerlink" title="Hadoop的安全管理"></a>Hadoop的安全管理</h2><p>Hadoop生态安全管理框架Apache Ranger</p>
-<p>Ranger是一个框架，用于Hadoop平台上的监控和全面的数据安全管理。</p>
-<p>Apache Ranger有以下目标：</p>
-<ul>
-<li>集中安全管理，在中央UI中或使用REST API来管理所有与安全相关的任务。</li>
-<li>使用Hadoop组件/工具执行特定行为（或操作）并通过中央管理工具来进行细粒度的授权管理。</li>
-<li>标准化所有Hadoop组件的授权方法。</li>
-<li>增强对不同授权方法的支持  如：基于角色的访问控制，基于属性的访问控制等。</li>
-<li>在Hadoop的所有组件中集中审核用户访问和（与安全相关的）管理操作。</li>
-</ul>
-<p>Ranger的功能还包括动态策略（Dynamic Policies），当访问依赖于时间等动态因素时。它可以基于每天的不同时刻、IP地址或是地理位置对访问资源进行限制。</p>
-<p>对于受支持的Hadoop组件，Ranger通过访问控制策略提供了一种标准的授权方法。作为标准，Ranger提供了一种集中式的组件，用于审计用户的访问行为和管理组件间的安全交互行为。</p>
-<p>Ranger使用了一种基于属性的方法定义和强制实施安全策略。当与Apache Hadoop的数据治理解决方案和元数据仓储组件Apache Atlas一起使用时，它可以定义一种基于标签的安全服务，通过使用标签对文件和数据资产进行分类，并控制用户和用户组对一系列标签的访问。Ranger的功能还包括动态策略（Dynamic Policies），当访问依赖于时间等动态因素时。它可以基于每天的不同时刻、IP地址或是地理位置对访问资源进行限制。</p>
-<p>参考：<br><a href="http://www.lpnote.com/2017/04/11/best-practices-in-hdfs-authorization-with-apache-ranger/" target="_blank" rel="external">Apache Ranger在HDFS中的最佳实践</a><br><a href="http://www.datastart.cn/tech/2016/05/12/ranger.html" target="_blank" rel="external"></a></p>
-<h2 id="WebUI保护"><a href="#WebUI保护" class="headerlink" title="WebUI保护"></a>WebUI保护</h2><p>Apache Knox Gateway是一个用于hadoop安全的RESTful API Gateway，为Spark/Hadoop集群提供唯一的REST入口。Knox以类似防火墙的形式挡在Spark集群之前，接管所有用户请求（如WEB UI访问、HDFS内容查看、Hive/HBase数据操作等）。从拓扑上来说这种做法更清爽（相对Kerberos），但对内部集群的保护要求很高，因为一旦攻破了Knox层，不管资源还是数据都是光着屁股的。</p>
-<p>Spark、HDFS等等都提供了Story Web UI，用户可以从Web上查看当前JOB的执行情况，也可以kill掉JOB。那么这个Web UI不应该所有人都可以访问，而应该只开放给管理员使用。默认Spark没有认证，能连接到这个集群上就可以访问Web UI，但通过Knox，可以在打开Web UI的时候先做认证，限制只有某些用户可以访问。 类似的，Knox还可以保护HDFS NN UI、Yarn UI等</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hadoop/">Hadoop</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/05/26/Hive-Metadata存MySQL注释中文乱码的问题/" title="Hive Metadata存MySQL注释中文乱码的问题" itemprop="url">Hive Metadata存MySQL注释中文乱码的问题</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-05-26T04:48:35.000Z" itemprop="datePublished"> 發表於 2017-05-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>参考： <a href="http://gengqi88.iteye.com/blog/2040422" target="_blank" rel="external">http://gengqi88.iteye.com/blog/2040422</a></p>
-<p>解决方案：数据库编码为latin1.将一下表的字段(涉及注释的字段都改)编码设定为UTF8<br>1、然后进入数据库执行以下5条SQL语句：<br>(1)修改表字段注解和表注解<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> COLUMNS_V2 <span class="keyword">modify</span> <span class="keyword">column</span> <span class="keyword">COMMENT</span> <span class="built_in">varchar</span>(<span class="number">256</span>) <span class="built_in">character</span> <span class="keyword">set</span> utf8;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> TABLE_PARAMS <span class="keyword">modify</span> <span class="keyword">column</span> PARAM_VALUE <span class="built_in">varchar</span>(<span class="number">4000</span>) <span class="built_in">character</span> <span class="keyword">set</span> utf8;</span><br></pre></td></tr></table></figure></p>
-<p>(2) 修改分区字段注解：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> PARTITION_PARAMS  <span class="keyword">modify</span> <span class="keyword">column</span> PARAM_VALUE <span class="built_in">varchar</span>(<span class="number">4000</span>) <span class="built_in">character</span> <span class="keyword">set</span> utf8 ; </span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> PARTITION_KEYS  <span class="keyword">modify</span> <span class="keyword">column</span> PKEY_COMMENT <span class="built_in">varchar</span>(<span class="number">4000</span>) <span class="built_in">character</span> <span class="keyword">set</span> utf8;</span><br></pre></td></tr></table></figure></p>
-<p>(3)修改索引注解：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">alter table  INDEX_PARAMS  modify column PARAM_VALUE  varchar(4000) character set utf8;</span><br><span class="line">``` </span><br><span class="line">2、修改hive连接mysql的连接为utf-8</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt; </span><br><span class="line">  &lt;name&gt;&lt;/name&gt; </span><br><span class="line">  &lt;value&gt;jdbc:mysql://IP:3306/hive?createDatabaseIfNotExist=true&amp;amp;characterEncoding=UTF-8&lt;/value&gt; </span><br><span class="line">  &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt; </span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
-<p>另参考：<br><a href="https://my.oschina.net/jackieyeah/blog/742088" target="_blank" rel="external">https://my.oschina.net/jackieyeah/blog/742088</a><br><a href="http://www.crazyant.net/1193.html" target="_blank" rel="external">http://www.crazyant.net/1193.html</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Hive/">Hive</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Hive/">Hive</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github 名片</p>
+<p class="asidetitle">Github Card</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -798,11 +775,11 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>5</sup></a></li>
+			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
 		  
 		
 		  
@@ -883,7 +860,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -899,6 +876,10 @@
 			
 		
 			
+				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
 			
 		
@@ -911,15 +892,19 @@
 			
 		
 			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>5</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
 			
 		
 			
@@ -935,15 +920,7 @@
 			
 		
 			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
 			
 		
 			
@@ -951,11 +928,11 @@
 			
 		
 			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
 			
 		
 			
@@ -963,7 +940,7 @@
 			
 		
 			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -971,7 +948,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
           <li>
@@ -987,11 +964,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
+  <p class="asidetitle">Weibo</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -1143,7 +1120,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
