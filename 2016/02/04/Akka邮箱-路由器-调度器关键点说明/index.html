@@ -15,11 +15,11 @@
 调度器Akka MessageDispatcher是维持 Akka Actor “运作”的部分, 可以说它是整个机器的引擎。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Akka邮箱&路由器&调度器关键点说明">
-<meta property="og:url" content="slamke.github.io/2018/02/04/Akka邮箱-路由器-调度器关键点说明/index.html">
+<meta property="og:url" content="slamke.github.io/2016/02/04/Akka邮箱-路由器-调度器关键点说明/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="Akkay邮箱&amp;amp;路由器&amp;amp;调度器关键点说明Akka 无法保证消息将被传送到目的地。这种无保证传送背后的哲学原理是 Akka 的核心原理之一。Akka 可以 保证消息最多传送一次，而且绝不会无序地收到从一个 actor 实例发送到另一个 actor 实例的消息。
 调度器Akka MessageDispatcher是维持 Akka Actor “运作”的部分, 可以说它是整个机器的引擎。">
-<meta property="og:updated_time" content="2018-02-04T05:42:22.685Z">
+<meta property="og:updated_time" content="2018-02-04T07:21:53.585Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Akka邮箱&路由器&调度器关键点说明">
 <meta name="twitter:description" content="Akkay邮箱&amp;amp;路由器&amp;amp;调度器关键点说明Akka 无法保证消息将被传送到目的地。这种无保证传送背后的哲学原理是 Akka 的核心原理之一。Akka 可以 保证消息最多传送一次，而且绝不会无序地收到从一个 actor 实例发送到另一个 actor 实例的消息。
@@ -51,7 +51,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -67,7 +67,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -83,21 +83,21 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/02/04/Akka邮箱-路由器-调度器关键点说明/" title="Akka邮箱&amp;路由器&amp;调度器关键点说明" itemprop="url">Akka邮箱&amp;路由器&amp;调度器关键点说明</a>
+      <a href="/2016/02/04/Akka邮箱-路由器-调度器关键点说明/" title="Akka邮箱&amp;路由器&amp;调度器关键点说明" itemprop="url">Akka邮箱&amp;路由器&amp;调度器关键点说明</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2018-02-04T04:47:40.000Z" itemprop="datePublished"> Published 2018-02-04</time>
+    <time datetime="2016-02-04T04:47:40.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">Contents</strong>
+			<strong class="toc-title">文章目錄</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Akkay邮箱-amp-路由器-amp-调度器关键点说明"><span class="toc-number">1.</span> <span class="toc-text">Akkay邮箱&路由器&调度器关键点说明</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#调度器"><span class="toc-number">1.1.</span> <span class="toc-text">调度器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缺省派发器"><span class="toc-number">1.1.1.</span> <span class="toc-text">缺省派发器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#邮箱"><span class="toc-number">1.2.</span> <span class="toc-text">邮箱</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为actor指定一个消息队列类型"><span class="toc-number">1.2.1.</span> <span class="toc-text">为actor指定一个消息队列类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何选择邮箱类型"><span class="toc-number">1.2.2.</span> <span class="toc-text">如何选择邮箱类型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#路由"><span class="toc-number">1.3.</span> <span class="toc-text">路由</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一个路由actor"><span class="toc-number">1.3.1.</span> <span class="toc-text">一个路由actor</span></a></li></ol></li></ol></li></ol>
 		
@@ -118,6 +118,8 @@
 <li>将使用默认邮箱akka.actor.default-mailbox。</li>
 </ol>
 <h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><p>消息可以通过路由器发送，以便有效地将它们路由到目的actor，称为其routee。一个Router可以在actor内部或外部使用，并且你可以自己管理routee或使用有配置功能的自我包含的路由actor。</p>
+<p>为了创建路由器，设置指定数量的rountee,需要以下信息<br>-rounter类型和routee实例的数量<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ActorRef</span> masterAct = system.actorOf(<span class="type">Props</span>.create(<span class="type">MasterActor</span>.<span class="keyword">class</span>).withRouter(<span class="keyword">new</span> <span class="type">RoundRobinPool</span>(<span class="number">5</span>)),<span class="string">"RounterActor"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>定义了一个Actor,通过实例化一个路由器实例,这里是RoundRobin，它的构造函数接受一个参数，表示创建rountees的数量.</p>
 <p>一个简单的路由器</p>
 <p>下面的示例阐释如何使用Router和在actor内管理routee。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">ActorRefRoutee</span></span><br><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">Router</span></span><br><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">RoundRobinRoutingLogic</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Master</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> router = &#123;</span><br><span class="line">    <span class="keyword">val</span> routees = <span class="type">Vector</span>.fill(<span class="number">5</span>) &#123;</span><br><span class="line">      <span class="keyword">val</span> r = context.actorOf(<span class="type">Props</span>[<span class="type">Worker</span>])</span><br><span class="line">      context watch r</span><br><span class="line">      <span class="type">ActorRefRoutee</span>(r)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Router</span>(<span class="type">RoundRobinRoutingLogic</span>(), routees)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> w: <span class="type">Work</span> =&gt;</span><br><span class="line">      router.route(w, sender())</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(a) =&gt;</span><br><span class="line">      router = router.removeRoutee(a)</span><br><span class="line">      <span class="keyword">val</span> r = context.actorOf(<span class="type">Props</span>[<span class="type">Worker</span>])</span><br><span class="line">      context watch r</span><br><span class="line">      router = router.addRoutee(r)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>Akka自带的路由逻辑如下：</p>
@@ -130,11 +132,12 @@
 <li>akka.routing.TailChoppingRoutingLogic</li>
 <li>akka.routing.ConsistentHashingRoutingLogic</li>
 </ul>
-<p>Router是不可变的，而RoutingLogic是线程安全的；意味着他们也可以在actor外部使用。</p>
+<p>Router是不可变的，而RoutingLogic是线程安全的；意味着他们也可以在actor外部使用。<br>路由actor是一种特殊的类型-RounterActorRef。RounterActorRef不是利用存储转发的机制，他直接路由消息到Rountee的邮箱，而不是到Router的邮箱，当routee答复路由消息时，回复将发送到原始发件人，而不是路由actor。</p>
 <blockquote>
 <p>注意<br>一般情况下，任何发送到路由器的消息将被向前发送到它的routee，但有一个例外。特别地广播消息将发送到路由器下所有的routee</p>
 </blockquote>
 <h3 id="一个路由actor"><a href="#一个路由actor" class="headerlink" title="一个路由actor"></a>一个路由actor</h3><p>一个路由器也可以被创建为一个自包含的actor，来管理routee，载入路由逻辑和其他配置设置。</p>
+<p>注意:   路由器actor相当于是透明的<br>路由器也是子actor的监管者。路由器的默认策略是总是上溯，所以错误会传递给路由器的监管者处理。<br>注意路由器的监管者会将错误当做路由器的错位，因此会重启路由器，并将导致他的孩子全部重启。<br>如果路由器池的子actor终止，池路由器不会自动产生一个新的actor。在池路由器所有子actor都终止的事件中，路由器将终止本身，除非它是一个动态的路由器，例如使用了大小调整。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -157,7 +160,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="slamke.github.io/2018/02/04/Akka邮箱-路由器-调度器关键点说明/" data-title="Akka邮箱&amp;路由器&amp;调度器关键点说明 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
+	  <div data-url="slamke.github.io/2016/02/04/Akka邮箱-路由器-调度器关键点说明/" data-title="Akka邮箱&amp;路由器&amp;调度器关键点说明 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -171,7 +174,7 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2018/02/04/有类型Actor/" title="有类型Actor">
+ <a href="/2016/02/04/有类型Actor/" title="有类型Actor">
   <strong>上一篇：</strong><br/>
   <span>
   有类型Actor</span>
@@ -180,7 +183,7 @@
 
 
 <div class="next">
-<a href="/2018/02/04/AkkaRemote/"  title="AkkaRemote">
+<a href="/2016/02/04/AkkaRemote/"  title="AkkaRemote">
  <strong>下一篇：</strong><br/> 
  <span>AkkaRemote
 </span>
@@ -192,22 +195,22 @@
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">Contents</strong>
+  <strong class="toc-title">文章目錄</strong>
  
  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Akkay邮箱-amp-路由器-amp-调度器关键点说明"><span class="toc-number">1.</span> <span class="toc-text">Akkay邮箱&路由器&调度器关键点说明</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#调度器"><span class="toc-number">1.1.</span> <span class="toc-text">调度器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#缺省派发器"><span class="toc-number">1.1.1.</span> <span class="toc-text">缺省派发器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#邮箱"><span class="toc-number">1.2.</span> <span class="toc-text">邮箱</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为actor指定一个消息队列类型"><span class="toc-number">1.2.1.</span> <span class="toc-text">为actor指定一个消息队列类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何选择邮箱类型"><span class="toc-number">1.2.2.</span> <span class="toc-text">如何选择邮箱类型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#路由"><span class="toc-number">1.3.</span> <span class="toc-text">路由</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一个路由actor"><span class="toc-number">1.3.1.</span> <span class="toc-text">一个路由actor</span></a></li></ol></li></ol></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -217,7 +220,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -281,6 +284,10 @@
 		  
 		
 		  
+			<li><a href="/categories/ZooKeeper/" title="ZooKeeper">ZooKeeper<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
 		  
 		
@@ -302,7 +309,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
@@ -326,11 +333,11 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -339,6 +346,14 @@
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
@@ -354,23 +369,7 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 			
@@ -378,11 +377,19 @@
 			
 		
 			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -390,7 +397,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -406,11 +413,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -639,7 +646,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

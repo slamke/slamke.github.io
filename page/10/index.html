@@ -47,7 +47,7 @@
 				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -63,7 +63,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:slamke.github.io">
 					</form>
 					
@@ -81,34 +81,60 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/Session和Cookie的区别与联系以及Session的实现原理/" title="Session和Cookie的区别与联系以及Session的实现原理" itemprop="url">Session和Cookie的区别与联系以及Session的实现原理</a>
+      <a href="/2016/02/04/有类型Actor/" title="有类型Actor" itemprop="url">有类型Actor</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-02-04T05:47:30.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Session和Cookie的区别与联系以及Session的实现原理"><a href="#Session和Cookie的区别与联系以及Session的实现原理" class="headerlink" title="Session和Cookie的区别与联系以及Session的实现原理"></a>Session和Cookie的区别与联系以及Session的实现原理</h1><hr>
-<h2 id="HTTP链接状态"><a href="#HTTP链接状态" class="headerlink" title="HTTP链接状态"></a>HTTP链接状态</h2><p>web应用技术的核心http协议是一个无状态的协议，web应用开发里就出现了保持http链接状态的技术：一个是cookie技术，另一种是session技术。</p>
-<p>cookie技术是客户端的解决方案，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从： [系统盘]:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。</p>
-<p>session技术则是服务端的解决方案，它是通过服务器来保持状态的。由于Session这个词汇包含的语义很多，因此需要在这里明确一下 Session的含义。首先，我们通常都会把Session翻译成会话，因此我们可以把客户端浏览器与服务器之间一系列交互的动作称为一个 Session。从这个语义出发，我们会提到Session持续的时间，会提到在Session过程中进行了什么操作等等；其次，Session指的是服务器端为客户端所开辟的存储空间，在其中保存的信息就是用于保持状态。从这个语义出发，我们则会提到往Session中存放什么内容，如何根据键值从 Session中获取匹配的内容等。要使用Session，第一步当然是创建Session了。那么Session在何时创建呢？当然还是在服务器端程序运行的过程中创建的，不同语言实现的应用程序有不同创建Session的方法，而在Java中是通过调用HttpServletRequest的getSession方法（使用true作为参数）创建的。在创建了Session的同时，服务器会为该Session生成唯一的Session id，而这个Session id在随后的请求中会被用来重新获得已经创建的Session；在Session被创建之后，就可以调用Session相关的方法往Session中增加内容了，而这些内容只会保存在服务器中，发到客户端的只有Session id；当客户端再次发送请求的时候，会将这个Session id带上，服务器接受到请求之后就会依据Session id找到相应的Session，从而再次使用之。正式这样一个过程，用户的状态也就得以保持了。<br>由此我们可以得出，session是解决http协议无状态问题的服务端解决方案，它能让客户端和服务端一系列交互动作变成一个完整的事务，能使网站变成一个真正意义上的软件。</p>
-<h2 id="cookie与session的关系"><a href="#cookie与session的关系" class="headerlink" title="cookie与session的关系"></a>cookie与session的关系</h2><p>cookie和session的方案虽然分别属于客户端和服务端，但是服务端的session的实现对客户端的cookie有依赖关系的，上面我讲到服务端执行session机制时候会生成session的id值，这个id值会发送给客户端，客户端每次请求都会把这个id值放到http请求的头部发送给服务端，而这个id值在客户端会保存下来，保存的容器就是cookie，因此当我们完全禁掉浏览器的cookie的时候，服务端的session也会不能正常使用</p>
-<h2 id="在实际运用中session所带来的问题"><a href="#在实际运用中session所带来的问题" class="headerlink" title="在实际运用中session所带来的问题"></a>在实际运用中session所带来的问题</h2><p>由上面所描述的session实现机制，我们会发现，为了弥补http协议的无状态的特点，服务端会占用一定的内存和cpu用来存储和处理session计算的开销，这也就是tomcat这个的web容器的并发连接那么低（tomcat官方文档里默认的连接数是200）原因之一。因此很多java语言编写的网站，在生产环境里web容器之前会加一个静态资源服务器，例如：apache服务器或nginx服务器，静态资源服务器没有解决http无状态问题的功能，因此部署静态资源的服务器也就不会让出内存或cpu计算资源专门去处理像session这样的功能，这些内存和cpu资源可以更有效的处理每个http请求，因此静态资源服务器的并发连接数更高，所以我们可以让那些没有状态保持要求的请求直接在静态服务器里处理，而要进行状态保持的请求则在java的web容器里进行处理，这样能更好的提升网站的效率。</p>
-<p>当下的互联网网站为了提高网站安全性和并发量，服务端的部署的服务器的数量往往是大于或等于两台，多台服务器对外提供的服务是等价的，但是不同的服务器上面肯定会有不同的web容器，由上面的讲述我们知道session的实现机制都是web容器里内部机制，这就导致一个web容器里所生成的session的id值是不同的，因此当一个请求到了A服务器，浏览器得到响应后，客户端存下的是A服务器上所生成的session的id，当在另一个请求分发到了B服务器，B服务器上的web容器是不能识别这个session的id值，更不会有这个sessionID所对应记录下来的信息，这个时候就需要两个不同web容器之间进行session的同步。Tomcat容器有一个官方的解决方案就是使用apache+tomcat+mod_jk方案，当一个web容器里session的信息发生变化后，该web容器会向另一个web容器进行广播，另一个web收到广播后将session信息同步到自己的容器里，这个过程是十分消耗系统资源，当访问量增加会严重影响到网站的效率和稳定性。</p>
-<p>通常会使用session Id进行负载均衡粘性控制，但是这种做法干扰了负载均衡服务器的负载均衡的计算，让请求的分发并不是公平的。</p>
-<h2 id="解决session相关问题的技术方案"><a href="#解决session相关问题的技术方案" class="headerlink" title="解决session相关问题的技术方案"></a>解决session相关问题的技术方案</h2><p>由上所述，session一共有两个问题需要解决：<br>1) session的存储应该独立于web容器，也要独立于部署web容器的服务器；<br>2）如何进行高效的session同步。</p>
-<p>在讲到解决这些问题之前，首先考虑下session如何存储才是高效，是存在内存、文件还是数据库了？文件和数据库的存储方式都是将session的数据固化到硬盘上，操作硬盘的方式就是IO，IO操作的效率是远远低于操作内存的数据，因此文件和数据库存储方式是不可取的，所以将session数据存储到内存是最佳的选择。因此最好的解决方案就是使用分布式缓存技术，例如：memcached和redis，将session信息的存储独立出来也是解决session同步问题的方法。</p>
-<p>参考：</p>
-<ul>
-<li><a href="http://www.cnblogs.com/sharpxiajun/p/3395607.html" target="_blank" rel="external">session机制详解以及session的相关应用</a></li>
-<li><a href="http://www.blogjava.net/persister/archive/2010/08/24/329838.html" target="_blank" rel="external">Session原理和Tomcat实现分析</a></li>
+        <h1 id="有类型Actor"><a href="#有类型Actor" class="headerlink" title="有类型Actor"></a>有类型Actor</h1><ul>
+<li>通过接口明确actor可以接收的消息目标和行为。</li>
 </ul>
+<p>TypedActor是Akka基于Active对象（Active Object）设计模式的一个实现，关于Active对象模式，可以看维基百科的定义：<br>Active对象模式解耦了在一个对象上执行方法和调用方法的逻辑，执行方法和调用方法分别在各自的线程执行上下文中。该模式的目标是通过使用异步方法调用和一个调度器来处理请求，从而实现并行计算处理，该模式由6个元素组成：</p>
+<ul>
+<li>一个Proxy对象，提供一个面向客户端的接口和一组公共的方法</li>
+<li>一个接口，定义了请求一个Active对象上的方法的集合</li>
+<li>一个来自客户端请求的列表</li>
+<li>一个调度器，确定下一次处理哪一个请求</li>
+<li>Active对象上方法的实现</li>
+<li>一个回调或者变量，供客户端接收请求被处理后的结果<br>通过前面对Actor的了解，我们知道Actor更适用于在Akka的Actor系统之间来实现并行计算处理，而TypedActor适用于桥接Actor系统和非Actor系统。TypedActor是基于JDK的Proxy来实现的，与Actor不同的是，Actor一次处理一个消息，而TypedActor一次处理一个调用（Call）。关于更多关于TypedActor，可以查看Akka文档。</li>
+</ul>
+<p>有类型Actor由两 “部分” 组成, <strong><em>一个公开的接口和一个实现,</em></strong> 对普通actor来说，你拥有一个外部API（公开接口的实例）来将方法调用异步地委托给其实现的私有实例。</p>
+<p>有类型Actor相对于普通Actor的优势在于有类型Actor拥有静态的契约，你不需要定义你自己的消息；它的劣势在于对你能做什么和不能做什么进行了一些限制，即你不能使用become/unbecome。</p>
+<p>有类型Actor是使用JDK Proxies实现的，JDK Proxies提供了非常简单的api来拦截方法调用。</p>
+<blockquote>
+<p>注意<br>和普通Akka actor一样，有类型actor一次也只处理一个消息。</p>
+</blockquote>
+<h2 id="工具箱"><a href="#工具箱" class="headerlink" title="工具箱"></a>工具箱</h2><p>在创建第一个有类型Actor之前，我们先了解一下我们手上可供使用的工具，它位于akka.actor.TypedActor中。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">TypedActor</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//返回有类型actor扩展</span></span><br><span class="line"><span class="keyword">val</span> extension = <span class="type">TypedActor</span>(system) <span class="comment">//system是一个Actor系统实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//判断一个引用是否是有类型actor代理</span></span><br><span class="line"><span class="type">TypedActor</span>(system).isTypedActor(someReference)</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回一个外部有类型actor代理所代表的Akka actor</span></span><br><span class="line"><span class="type">TypedActor</span>(system).getActorRefFor(someReference)</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回当前的ActorContext,</span></span><br><span class="line"><span class="comment">// 此方法仅在一个TypedActor 实现的方法中有效</span></span><br><span class="line"><span class="keyword">val</span> c: <span class="type">ActorContext</span> = <span class="type">TypedActor</span>.context</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回当前有类型actor的外部代理,</span></span><br><span class="line"><span class="comment">// 此方法仅在一个TypedActor 实现的方法中有效</span></span><br><span class="line"><span class="keyword">val</span> s: <span class="type">Squarer</span> = <span class="type">TypedActor</span>.self[<span class="type">Squarer</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回一个有类型Actor扩展的上下文实例</span></span><br><span class="line"><span class="comment">//这意味着如果你用它创建其它的有类型actor，它们会成为当前有类型actor的子actor</span></span><br><span class="line"><span class="type">TypedActor</span>(<span class="type">TypedActor</span>.context)</span><br></pre></td></tr></table></figure></p>
+<h2 id="创建有类型Actor"><a href="#创建有类型Actor" class="headerlink" title="创建有类型Actor"></a>创建有类型Actor</h2><p>要创建有类型Actor，需要一个或多个接口，和一个实现。<br>创建我们的Squarer的有类型actor实例的最简单方法是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> mySquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(system).typedActorOf(<span class="type">TypedProps</span>[<span class="type">SquarerImpl</span>]())</span><br></pre></td></tr></table></figure></p>
+<p>第一个类型是代理的类型，第二个类型是实现的类型。如果要调用某特定的构造方法要这样做：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> otherSquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(system).typedActorOf(<span class="type">TypedProps</span>(classOf[<span class="type">Squarer</span>],</span><br><span class="line">    <span class="keyword">new</span> <span class="type">SquarerImpl</span>(<span class="string">"foo"</span>)), <span class="string">"name"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>由于你提供了一个 Props, 你可以指定使用哪个派发器, 缺省的超时时间等。</p>
+<p>方法派发语义</p>
+<h3 id="方法返回"><a href="#方法返回" class="headerlink" title="方法返回:"></a>方法返回:</h3><ul>
+<li>Unit 会以 fire-and-forget语义进行派发，与ActorRef.tell完全一致。</li>
+<li>akka.dispatch.Future[_] 会以 send-request-reply语义进行派发，与 ActorRef.ask完全一致。</li>
+<li>scala.Option[<em>]会以send-request-reply语义派发，但是会阻塞等待应答, 如果在超时时限内没有应答则返回scala.None，否则返回包含结果的scala.Some[</em>]。在这个调用中发生的异常将被重新抛出。</li>
+<li>任何其它类型的值将以send-request-reply语义进行派发，但会阻塞地等待应答, 如果超时会抛出java.util.concurrent.TimeoutException，如果发生异常则将异常重新抛出。</li>
+</ul>
+<h3 id="终止有类型Actor"><a href="#终止有类型Actor" class="headerlink" title="终止有类型Actor"></a>终止有类型Actor</h3><p>由于有类型actor底层还是Akka actor，所以在不需要的时候要终止它。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">TypedActor</span>(system).stop(mySquarer)</span><br><span class="line">这将会尽快地异步终止与指定的代理关联的有类型<span class="type">Actor</span>。</span><br><span class="line"></span><br><span class="line"><span class="type">TypedActor</span>(system).poisonPill(otherSquarer)</span><br><span class="line">这将会在有类型actor完成所有入队的调用后异步地终止它。</span><br></pre></td></tr></table></figure></p>
+<h3 id="有类型Actor监管树"><a href="#有类型Actor监管树" class="headerlink" title="有类型Actor监管树"></a>有类型Actor监管树</h3><p>你可以通过传入一个ActorContext来获得有类型Actor上下文，所以你可以对它调用typedActorOf(..)来创建有类型子actor。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Inside your Typed Actor</span></span><br><span class="line"><span class="keyword">val</span> childSquarer: <span class="type">Squarer</span> =</span><br><span class="line">  <span class="type">TypedActor</span>(<span class="type">TypedActor</span>.context).typedActorOf(<span class="type">TypedProps</span>[<span class="type">SquarerImpl</span>]())</span><br><span class="line"><span class="comment">//Use "childSquarer" as a Squarer</span></span><br><span class="line">通过将<span class="type">ActorContext</span>作为参数传给<span class="type">TypedActor</span>.get(…)，也可以为普通的<span class="type">Akka</span> actor创建有类型子actor。</span><br></pre></td></tr></table></figure></p>
+<h3 id="监管策略"><a href="#监管策略" class="headerlink" title="监管策略"></a>监管策略</h3><p>通过让你的有类型Actor的具体实现类实现TypedActor.Supervisor方法，你可以定义用来监管子actor的策略，就像监管与监控 和容错(Scala)所描述的。</p>
+<h3 id="生命周期回调"><a href="#生命周期回调" class="headerlink" title="生命周期回调"></a>生命周期回调</h3><p>通过使你的有类型actor实现类实现以下方法:</p>
+<ul>
+<li>TypedActor.PreStart</li>
+<li>TypedActor.PostStop</li>
+<li>TypedActor.PreRestart</li>
+<li>TypedActor.PostRestart<br>你可以hook进有类型actor的整个生命周期。</li>
+</ul>
+<h3 id="接收任意消息"><a href="#接收任意消息" class="headerlink" title="接收任意消息"></a>接收任意消息</h3><p>如果你的有类型actor的实现类扩展了akka.actor.TypedActor.Receiver，所有非方法调用MethodCall的消息会被传给onReceive方法.</p>
+<p>这使你能够对DeathWatch的Terminated消息及其它类型的消息进行处理，例如，与无类型actor进行交互的场合。</p>
 
         
         
@@ -121,13 +147,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/Akka/">Akka</a>
   </div>
 
 </div>
@@ -155,51 +181,151 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/01/Session原理、安全以及最基本的Express和Redis实现/" title="Session原理、安全以及最基本的Express和Redis实现" itemprop="url">Session原理、安全以及最基本的Express和Redis实现</a>
+      <a href="/2016/02/04/Akka邮箱-路由器-调度器关键点说明/" title="Akka邮箱&amp;路由器&amp;调度器关键点说明" itemprop="url">Akka邮箱&amp;路由器&amp;调度器关键点说明</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-01T09:54:41.000Z" itemprop="datePublished"> Published 2016-04-01</time>
+    <time datetime="2016-02-04T04:47:40.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Session原理、安全以及最基本的Express和Redis实现"><a href="#Session原理、安全以及最基本的Express和Redis实现" class="headerlink" title="Session原理、安全以及最基本的Express和Redis实现"></a>Session原理、安全以及最基本的Express和Redis实现</h1><h2 id="Session基础概念"><a href="#Session基础概念" class="headerlink" title="Session基础概念"></a>Session基础概念</h2><hr>
-<p>Session管理是Web Application的基础也是一个老生常谈的话题。为了方便后文的展开，更重要的是确认自己清晰的理解了整个Session管理的概念，我在此还是决定赘述的整个流程。如果你已经对于Session概念非常清晰的话，可以跳过本节不影响对于后文的理解。</p>
-<p>HTTP协议在设计的时候是无状态的。这是一个很关键的概念，意味着服务器在处理请求的时候，并不关注这个请求是谁发来的。这对于以提供内容为核心的Web1.0，例如门户网站，非常适合。然而对于以应用服务为核心的Web 2.0而言，服务器端必须有能力从请求中提取出请求者的身份信息，以在请求者不用反复输入身份的情况下，提供连续的服务。</p>
-<p>实现请求身份验证的方式很多，其中一种广泛接受的方式是使用服务器端产生的Session ID结合浏览器的Cookie实现对Session的管理，一般来说包括以下4个步骤：</p>
+        <h1 id="Akkay邮箱-amp-路由器-amp-调度器关键点说明"><a href="#Akkay邮箱-amp-路由器-amp-调度器关键点说明" class="headerlink" title="Akkay邮箱&amp;路由器&amp;调度器关键点说明"></a>Akkay邮箱&amp;路由器&amp;调度器关键点说明</h1><p>Akka 无法保证消息将被传送到目的地。这种无保证传送背后的哲学原理是 Akka 的核心原理之一。<br>Akka 可以 保证消息最多传送一次，而且绝不会无序地收到从一个 actor 实例发送到另一个 actor 实例的消息。</p>
+<h2 id="调度器"><a href="#调度器" class="headerlink" title="调度器"></a>调度器</h2><p>Akka MessageDispatcher是维持 Akka Actor “运作”的部分, 可以说它是整个机器的引擎。所有的MessageDispatcher实现也同时也是一个ExecutionContext</p>
+<h3 id="缺省派发器"><a href="#缺省派发器" class="headerlink" title="缺省派发器"></a>缺省派发器</h3><p>在没有为Actor作配置的情况下，每一个ActorSystem将有一个缺省的派发器。该缺省派发器可以被配置，默认是使用指定的default-executor的一个Dispatcher。如果一个ActorSystem是使用传入的ExecutionContext创建的，则该ExecutionContext将被用作所有派发器的默认执行器（“executor”）。如果没有给定ExecutionContext，则会回退使用akka.actor.default-dispatcher.default-executor.fallback指定的执行器。缺省情况下是使用“fork-join-executor”，它在大多数情况下拥有非常好的性能。</p>
+<h2 id="邮箱"><a href="#邮箱" class="headerlink" title="邮箱"></a>邮箱</h2><p>一个Akka Mailbox保存发往某个Actor的消息。通常每个Actor都拥有自己的邮箱，但也有例外，例如使用BalancingPool的所有路由子(routee)共享同一个邮箱实例。</p>
+<h3 id="为actor指定一个消息队列类型"><a href="#为actor指定一个消息队列类型" class="headerlink" title="为actor指定一个消息队列类型"></a>为actor指定一个消息队列类型</h3><p>为某个特定类型的actor指定一个特定类型的消息队列是有可能的，只要通过actor扩展RequiresMessageQueue参数化特质即可。下面是一个示例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.dispatch.<span class="type">RequiresMessageQueue</span></span><br><span class="line"><span class="keyword">import</span> akka.dispatch.<span class="type">BoundedMessageQueueSemantics</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyBoundedActor</span> <span class="keyword">extends</span> <span class="title">MyActor</span></span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">RequiresMessageQueue</span>[<span class="type">BoundedMessageQueueSemantics</span>]</span><br><span class="line"><span class="type">RequiresMessageQueue</span>特质的类型参数需要映射到配置中的邮箱，像这样：</span><br><span class="line"></span><br><span class="line">bounded-mailbox &#123;</span><br><span class="line">  mailbox-<span class="class"><span class="keyword">type</span> </span>= <span class="string">"akka.dispatch.BoundedMailbox"</span></span><br><span class="line">  mailbox-capacity = <span class="number">1000</span></span><br><span class="line">  mailbox-push-timeout-time = <span class="number">10</span>s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">akka.actor.mailbox.requirements &#123;</span><br><span class="line">  <span class="string">"akka.dispatch.BoundedMessageQueueSemantics"</span> = bounded-mailbox</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="如何选择邮箱类型"><a href="#如何选择邮箱类型" class="headerlink" title="如何选择邮箱类型"></a>如何选择邮箱类型</h3><p>当一个actor创建时，ActorRefProvider首先确定将执行它的调度器。然后，邮箱确定如下：</p>
 <ol>
-<li>服务器端的产生Session ID</li>
-<li>服务器端和客户端存储Session ID</li>
-<li>从HTTP Header中提取Session ID</li>
-<li>根据Session ID从服务器端的Hash中获取请求者身份信息</li>
+<li>如果actor的部署配置节包含mailbox键，则其描述邮箱类型将被使用。</li>
+<li>如果actor的Props包含邮箱选择——即它调用了withMailbox——则其描述邮箱类型将被使用。</li>
+<li>如果调度器的配置节包含mailbox-type键，则该节内容将用于配置邮箱类型。</li>
+<li>如果该actor需要邮箱类型，如上文所述，然后该约束的映射将用于确定使用的邮箱类型；如果不能满足调度器的约束——如果有的话——将继续替换尝试。</li>
+<li>如果调度器需要一个邮箱类型，如上文所述，则该约束的映射将被用来确定要使用的邮箱类型。</li>
+<li>将使用默认邮箱akka.actor.default-mailbox。</li>
 </ol>
-<p><img src="https://github.com/slamke/image/blob/master/web/session.jpg?raw=true" alt="enter image description here"></p>
-<p>上图是一个使用Redis Cluster来实现对Session管理的流程，但本质上除了redisMatrix.get和redisMatrix.set以外，和一般的Session管理流程是一致的。</p>
-<p>简单来说，一个请求到达的时候，服务器会先判断是否带有Session信息。如果有，则根据Session ID去数据库中查找是否具有对应的用户身份信息。此处可能会出现Session失效、非法的Session信息等可能性，那么服务器视同无Ssession信息的情况，重新的产生一个随机的字符串，并且在Http返回头中写入新的Session ID信息。另一者，如果服务器成功获取了用户的身份信息则以该身份为请求者提供服务。</p>
-<h2 id="使用Express和Redis对Session管理的实现"><a href="#使用Express和Redis对Session管理的实现" class="headerlink" title="使用Express和Redis对Session管理的实现"></a>使用Express和Redis对Session管理的实现</h2><hr>
-<p>Redis是一个非常适合用于Session管理的数据库。第一，它的结构简单，key-value的形式非常符合SessionID-UserID的存储；第二，读写速度非常快；第三，自身支持数据自动过期和清除；第四，语法、部署非常简单。基于以上原因，很多Session管理都是基于Redis实现的。</p>
-<h2 id="Session的安全问题"><a href="#Session的安全问题" class="headerlink" title="Session的安全问题"></a>Session的安全问题</h2><hr>
-<p>SessionId就如同请求者的身份证，一旦被攻击者恶意获得，攻击者便可以伪装成请求者对服务器发起请求，也就是我们经常听到的会话劫持(Session/Cookie Hijack)<br>关于会话劫持的原理推荐大家去看<a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">这篇文章</a></p>
-<p>基于上述实现方法的Session管理，我认为基本上可以排除</p>
+<h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><p>消息可以通过路由器发送，以便有效地将它们路由到目的actor，称为其routee。一个Router可以在actor内部或外部使用，并且你可以自己管理routee或使用有配置功能的自我包含的路由actor。</p>
+<p>为了创建路由器，设置指定数量的rountee,需要以下信息<br>-rounter类型和routee实例的数量<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ActorRef</span> masterAct = system.actorOf(<span class="type">Props</span>.create(<span class="type">MasterActor</span>.<span class="keyword">class</span>).withRouter(<span class="keyword">new</span> <span class="type">RoundRobinPool</span>(<span class="number">5</span>)),<span class="string">"RounterActor"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>定义了一个Actor,通过实例化一个路由器实例,这里是RoundRobin，它的构造函数接受一个参数，表示创建rountees的数量.</p>
+<p>一个简单的路由器</p>
+<p>下面的示例阐释如何使用Router和在actor内管理routee。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">ActorRefRoutee</span></span><br><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">Router</span></span><br><span class="line"><span class="keyword">import</span> akka.routing.<span class="type">RoundRobinRoutingLogic</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Master</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> router = &#123;</span><br><span class="line">    <span class="keyword">val</span> routees = <span class="type">Vector</span>.fill(<span class="number">5</span>) &#123;</span><br><span class="line">      <span class="keyword">val</span> r = context.actorOf(<span class="type">Props</span>[<span class="type">Worker</span>])</span><br><span class="line">      context watch r</span><br><span class="line">      <span class="type">ActorRefRoutee</span>(r)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Router</span>(<span class="type">RoundRobinRoutingLogic</span>(), routees)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> w: <span class="type">Work</span> =&gt;</span><br><span class="line">      router.route(w, sender())</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(a) =&gt;</span><br><span class="line">      router = router.removeRoutee(a)</span><br><span class="line">      <span class="keyword">val</span> r = context.actorOf(<span class="type">Props</span>[<span class="type">Worker</span>])</span><br><span class="line">      context watch r</span><br><span class="line">      router = router.addRoutee(r)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Akka自带的路由逻辑如下：</p>
 <ul>
-<li>暴力破解SessionId</li>
-<li>恶意植入固定SessionId</li>
+<li>akka.routing.RoundRobinRoutingLogic</li>
+<li>akka.routing.RandomRoutingLogic</li>
+<li>akka.routing.SmallestMailboxRoutingLogic</li>
+<li>akka.routing.BroadcastRoutingLogic</li>
+<li>akka.routing.ScatterGatherFirstCompletedRoutingLogic</li>
+<li>akka.routing.TailChoppingRoutingLogic</li>
+<li>akka.routing.ConsistentHashingRoutingLogic</li>
 </ul>
-<p>两种可能，因为uid的库基本上可以保证SessionId的随机性；而传递SessionId则依赖HTTP请求头中的Cookie信息而非URL，同时在用户登录立刻更换SessionId。</p>
-<p>唯一的可能性来源于Session的监听，而对于这种攻击有效的两种防止办法是：</p>
+<p>Router是不可变的，而RoutingLogic是线程安全的；意味着他们也可以在actor外部使用。<br>路由actor是一种特殊的类型-RounterActorRef。RounterActorRef不是利用存储转发的机制，他直接路由消息到Rountee的邮箱，而不是到Router的邮箱，当routee答复路由消息时，回复将发送到原始发件人，而不是路由actor。</p>
+<blockquote>
+<p>注意<br>一般情况下，任何发送到路由器的消息将被向前发送到它的routee，但有一个例外。特别地广播消息将发送到路由器下所有的routee</p>
+</blockquote>
+<h3 id="一个路由actor"><a href="#一个路由actor" class="headerlink" title="一个路由actor"></a>一个路由actor</h3><p>一个路由器也可以被创建为一个自包含的actor，来管理routee，载入路由逻辑和其他配置设置。</p>
+<p>注意:   路由器actor相当于是透明的<br>路由器也是子actor的监管者。路由器的默认策略是总是上溯，所以错误会传递给路由器的监管者处理。<br>注意路由器的监管者会将错误当做路由器的错位，因此会重启路由器，并将导致他的孩子全部重启。<br>如果路由器池的子actor终止，池路由器不会自动产生一个新的actor。在池路由器所有子actor都终止的事件中，路由器将终止本身，除非它是一个动态的路由器，例如使用了大小调整。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Akka/">Akka</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/04/AkkaRemote/" title="AkkaRemote" itemprop="url">AkkaRemote</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-04T04:40:53.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Akka远程"><a href="#Akka远程" class="headerlink" title="Akka远程"></a>Akka远程</h2><p>Akka remoting是按照端到端（peer-to-peer）对等通信的方式设计的</p>
+<h2 id="远程交互的类型"><a href="#远程交互的类型" class="headerlink" title="远程交互的类型"></a>远程交互的类型</h2><p>Akka 远程调用有两种方式:</p>
 <ul>
-<li>Https<br>很多网站仅仅在Login的阶段使用Https防止用户的用户名、密码信息被监听者获取，但是随后的SessionId同样有可能被监听者获取而伪造登录者的身份信息。因此更加推荐的方式是所有的信息传递全部使用Https实现，这样即使监听着截获了信息也无法破解其中的内容。关于如何使用NodeJS建立一个HTTPS的server可以参考《HTTPS的原理和NodeJS的实现》 这篇文章</li>
-<li>httpOnly<br>Express在options中提供了httpOnly的属性，此属性默认值为true，这个属性保证了Cookie的信息不能够通过JavaScript脚本获取。</li>
+<li>查找 : 使用actorSelection(path)在远程主机上查找一个actor</li>
+<li>创建 : 使用actorOf(Props(…), actorName)在远程主机上创建一个actor</li>
 </ul>
-<p>参考:</p>
+<h3 id="查找远程-Actors"><a href="#查找远程-Actors" class="headerlink" title="查找远程 Actors"></a>查找远程 Actors</h3><p>actorSelection(path)会获得远程结点上一个Actor的ActorSelection, 例如:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> selection =</span><br><span class="line">  context.actorSelection(<span class="string">"akka.tcp://actorSystemName@10.0.0.1:2552/user/actorName"</span>)</span><br><span class="line">可以看到以下模式被用来在远程结点上查找一个actor:</span><br><span class="line"></span><br><span class="line">akka.&lt;protocol&gt;:<span class="comment">//&lt;actor system&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;actor path&gt;</span></span><br><span class="line">一旦得到了actor的selection，你就可以像与本地actor通讯一样与它进行通迅, 例如:</span><br><span class="line"></span><br><span class="line">selection ! <span class="string">"Pretty awesome feature"</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="用代码进行远程部署"><a href="#用代码进行远程部署" class="headerlink" title="用代码进行远程部署"></a>用代码进行远程部署</h3><p>要允许动态部署系统，也可以在用来创建actor的Props中包含deployment配置 : 这一部分信息与配置文件中的deployment部分是等价的, 如果两者都有，则外部配置拥有更高的优先级.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">加入这些<span class="keyword">import</span>:</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Props</span>, <span class="type">Deploy</span>, <span class="type">Address</span>, <span class="type">AddressFromURIString</span> &#125;</span><br><span class="line"><span class="keyword">import</span> akka.remote.<span class="type">RemoteScope</span></span><br><span class="line">和一个像这样的远程地址:</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> one = <span class="type">AddressFromURIString</span>(<span class="string">"akka.tcp://sys@host:1234"</span>)</span><br><span class="line"><span class="keyword">val</span> two = <span class="type">Address</span>(<span class="string">"akka.tcp"</span>, <span class="string">"sys"</span>, <span class="string">"host"</span>, <span class="number">1234</span>) <span class="comment">// this gives the same</span></span><br><span class="line">你可以像这样建议系统在此远程结点上创建一个子actor:</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> ref = system.actorOf(<span class="type">Props</span>[<span class="type">SampleActor</span>].</span><br><span class="line">  withDeploy(<span class="type">Deploy</span>(scope = <span class="type">RemoteScope</span>(address))))</span><br></pre></td></tr></table></figure>
+<h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><p>对actor使用远程调用时，你必须保证这些actor所使用的props和messages是可序列化的. 如果不能保证会导致系统产生意料之外的行为.<br>配置</p>
 <ol>
-<li><a href="https://segmentfault.com/a/1190000002630691" target="_blank" rel="external">https://segmentfault.com/a/1190000002630691</a></li>
-<li><a href="http://devco.re/blog/2014/06/03/http-session-protection/" target="_blank" rel="external">http://devco.re/blog/2014/06/03/http-session-protection/</a></li>
+<li><p>为了让 Akka 知道对什么任务使用哪个Serializer, 你需要编辑你的 配置文件, 在 “akka.actor.serializers”一节将名称绑定为akka.serialization.Serializer的实现</p>
+</li>
+<li><p>在将名称与Serializer的不同实现绑定后，你需要指定哪些类的序列化使用哪种Serializer, 这部分配置写在“akka.actor.serialization-bindings”一节中:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">akka &#123;</span><br><span class="line">  actor &#123;</span><br><span class="line">    serializers &#123;</span><br><span class="line">      java = "akka.serialization.JavaSerializer"</span><br><span class="line">      proto = "akka.remote.serialization.ProtobufSerializer"</span><br><span class="line">      myown = "docs.serialization.MyOwnSerializer"</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    serialization-bindings &#123;</span><br><span class="line">      "java.lang.String" = java</span><br><span class="line">      "docs.serialization.Customer" = java</span><br><span class="line">      "com.google.protobuf.Message" = proto</span><br><span class="line">      "docs.serialization.MyOwnSerializable" = myown</span><br><span class="line">      "java.lang.Boolean" = myown</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="自定义-创建新的-Serializer"><a href="#自定义-创建新的-Serializer" class="headerlink" title="自定义 创建新的 Serializer"></a>自定义 创建新的 Serializer</h4><p>首先你需要为你的 Serializer 写一个类定义，像这样:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">ActorRef</span>, <span class="type">ActorSystem</span> &#125;</span><br><span class="line"><span class="keyword">import</span> akka.serialization._</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyOwnSerializer</span> <span class="keyword">extends</span> <span class="title">Serializer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// This is whether "fromBinary" requires a "clazz" or not</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">includeManifest</span></span>: <span class="type">Boolean</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Pick a unique identifier for your Serializer,</span></span><br><span class="line">  <span class="comment">// you've got a couple of billions to choose from,</span></span><br><span class="line">  <span class="comment">// 0 - 16 is reserved by Akka itself</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">identifier</span> </span>= <span class="number">1234567</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// "toBinary" serializes the given object to an Array of Bytes</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">toBinary</span></span>(obj: <span class="type">AnyRef</span>): <span class="type">Array</span>[<span class="type">Byte</span>] = &#123;</span><br><span class="line">    <span class="comment">// Put the code that serializes the object here</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// "fromBinary" deserializes the given array,</span></span><br><span class="line">  <span class="comment">// using the type hint (if any, see "includeManifest" above)</span></span><br><span class="line">  <span class="comment">// into the optionally provided classLoader.</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">fromBinary</span></span>(bytes: <span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                 clazz: <span class="type">Option</span>[<span class="type">Class</span>[_]]): <span class="type">AnyRef</span> = &#123;</span><br><span class="line">    <span class="comment">// Put your code that deserializes here</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="远程事件"><a href="#远程事件" class="headerlink" title="远程事件"></a>远程事件</h3><p>可以监听Akka远程调用中发生的事件，也可以订阅/取消订阅这些事情，你只需要在ActorSystem.eventStream中为下面所列出类型的事件注册监听器.</p>
+<blockquote>
+<p>注意<br>若要订阅任意远程事件，订阅RemotingLifecycleEvent。若要订阅只涉及链接的生命周期的事件，请订阅akka.remote.AssociationEvent。</p>
+<p>注意<br>使用”链接”而不是”连接”一词，反映了远程处理子系统可能使用无连接传输，但链接类似于运输层连接，来维持点到点之间的Akka协议。</p>
+</blockquote>
+<h3 id="远程安全"><a href="#远程安全" class="headerlink" title="远程安全"></a>远程安全</h3><p>Akka提供了几种方式来加强远程节点（客户端/服务器）之间的安全：</p>
+<ul>
+<li>不受信任的模式</li>
+<li>安全 Cookie 握手</li>
+</ul>
+<ol>
+<li>配置为不受信任模式的系统通过远程处理层传入的以下操作将被忽略：<ul>
+<li>远程部署 （这也意味着没有远程监控）</li>
+<li>远程DeathWatch</li>
+<li>system.stop(), PoisonPill, Kill</li>
+<li>发送任何继承自PossiblyHarmful标记接口的消息，包括Terminated</li>
+<li>通过actor selection发送的消息，除非目标定义在trusted-selection-paths中。</li>
+</ul>
+</li>
+<li>安全 Cookie 握手<br>Akka远程处理还允许你指定一个安全cookie，它将被交换并确保在客户端和服务器之间的连接握手中是相同的。如果他们不相同，则客户端将被拒绝连接到服务器。</li>
 </ol>
 
         
@@ -213,13 +339,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Web/">Web</a>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Web/">Web</a><a href="/tags/Session/">Session</a><a href="/tags/Cookie/">Cookie</a>
+  <span></span> <a href="/tags/Akka/">Akka</a>
   </div>
 
 </div>
@@ -247,20 +373,72 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/23/java-multi-thread-start/" title="Java中一个线程可以多次start吗?" itemprop="url">Java中一个线程可以多次start吗?</a>
+      <a href="/2016/02/04/Akka的监管和监控/" title="Akka的监管和监控" itemprop="url">Akka的监管和监控</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
+    <time datetime="2016-02-04T04:33:13.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Java中一个线程可以多次start吗"><a href="#Java中一个线程可以多次start吗" class="headerlink" title="Java中一个线程可以多次start吗?"></a>Java中一个线程可以多次start吗?</h1><p><strong>不可以</strong><br>通过Thread实例的start()，一个Thread的实例只能产生一个线程。一个Thread的实例一旦调用start()方法，这个实例的started标记就标记为true，事实中不管这个线程后来有没有执行到底，只要调用了一次start()就再也没有机会运行了。<br>一个线程对象只能调用一次start方法.从new到等待运行是单行道,所以如果你对一个已经启动的线程对象再调用一次start方法的话,会产生:IllegalThreadStateException异常. 可以被重复调用的是run()方法。<br>Thread类中run()和start()方法的区别如下:<br>run()方法: 在本线程内调用该Runnable对象的run()方法，可以重复多次调用；<br>start()方法: 启动一个线程，调用该Runnable对象的run()方法，不能多次启动一个线程</p>
+        <h1 id="Akka的监管和监控"><a href="#Akka的监管和监控" class="headerlink" title="Akka的监管和监控"></a>Akka的监管和监控</h1><h2 id="监管和监控"><a href="#监管和监控" class="headerlink" title="监管和监控"></a>监管和监控</h2><p>在 Actor 系统 中说过，监管描述的是actor之间的依赖关系：监管者将任务委托给下属，并相应地对下属的失败状况进行响应。当一个下属出现了失败（即抛出一个异常），它自己会将自己和自己所有的下属挂起，然后向自己的监管者发送一个提示失败的消息。基于所监管的工作的性质和失败的性质，监管者可以有4种基本选择：</p>
+<ol>
+<li>恢复下属，保持下属当前积累的内部状态</li>
+<li>重启下属，清除下属的内部状态</li>
+<li>永久地停止下属</li>
+<li>升级失败（沿监管树向上传递失败），由此失败自己</li>
+</ol>
+<blockquote>
+<p>警告<br>监管相关的父-子沟通，使用了特殊的系统消息及其固有的邮箱，从而和用户消息隔离开来。这意味着，监管相关的事件相对于普通的消息没有确定的顺序关系。在一般情况下，用户不能影响正常消息和失败通知的顺序。</p>
+<h3 id="顶级监管者"><a href="#顶级监管者" class="headerlink" title="顶级监管者"></a>顶级监管者</h3><p><img src="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/chapter2/guardians.png" alt="enter image description here"></p>
+</blockquote>
+<p>一个actor系统在其创建过程中至少要启动三个actor，如上图所示。</p>
+<ul>
+<li>/user: 守护Actor</li>
+</ul>
+<p>这个名为”/user”的守护者，作为所有用户创建actor的父actor，可能是需要打交道最多的。使用system.actorOf()创建的actor都是其子actor。</p>
+<ul>
+<li>/system: 系统守护者</li>
+</ul>
+<p>这个特殊的守护者被引入，是为了实现正确的关闭顺序，即日志（logging）要保持可用直到所有普通actor终止，即使日志本身也是用actor实现的。</p>
+<ul>
+<li>/: 根守护者</li>
+</ul>
+<p>根守护者所谓“顶级”actor的祖父，它监督所有在Actor路径的顶级作用域中定义的特殊actor，使用发现任何Exception就终止子actor的SupervisorStrategy.stoppingStrategy策略。</p>
+<h3 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h3><p>重启过程中所发生事件的精确次序是：</p>
+<ol>
+<li>actor被挂起（意味着它不会处理正常消息直到被恢复），并递归挂起其所有子actor</li>
+<li>调用旧实例的 preRestart hook (缺省实现是向所有子actor发送终止请求并调用 postStop)</li>
+<li>等待所有子actor终止（使用context.stop()）直到 preRestart 最终结束；这里所有的actor操作都是非阻塞的，最后被杀掉的子actor的终止通知会影响下一步的执行</li>
+<li>再次调用原来提供的工厂生成actor的新实例</li>
+<li>调用新实例的postRestart方法（其默认实现是调用preStart方法）</li>
+<li>对步骤3中没有被杀死的所有子actor发送重启请求；重启的actor会遵循相同的过程， 从步骤2开始</li>
+<li>恢复这个actor</li>
+</ol>
+<h2 id="Actor引用-路径与地址"><a href="#Actor引用-路径与地址" class="headerlink" title="Actor引用, 路径与地址"></a>Actor引用, 路径与地址</h2><h3 id="什么是Actor引用？"><a href="#什么是Actor引用？" class="headerlink" title="什么是Actor引用？"></a>什么是Actor引用？</h3><p>Actor引用是 ActorRef 的子类，其最重要的目的是支持向它所代表的actor发送消息。每个actor通过self字段来访问自己的标准（本地）引用；在给其它actor发送的消息中也缺省包含这个引用。反过来，在消息处理过程中，actor可以通过sender()方法来访问到当前消息的发送者的引用。</p>
+<h3 id="什么是Actor路径"><a href="#什么是Actor路径" class="headerlink" title="什么是Actor路径?"></a>什么是Actor路径?</h3><p>由于actor是以一种严格的树形结构样式来创建的，所以沿着子actor到父actor的监管链，一直到actor系统的根存在一条唯一的actor名字序列。这个序列可以被看做是文件系统中的文件路径，所以我们称之为“路径”。就像在一些真正的文件系统中一样，也存在所谓的“符号链接”，即一个actor也许能通过不同的路径被访问到，除了原始路径外，其它的路径都涉及到对actor实际监管祖先链的某部分路径进行转换的方法。</p>
+<h3 id="如何获得Actor引用？"><a href="#如何获得Actor引用？" class="headerlink" title="如何获得Actor引用？"></a>如何获得Actor引用？</h3><p>actor引用的获取方法分为两类：通过创建actor，或者通过查找actor。后一种功能又分两种：通过具体的actor路径来创建actor引用，和查询actor逻辑树。</p>
+<h4 id="创建Actor"><a href="#创建Actor" class="headerlink" title="创建Actor"></a>创建Actor</h4><p>一个actor系统通常是在根守护者上使用ActorSystem.actorOf创建actor来启动，然后在创建出的actor中使用ActorContext.actorOf来展开actor树。这些方法返回的是指向新创建的actor的引用。每个actor都拥有到它的父亲，它自己和它的子actor的引用（通过ActorContext访问）。这些引用可以与消息一起被发送给别的actor，以便接收方直接回复。</p>
+<h4 id="通过具体的路径来查找actor"><a href="#通过具体的路径来查找actor" class="headerlink" title="通过具体的路径来查找actor"></a>通过具体的路径来查找actor</h4><p>另外，可以使用ActorSystem.actorSelection来查找actor引用。“选择”可在已有actor与被选择的actor进行通讯的时候用到，在投递每条消息的时候都会用到查找。</p>
+<p>为了获得一个绑定到指定actor生命周期的ActorRef，你需要发送一个消息，如内置的Identify信息，向指定的actor，所获得的sender()即为所求。</p>
+<p>val selection = context.actorSelection(“/user/serviceA”)<br>selection.tell(new Identify(identifyId), getSelf());</p>
+<p>总结: actorOf vs. actorSelection vs. actorFor</p>
+<p>Note</p>
+<p>以上部分所描述的细节可以简要地总结和记忆成：</p>
+<p>actorOf 永远都只会创建一个新的actor，这个新的actor是actorOf所调用上下文（可以是任意一个actor或actor系统本身）的直接子actor<br>actorSelection只会在消息送达后查找已经存在的actor集合，即不会创建actor，也不会在创建选择集合时验证actor是否存在。<br>actorFor（废弃，已经被actorSelection取代） 永远都只是查找到一个已存在的actor，不会创建新的actor。</p>
+<h2 id="Actor路径的顶级作用域"><a href="#Actor路径的顶级作用域" class="headerlink" title="Actor路径的顶级作用域"></a>Actor路径的顶级作用域</h2><p>在路径树的根上是根监管者，所有其他actor都可以从通过它找到；它的名字是”/“。在第二个层次上是以下这些：</p>
+<ul>
+<li>“/user” 是所有由用户创建的顶级actor的监管者；用 ActorSystem.actorOf创建的actor在其下。</li>
+<li>“/system” 是所有由系统创建的顶级actor的监管者，如日志监听器，或由配置指定在actor系统启动时自动部署的actor。</li>
+<li>“/deadLetters” 是死信actor，所有发往已经终止或不存在的actor的消息会被重定向到这里（以尽最大努力为基础：即使在本地JVM，消息也可能丢失）</li>
+<li>“/temp”是所有系统创建的短时actor的监管者，例如那些在ActorRef.ask的实现中用到的actor。</li>
+<li>“/remote” 是一个人造虚拟路径，用来存放所有其监管者是远程actor引用的actor。</li>
+</ul>
 
         
         
@@ -273,13 +451,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/多线程/">多线程</a>
+  <span></span> <a href="/tags/Akka/">Akka</a>
   </div>
 
 </div>
@@ -307,61 +485,135 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/23/java-io/" title="Java IO" itemprop="url">Java IO</a>
+      <a href="/2016/02/04/Akka Actor的创建-引用-声明周期/" title="Akka Actor的创建&amp;引用&amp;声明周期" itemprop="url">Akka Actor的创建&amp;引用&amp;声明周期</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-23T06:13:41.000Z" itemprop="datePublished"> Published 2016-03-23</time>
+    <time datetime="2016-02-04T04:09:54.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="Java-IO"><a href="#Java-IO" class="headerlink" title="Java IO"></a>Java IO</h1><h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><p>Java IO流是既可以从中读取，也可以写入到其中的数据流。正如这个系列教程之前提到过的，流通常会与数据源、数据流向目的地相关联，比如文件、网络等等。</p>
-<p>流和数组不一样，不能通过索引读写数据。在流中，你也不能像数组那样前后移动读取数据，除非使用RandomAccessFile 处理文件。流仅仅只是一个连续的数据流。</p>
-<p>某些类似PushbackInputStream 流的实现允许你将数据重新推回到流中，以便重新读取。然而你只能把有限的数据推回流中，并且你不能像操作数组那样随意读取数据。流中的数据只能够顺序访问。</p>
-<p>Java IO流通常是基于字节或者基于字符的。字节流通常以“stream”命名，比如InputStream和OutputStream。除了DataInputStream 和DataOutputStream 还能够读写int, long, float和double类型的值以外，其他流在一个操作时间内只能读取或者写入一个原始字节。</p>
-<p>字符流通常以“Reader”或者“Writer”命名。字符流能够读写字符(比如Latin1或者Unicode字符)。可以浏览Java Readers and Writers获取更多关于字符流输入输出的信息。</p>
-<ul>
-<li>InputStream</li>
+        <h1 id="Actor的创建-amp-引用-amp-声明周期"><a href="#Actor的创建-amp-引用-amp-声明周期" class="headerlink" title="Actor的创建&amp;引用&amp;声明周期"></a>Actor的创建&amp;引用&amp;声明周期</h1><h2 id="1-创建actor"><a href="#1-创建actor" class="headerlink" title="1.创建actor"></a>1.创建actor</h2><ul>
+<li>定义一个Actor类</li>
 </ul>
-<p>java.io.InputStream类是所有Java IO输入流的基类。如果你正在开发一个从流中读取数据的组件，请尝试用InputStream替代任何它的子类(比如FileInputStream)进行开发。这么做能够让你的代码兼容任何类型而非某种确定类型的输入流。</p>
-<p>然而仅仅依靠InputStream并不总是可行。如果你需要将读过的数据推回到流中，你必须使用PushbackInputStream，这意味着你的流变量只能是这个类型，否则在代码中就不能调用PushbackInputStream的unread()方法。</p>
-<p>通常使用输入流中的read()方法读取数据。read()方法返回一个整数，代表了读取到的字节的内容(译者注：0 ~ 255)。当达到流末尾没有更多数据可以读取的时候，read()方法返回-1。</p>
+<p>要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。<br>如下例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
-<li>OutputStream</li>
+<li>Props</li>
 </ul>
-<p>java.io.OutputStream是Java IO中所有输出流的基类。如果你正在开发一个能够将数据写入流中的组件，请尝试使用OutputStream替代它的所有子类。<br>-组合流</p>
-<p>你可以将流整合起来以便实现更高级的输入和输出操作。比如，一次读取一个字节是很慢的，所以可以从磁盘中一次读取一大块数据，然后从读到的数据块中获取字节。为了实现缓冲，可以把InputStream包装到BufferedInputStream中。</p>
-<h2 id="字节和字符数组"><a href="#字节和字符数组" class="headerlink" title="字节和字符数组"></a>字节和字符数组</h2><p>Java中的字节和字符数组，经常被用于临时存储应用程序内部的数据，所以数组也是常见的数据来源以及数据流目的地。如果你在程序执行过程中需要频繁访问文件的内容，你可能会愿意将文件加载到数组中去。当然你可以通过索引直接访问这些数组。但是如果你有一个组件的设计初衷是从InputStream或者Reader而非数组中读取某些数据呢？</p>
+<p>Props是一个用来在创建actor时指定选项的配置类，可以把它看作是不可变的，因此在创建包含相关部署信息的actor时（例如使用哪一个调度器(dispatcher)，详见下文），是可以自由共享的。以下是如何创建Props实例的示例.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> props1 = <span class="type">Props</span>[<span class="type">MyActor</span>]</span><br><span class="line"><span class="keyword">val</span> props2 = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">ActorWithArgs</span>(<span class="string">"arg"</span>)) <span class="comment">// careful, see below</span></span><br><span class="line"><span class="keyword">val</span> props3 = <span class="type">Props</span>(classOf[<span class="type">ActorWithArgs</span>], <span class="string">"arg"</span>)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>警告<br>在另一个actor中声明一个actor是非常危险的，会打破actor的封装。永远不要将一个actor的this引用传进Props！<br>推荐做法</p>
+</blockquote>
+<p>在每一个Actor的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的Props，尽可能接近actor的定义。这也避免了使用Props.apply(…)方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">DemoActor</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Create Props for an actor of this type.</span><br><span class="line">   * @param magciNumber The magic number to be passed to this actor’s constructor.</span><br><span class="line">   * @return a Props for creating this actor, which can then be further configured</span><br><span class="line">   *         (e.g. calling `.withDispatcher()` on it)</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">props</span></span>(magicNumber: <span class="type">Int</span>): <span class="type">Props</span> = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">DemoActor</span>(magicNumber))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemoActor</span>(<span class="params">magicNumber: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> x: <span class="type">Int</span> =&gt; sender() ! (x + magicNumber)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeOtherActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Props(new DemoActor(42)) would not be safe</span></span><br><span class="line">  context.actorOf(<span class="type">DemoActor</span>.props(<span class="number">42</span>), <span class="string">"demo"</span>)</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
-<li>通过InputStream或者Reader读取数组</li>
+<li>使用Props创建Actor</li>
 </ul>
-<p>为了让你的组件能够从数组中读取数据，你需要把字节或者字符数组包装到一个ByteArrayInputStream或者CharArrayReader中。这种方式允许通过包装好的stream或者reader读取数组中的字节或者字符数据。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>]; </span><br><span class="line"><span class="comment">//write data into byte array...  </span></span><br><span class="line">InputStream input = <span class="keyword">new</span> ByteArrayInputStream(bytes);  </span><br><span class="line"><span class="comment">//read first byte </span></span><br><span class="line"><span class="keyword">int</span> data = input.read(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(data != -<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">//do something with data</span></span><br><span class="line">    <span class="comment">//read next byte      </span></span><br><span class="line">    data = input.read(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Actor可以通过将Props实例传入actorOf工厂方法来创建，ActorSystem和ActorContext中都有该方法。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">ActorSystem</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ActorSystem is a heavy object: create only one per application</span></span><br><span class="line"><span class="keyword">val</span> system = <span class="type">ActorSystem</span>(<span class="string">"mySystem"</span>)</span><br><span class="line"><span class="keyword">val</span> myActor = system.actorOf(<span class="type">Props</span>[<span class="type">MyActor</span>], <span class="string">"myactor2"</span>)</span><br><span class="line">使用<span class="type">ActorSystem</span>将创建顶级actor，由actor系统提供的守护actor监管；如果使用的是actor的上下文，则创建一个该actor的子actor。</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> child = context.actorOf(<span class="type">Props</span>[<span class="type">MyActor</span>], name = <span class="string">"myChild"</span>)</span><br><span class="line">  <span class="comment">// plus some behavior ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>推荐创建一个树形结构，包含子actor、孙子等等，使之符合应用的逻辑错误处理结构</p>
 <ul>
-<li>通过InputStream或者Reader写入数组</li>
+<li>依赖注入</li>
 </ul>
-<p>同样可以将数据写入到ByteArrayOutputStream或者CharArrayWriter中。你所需要做的是创建一个ByteArrayOutputStream或者CharArrayWriter，然后写入数据，就像你操作其他类型的stream或者writer一样。当所有的数据都写入完毕，只需调用toByteArray()或者toCharArray()，即可得到写入数据的数组形式。</p>
-<p>这是一个简单的示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">output.write(<span class="string">"This text is converted to bytes"</span>.toBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line"><span class="keyword">byte</span>[] bytes = output.toByteArray();</span><br></pre></td></tr></table></figure></p>
-<p>操作一个字符数组的代码也与本例类似，只需要将字符数组包装到CharArrayWriter中。</p>
-<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>Java IO中的管道为运行在同一个JVM中的两个线程提供了通信的能力。所以管道也可以作为数据源以及目标媒介。</p>
-<p>你不能利用管道与不同的JVM中的线程通信(不同的进程)。在概念上，Java的管道不同于Unix/Linux系统中的管道。在Unix/Linux中，运行在不同地址空间的两个进程可以通过管道通信。在Java中，通信的双方应该是运行在同一进程中的不同线程。</p>
+<p>如果你的actor有带参数的构造函数，则这些参数也需要成为Props的一部分，如上文所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">IndirectActorProducer</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DependencyInjector</span>(<span class="params">applicationContext: <span class="type">AnyRef</span>, beanName: <span class="type">String</span></span>)</span></span><br><span class="line">  <span class="keyword">extends</span> <span class="type">IndirectActorProducer</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">actorClass</span> </span>= classOf[<span class="type">Actor</span>]</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">produce</span> </span>=</span><br><span class="line">    <span class="comment">// obtain fresh Actor instance from DI framework ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> actorRef = system.actorOf(</span><br><span class="line">  <span class="type">Props</span>(classOf[<span class="type">DependencyInjector</span>], applicationContext, <span class="string">"hello"</span>),</span><br><span class="line">  <span class="string">"helloBean"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-Actor-API"><a href="#2-Actor-API" class="headerlink" title="2.Actor API"></a>2.Actor API</h2><p>Actor trait只定义了一个抽象方法，就是上面提到的receive，用来实现actor的行为。</p>
+<p><strong>如果当前actor的行为与收到的消息不匹配，则会调用 unhandled，其缺省实现是向actor系统的事件流中发布一条akka.actor.UnhandledMessage(message, sender, recipient)</strong>（将配置项akka.actor.debug.unhandled设置为on来将它们转换为实际的调试消息）。</p>
+<p>另外，它还包括:</p>
 <ul>
-<li>通过Java IO创建管道</li>
+<li><strong>self引用代表本actor的ActorRef</strong></li>
+<li><strong>sender引用代表最近收到消息的发送actor，通常用于下面将讲到的消息回应中</strong></li>
+<li><strong>supervisorStrategy 用户可重写它来定义对子actor的监管策略</strong></li>
 </ul>
-<p>可以通过Java IO中的PipedOutputStream和PipedInputStream创建管道。一个PipedInputStream流应该和一个PipedOutputStream流相关联。一个线程通过PipedOutputStream写入的数据可以被另一个线程通过相关联的PipedInputStream读取出来。<br>你也可以使用两个管道共有的connect()方法使之相关联。PipedInputStream和PipedOutputStream都拥有一个可以互相关联的connect()方法。</p>
+<p>该策略通常在actor内声明，这样决定函数就可以访问actor的内部状态：因为失败通知作为消息发送给监管者，并像普通消息一样被处理（尽管不是正常行为），所有的值和actor变量都是可用的，以及sender引用 （报告失败的将是直接子actor；如果原始失败发生在遥远的后裔，它仍然是一次向上报告一层）。</p>
 <ul>
-<li>管道和线程</li>
+<li>context暴露actor和当前消息的上下文信息，如：<ul>
+<li>用于创建子actor的工厂方法（actorOf）</li>
+<li>actor所属的系统</li>
+<li>父监管者</li>
+<li>所监管的子actor</li>
+<li>生命周期监控</li>
+<li>hotswap行为栈，见Become/Unbecome</li>
 </ul>
-<p>请记得，当使用两个相关联的管道流时，务必将它们分配给不同的线程。read()方法和write()方法调用时会导致流阻塞，这意味着如果你尝试在一个线程中同时进行读和写，可能会导致线程死锁。</p>
+</li>
+</ul>
+<h2 id="3-Actor生命周期"><a href="#3-Actor生命周期" class="headerlink" title="3.Actor生命周期"></a>3.Actor生命周期</h2><p><img src="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png" alt="enter image description here"></p>
+<p>actor系统中的路径代表一个”地方”，这里可能会被活着的actor占据。最初（除了系统初始化actor）路径都是空的。在调用actorOf()时它将为指定路径分配根据传入Props创建的一个actor化身。<strong>actor化身是由路径和一个UID标识的</strong>。重新启动只会替换有Props定义的Actor实例，但不会替换化身，因此UID保持不变。</p>
+<p>当actor停止时，其化身的生命周期结束。在这一时间点上相关的生命周期事件被调用，监视该actor的actor都会获得终止通知。当化身停止后，路径可以重复使用，通过actorOf()创建一个actor。在这种情况下，除了UID不同外，新化身与老化身是相同的。</p>
+<p><strong>ActorRef始终表示化身（路径和UID）而不只是一个给定的路径。因此如果actor停止，并且创建一个新的具有相同名称的actor，则指向老化身的ActorRef将不会指向新的化身。</strong></p>
+<p>相对地，ActorSelection指向路径（或多个路径，如果使用了通配符），且完全不关注有没有化身占据它。因此ActorSelection 不能被监视。获取某路径下的当前化身ActorRef是可能的，只要向该ActorSelection发送Identify，如果收到ActorIdentity回应，则正确的引用就包含其中（详见通过Actor Selection确定Actor）。也可以使用ActorSelection的resolveOne方法，它会返回一个包含匹配ActorRef的Future。</p>
 <ul>
-<li>管道的替代</li>
+<li>使用DeathWatch进行生命周期监控</li>
 </ul>
-<p>除了管道之外，一个JVM中不同线程之间还有许多通信的方式。实际上，线程在大多数情况下会传递完整的对象信息而非原始的字节数据。但是，如果你需要在线程之间传递字节数据，Java IO的管道是一个不错的选择。</p>
+<p>为了在其它actor终止时 (即永久停止，而不是临时的失败和重启)收到通知，actor可以将自己注册为其它<strong>actor在终止时所发布的Terminated消息</strong>的接收者（见停止 Actor）。这个服务是由actor系统的DeathWatch组件提供的。</p>
+<p>注册一个监视器很简单：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Actor</span>, <span class="type">Props</span>, <span class="type">Terminated</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WatchActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> child = context.actorOf(<span class="type">Props</span>.empty, <span class="string">"child"</span>)</span><br><span class="line">  context.watch(child) <span class="comment">// &lt;-- this is the only call needed for registration</span></span><br><span class="line">  <span class="keyword">var</span> lastSender = system.deadLetters</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"kill"</span> =&gt;</span><br><span class="line">      context.stop(child); lastSender = sender()</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`child`) =&gt; lastSender ! <span class="string">"finished"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>要注意Terminated消息的产生与注册和终止行为所发生的顺序无关。特别地，即使在注册时，被观察的actor已经终止了，监视actor仍然会受到一个Terminated消息。</p>
+<p>多次注册并不表示会有多个消息产生，也不保证有且只有一个这样的消息被接收到：如果被监控的actor已经生成了消息并且已经进入了队列，在这个消息被处理之前又发生了另一次注册，则会有第二个消息进入队列，因为对一个已经终止的actor的监控注册操作会立刻导致Terminated消息的产生。</p>
+<p>可以使用context.unwatch(target)来停止对另一个actor生存状态的监控。即使Terminated已经加入邮箱，该操作仍有效；一旦调用unwatch，则被观察的actor的Terminated消息就都不会再被处理。</p>
+<ul>
+<li>启动Hook</li>
+</ul>
+<p>actor启动后，它的preStart方法会被立即执行。</p>
+<p>override def preStart() {<br>  // registering with other actors<br>  someService ! Register(self)<br>}<br>在actor第一次创建时，将调用此方法。在重新启动期间，它被postRestart的默认实现调用，这意味着通过重写该方法，你可以选择是仅仅在初始化该actor时调用一次，还是为每次重新启动都调用。actor构造函数中的初始化代码将在每个actor实例创建的时候被调用，这也发生在每次重启时。</p>
+<ul>
+<li>重启Hook</li>
+</ul>
+<p>所有的actor都是被监管的，即与另一个使用某种失败处理策略的actor绑定在一起。如果在处理一个消息的时候抛出了异常，Actor将被重启（详见监管与监控）。这个重启过程包括上面提到的Hook：</p>
+<p>要被重启的actor被通知是通过调用preRestart，包含着导致重启的异常以及触发异常的消息；如果重启并不是因为消息处理而发生的，则所携带的消息为None，例如，当一个监管者没有处理某个异常继而被其监管者重启时，或者因其兄弟节点的失败导致的重启。如果消息可用，则消息的发送者通常也可用（即通过调用sender）。</p>
+<p>这个方法是用来完成清理、准备移交给新actor实例等操作的最佳位置。其缺省实现是终止所有子actor并调用postStop。</p>
+<p>最初调用actorOf的工厂将被用来创建新的实例。<br>新的actor的postRestart方法被调用时，将携带着导致重启的异常信息。默认实现中，preStart被调用时，就像一个正常的启动一样。<br>actor的重启只会替换掉原来的actor对象；重启不影响邮箱的内容，所以对消息的处理将在postRestart hook返回后继续。触发异常的消息不会被重新接收。在actor重启过程中，所有发送到该actor的消息将象平常一样被放进邮箱队列中。</p>
+<blockquote>
+<p>警告<br>要知道失败通知与用户消息的相关顺序不是决定性的。尤其是，在失败以前收到的最后一条消息被处理之前，父节点可能已经重启其子节点了。详细信息请参见“讨论：消息顺序”。</p>
+</blockquote>
+<ul>
+<li>终止 Hook</li>
+</ul>
+<p>一个Actor终止后，其postStop hook将被调用，它可以用来，例如取消该actor在其它服务中的注册。这个hook保证在该actor的消息队列被禁止后才运行，即之后发给该actor的消息将被重定向到ActorSystem的deadLetters中。</p>
+<h2 id="3-通过Actor-Selection定位Actor"><a href="#3-通过Actor-Selection定位Actor" class="headerlink" title="3. 通过Actor Selection定位Actor"></a>3. 通过Actor Selection定位Actor</h2><p>如Actor引用, 路径与地址中所述，每个actor都拥有一个唯一的逻辑路径，此路径是由从actor系统的根开始的父子链构成；它还拥有一个物理路径，如果监管链包含有远程监管者，此路径可能会与逻辑路径不同。这些路径用来在系统中查找actor，例如，当收到一个远程消息时查找收件者，但是它们更直接的用处在于：actor可以通过指定绝对或相对路径（逻辑的或物理的）来查找其它的actor，并随结果获取一个ActorSelection：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// will look up this absolute path</span></span><br><span class="line">context.actorSelection(<span class="string">"/user/serviceA/aggregator"</span>)</span><br><span class="line"><span class="comment">// will look up sibling beneath same supervisor</span></span><br><span class="line">context.actorSelection(<span class="string">"../joe"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>其中指定的路径被解析为一个java.net.URI，它以/分隔成路径段。如果路径以/开始，表示一个绝对路径，且从根监管者（”/user”的父亲）开始查找；否则是从当前actor开始。如果某一个路径段为..，会找到当前所遍历到的actor的上一级，否则则会向下一级寻找具有该名字的子actor。 必须注意的是actor路径中的..总是表示逻辑结构，即其监管者。</p>
+<p><strong>一个actor selection的路径元素中可能包含通配符，从而允许向匹配模式的集合广播该条消息</strong>：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// will look all children to serviceB with names starting with worker</span></span><br><span class="line">context.actorSelection(<span class="string">"/user/serviceB/worker*"</span>)</span><br><span class="line"><span class="comment">// will look up all siblings beneath same supervisor</span></span><br><span class="line">context.actorSelection(<span class="string">"../*"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>消息可以通过ActorSelection发送，并且在投递每条消息时 ActorSelection的路径都会被查找。如果selection不匹配任何actor，则消息将被丢弃。</p>
+<p>要获得ActorSelection的ActorRef，你需要发送一条消息到selection，然后使用答复消息的sender()引用即可。有一个内置的Identify消息，所有actor会理解它并自动返回一个包含ActorRef的ActorIdentity消息。此消息被遍历到的actor特殊处理为，如果一个具体的名称查找失败（即一个不含通配符的路径没有对应的活动actor），则会生成一个否定结果。请注意这并不意味着应答消息有到达保证，它仍然是一个普通的消息。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123; <span class="type">Actor</span>, <span class="type">Props</span>, <span class="type">Identify</span>, <span class="type">ActorIdentity</span>, <span class="type">Terminated</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Follower</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> identifyId = <span class="number">1</span></span><br><span class="line">  context.actorSelection(<span class="string">"/user/another"</span>) ! <span class="type">Identify</span>(identifyId)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">ActorIdentity</span>(`identifyId`, <span class="type">Some</span>(ref)) =&gt;</span><br><span class="line">      context.watch(ref)</span><br><span class="line">      context.become(active(ref))</span><br><span class="line">    <span class="keyword">case</span> <span class="type">ActorIdentity</span>(`identifyId`, <span class="type">None</span>) =&gt; context.stop(self)</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">active</span></span>(another: <span class="type">ActorRef</span>): <span class="type">Actor</span>.<span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`another`) =&gt; context.stop(self)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>你也可以通过ActorSelection的resolveOne方法获取ActorSelection的一个ActorRef。如果存在这样的actor，它将返回一个包含匹配的ActorRef的Future。如果没有这样的actor 存在或识别没有在指定的时间内完成，它将以失败告终——akka.actor.ActorNotFound。</p>
+<p>如果开启了远程调用，则远程actor地址也可以被查找:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context.actorSelection(<span class="string">"akka.tcp://app@otherhost:1234/user/serviceB"</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-发送消息"><a href="#4-发送消息" class="headerlink" title="4.发送消息"></a>4.发送消息</h3><p>向actor发送消息需使用下列方法之一。</p>
+<ul>
+<li>!意思是“fire-and-forget”，即异步发送一个消息并立即返回。也称为tell。</li>
+<li>?异步发送一条消息并返回一个Future代表一个可能的回应。也称为ask。<br>对每一个消息发送者，分别有消息顺序保证。</li>
+</ul>
+<blockquote>
+<p>注意<br>使用ask有一些性能内涵，因为需要跟踪超时，需要有桥梁将Promise转为ActorRef，并且需要在远程情况下可访问。所以为了性能应该总选择tell，除非只能选择ask。</p>
+</blockquote>
+<h4 id="Tell-Fire-forget"><a href="#Tell-Fire-forget" class="headerlink" title="Tell: Fire-forget"></a>Tell: Fire-forget</h4><p>这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">actorRef ! message</span><br></pre></td></tr></table></figure></p>
+<p>如果是在一个Actor中调用 ，那么发送方的actor引用会被隐式地作为消息的sender(): ActorRef成员一起发送。目的actor可以使用它来向源actor发送回应， 使用sender() ! replyMsg。</p>
+<p>如果不是从Actor实例发送的，sender成员缺省为 deadLetters actor引用。</p>
+<h4 id="Ask-Send-And-Receive-Future"><a href="#Ask-Send-And-Receive-Future" class="headerlink" title="Ask: Send-And-Receive-Future"></a>Ask: Send-And-Receive-Future</h4><p>ask模式既包含actor也包含future，所以它是一种使用模式，而不是ActorRef的方法:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.&#123; ask, pipe &#125;</span><br><span class="line"><span class="keyword">import</span> system.dispatcher <span class="comment">// The ExecutionContext that will be used</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span>(<span class="params">x: <span class="type">Int</span>, s: <span class="type">String</span>, d: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Request</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> timeout = <span class="type">Timeout</span>(<span class="number">5</span> seconds) <span class="comment">// needed for `?` below</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f: <span class="type">Future</span>[<span class="type">Result</span>] =</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    x &lt;- ask(actorA, <span class="type">Request</span>).mapTo[<span class="type">Int</span>] <span class="comment">// call pattern directly</span></span><br><span class="line">    s &lt;- (actorB ask <span class="type">Request</span>).mapTo[<span class="type">String</span>] <span class="comment">// call by implicit conversion</span></span><br><span class="line">    d &lt;- (actorC ? <span class="type">Request</span>).mapTo[<span class="type">Double</span>] <span class="comment">// call by symbolic name</span></span><br><span class="line">  &#125; <span class="keyword">yield</span> <span class="type">Result</span>(x, s, d)</span><br><span class="line"></span><br><span class="line">f pipeTo actorD <span class="comment">// .. or ..</span></span><br><span class="line">pipe(f) to actorD</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-接收消息"><a href="#5-接收消息" class="headerlink" title="5.接收消息"></a>5.接收消息</h3><p>Actor必须实现receive方法来接收消息：</p>
+<p>protected def receive: PartialFunction[Any, Unit]<br>这个方法应返回一个PartialFunction，例如一个“match/case”子句，消息可以与其中的不同分支进行scala模式匹配。如下例:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="6-终止Actor"><a href="#6-终止Actor" class="headerlink" title="6.终止Actor"></a>6.终止Actor</h3><p>通过调用ActorRefFactory（即ActorContext或ActorSystem）的stop方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即stop可能在actor被终止之前返回。</p>
+<p>actor的终止分两步: 第一步actor将挂起对邮箱的处理，并向所有子actor发送终止命令，然后处理来自子actor的终止消息直到所有的子actor都完成终止，最后终止自己（调用postStop，清空邮箱，向DeathWatch发布Terminated，通知其监管者）。这个过程保证actor系统中的子树以一种有序的方式终止，将终止命令传播到叶子结点并收集它们回送的确认消息给被终止的监管者。如果其中某个actor没有响应（即由于处理消息用了太长时间以至于没有收到终止命令），整个过程将会被阻塞。</p>
+<p>在ActorSystem.shutdown()被调用时，系统根监管actor会被终止，以上的过程将保证整个系统的正确终止。</p>
+<p>postStop() hook 是在actor被完全终止以后调用的。这是为了清理资源:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">postStop</span></span>() &#123;</span><br><span class="line">  <span class="comment">// clean up some resources ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>注意<br>由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致InvalidActorNameException。你应该 监视watch()正在终止的actor，并在Terminated最终到达后作为回应创建它的替代者。</p>
+</blockquote>
+<p>优雅地终止</p>
+<p>如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用gracefulStop：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.gracefulStop</span><br><span class="line"><span class="keyword">import</span> scala.concurrent.<span class="type">Await</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">val</span> stopped: <span class="type">Future</span>[<span class="type">Boolean</span>] = gracefulStop(actorRef, <span class="number">5</span> seconds, <span class="type">Manager</span>.<span class="type">Shutdown</span>)</span><br><span class="line">  <span class="type">Await</span>.result(stopped, <span class="number">6</span> seconds)</span><br><span class="line">  <span class="comment">// the actor has been stopped</span></span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">  <span class="comment">// the actor wasn't stopped within 5 seconds</span></span><br><span class="line">  <span class="keyword">case</span> e: akka.pattern.<span class="type">AskTimeoutException</span> =&gt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Manager</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Shutdown</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Manager</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">import</span> <span class="type">Manager</span>._</span><br><span class="line">  <span class="keyword">val</span> worker = context.watch(context.actorOf(<span class="type">Props</span>[<span class="type">Cruncher</span>], <span class="string">"worker"</span>))</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; worker ! <span class="string">"crunch"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Shutdown</span> =&gt;</span><br><span class="line">      worker ! <span class="type">PoisonPill</span></span><br><span class="line">      context become shuttingDown</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">shuttingDown</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; sender() ! <span class="string">"service unavailable, shutting down"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`worker`) =&gt;</span><br><span class="line">      context stop self</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当gracefulStop()成功返回时，actor的postStop() hook将会被执行：在postStop()结束和gracefulStop()返回之间存在happens-before边界。</p>
+<p>在上面的示例中自定义的Manager.Shutdown消息是发送到目标actor来启动actor的终止过程。你可以使用PoisonPill，但之后在停止目标actor之前，你与其他actor的互动的机会有限。在postStop中，可以处理简单的清理任务。</p>
+<blockquote>
+<p>警告<br>请记住，actor停止和其名称被注销是彼此异步发生的独立事件。因此，在gracefulStop()返回后。你会发现其名称仍可能在使用中。为了保证正确注销，只在你控制的监管者内，并且只在响应Terminated消息时重用名称，即不是用于顶级actor。</p>
+</blockquote>
+<h3 id="7-Become-Unbecome"><a href="#7-Become-Unbecome" class="headerlink" title="7.Become/Unbecome"></a>7.Become/Unbecome</h3><p>升级</p>
+<p>Akka支持在运行时对Actor消息循环（即其实现）进行实时替换：在actor中调用context.become方法。become要求一个PartialFunction[Any, Unit]参数作为新的消息处理实现。 被替换的代码被保存在一个栈中，可以被push和pop。</p>
+<blockquote>
+<p>警告<br>请注意actor被其监管者重启后将恢复其最初的行为。</p>
+</blockquote>
+<h3 id="8-使用PartialFunction链来扩展actor"><a href="#8-使用PartialFunction链来扩展actor" class="headerlink" title="8.使用PartialFunction链来扩展actor"></a>8.使用PartialFunction链来扩展actor</h3><p>有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的receive方法返回一个Actor.Receive（PartialFunction[Any,Unit]的类型别名）而使之成为可能，多个偏函数可以使用PartialFunction#orElse链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记”第一个匹配”获胜——这在组合可以处理同一类型的消息的功能时会很重要。</p>
+<p>例如，假设你有一组actor是生产者Producers或消费者Consumers，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的receive实现为这些偏函数的组合。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> producerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">GiveMeThings</span> =&gt;</span><br><span class="line">      sender() ! <span class="type">Give</span>(<span class="string">"thing"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> <span class="keyword">with</span> <span class="type">ActorLogging</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> consumerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> ref: <span class="type">ActorRef</span> =&gt;</span><br><span class="line">      ref ! <span class="type">GiveMeThings</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Give</span>(thing) =&gt;</span><br><span class="line">      log.info(<span class="string">"Got a thing! It's &#123;&#125;"</span>, thing)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span> <span class="keyword">with</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProducerConsumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span></span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ProducerBehavior</span> <span class="keyword">with</span> <span class="type">ConsumerBehavior</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior orElse consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// protocol</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">GiveMeThings</span></span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Give</span>(<span class="params">thing: <span class="type">Any</span></span>)</span></span><br></pre></td></tr></table></figure></p>
+<p>不同于继承，相同的模式可以通过组合实现——可以简单地通过委托的偏函数组合成receive方法。</p>
 
         
         
@@ -374,13 +626,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Java/">Java</a>
+  <a class="article-category-link" href="/categories/Akka/">Akka</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/IO/">IO</a>
+  <span></span> <a href="/tags/Akka/">Akka</a>
   </div>
 
 </div>
@@ -415,7 +667,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> Published 2016-02-03</time>
+    <time datetime="2016-02-03T09:34:18.000Z" itemprop="datePublished"> 發表於 2016-02-03</time>
     
   </p>
 </header>
@@ -515,7 +767,7 @@
 		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
 		
   <p class="article-time">
-    <time datetime="2015-02-03T09:32:12.000Z" itemprop="datePublished"> Published 2015-02-03</time>
+    <time datetime="2015-02-03T09:32:12.000Z" itemprop="datePublished"> 發表於 2015-02-03</time>
     
   </p>
 </header>
@@ -600,15 +852,15 @@
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
 <aside class="clearfix">
 
   
 <div class="github-card">
-<p class="asidetitle">Github Card</p>
+<p class="asidetitle">Github 名片</p>
 <div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
 <script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
 </div>
@@ -618,7 +870,7 @@
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分類</p>
 		<ul>
 		
 		  
@@ -682,6 +934,10 @@
 		  
 		
 		  
+			<li><a href="/categories/ZooKeeper/" title="ZooKeeper">ZooKeeper<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
 		  
 		
@@ -703,7 +959,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">標簽</p>
 		<ul class="clearfix">
 		
 			
@@ -727,11 +983,11 @@
 			
 		
 			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
+				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
+				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
 			
 		
 			
@@ -740,6 +996,14 @@
 		
 			
 				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
 			
 		
 			
@@ -755,23 +1019,7 @@
 			
 		
 			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
 			
 		
 			
@@ -779,11 +1027,19 @@
 			
 		
 			
+				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
+				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
 			
 		
 		</ul>
@@ -791,7 +1047,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">Links</p>
+  <p class="asidetitle">友情鏈接</p>
     <ul>
         
           <li>
@@ -807,11 +1063,11 @@
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
 </div>
 
   <div class="weiboshow">
-  <p class="asidetitle">Weibo</p>
+  <p class="asidetitle">新浪微博</p>
     <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
 </div>
 
@@ -963,7 +1219,7 @@ var _hmt = _hmt || [];
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
