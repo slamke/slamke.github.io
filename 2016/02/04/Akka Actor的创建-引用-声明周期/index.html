@@ -1,117 +1,350 @@
+<!DOCTYPE html>
 
- <!DOCTYPE HTML>
-<html >
-<head>
-  <meta charset="UTF-8">
+
+
   
-    <title>Akka Actor的创建&amp;引用&amp;声明周期 | 雁渡寒潭 风吹疏竹</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
-    
-    <meta name="author" content="Sun Ke">
-    
 
-    
-    <meta name="description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
-定义一个Actor类
 
-要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Akka," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor 定义一个Actor类  要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta name="keywords" content="Akka">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Akka Actor的创建&引用&声明周期">
-<meta property="og:url" content="slamke.github.io/2016/02/04/Akka Actor的创建-引用-声明周期/index.html">
+<meta property="og:title" content="Akka Actor的创建&amp;引用&amp;声明周期">
+<meta property="og:url" content="http://slamke.github.io/2016/02/04/Akka Actor的创建-引用-声明周期/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
-定义一个Actor类
-
-要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta property="og:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor 定义一个Actor类  要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta property="og:locale" content="default">
 <meta property="og:image" content="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png">
 <meta property="og:updated_time" content="2018-02-04T07:24:37.790Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Akka Actor的创建&引用&声明周期">
-<meta name="twitter:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor
-定义一个Actor类
-
-要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
+<meta name="twitter:title" content="Akka Actor的创建&amp;引用&amp;声明周期">
+<meta name="twitter:description" content="Actor的创建&amp;amp;引用&amp;amp;声明周期1.创建actor 定义一个Actor类  要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。如下例：1234567891011impo">
 <meta name="twitter:image" content="http://udn.yyuap.com/doc/akka-doc-cn/2.3.6/scala/book/images/actor_lifecycle.png">
 
-    
-    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
-    
-    
-    <link rel="icon" href="/img/favicon.ico">
-    
-    
-    <link rel="apple-touch-icon" href="/img/jacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
-    
-    <link rel="stylesheet" href="/css/style.css">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://slamke.github.io/2016/02/04/Akka Actor的创建-引用-声明周期/"/>
+
+
+
+
+
+  <title>Akka Actor的创建&引用&声明周期 | 雁渡寒潭 风吹疏竹</title>
+  
+
+
+
+
+
+
+
+
 </head>
 
-  <body>
-    <header>
-      
-<div>
-		
-			<div id="imglogo">
-				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
-			</div>
-			
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/archives">Archives</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
- 					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:slamke.github.io">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
-</div>
-    </header>
-    <div id="container">
-      <div id="main" class="post" itemscope itemprop="blogPost">
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
   
-	<article itemprop="articleBody"> 
-		<header class="article-info clearfix">
-  <h1 itemprop="name">
+  
     
-      <a href="/2016/02/04/Akka Actor的创建-引用-声明周期/" title="Akka Actor的创建&amp;引用&amp;声明周期" itemprop="url">Akka Actor的创建&amp;引用&amp;声明周期</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-04T04:09:54.000Z" itemprop="datePublished"> 發表於 2016-02-04</time>
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
     
-  </p>
-</header>
-	<div class="article-content">
-		
-		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
-		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
-		
-		</div>
-		
-		<h1 id="Actor的创建-amp-引用-amp-声明周期"><a href="#Actor的创建-amp-引用-amp-声明周期" class="headerlink" title="Actor的创建&amp;引用&amp;声明周期"></a>Actor的创建&amp;引用&amp;声明周期</h1><h2 id="1-创建actor"><a href="#1-创建actor" class="headerlink" title="1.创建actor"></a>1.创建actor</h2><ul>
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">雁渡寒潭 风吹疏竹</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">教练，我想打篮球</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/02/04/Akka Actor的创建-引用-声明周期/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Akka Actor的创建&引用&声明周期</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-04T12:09:54+08:00">
+                2016-02-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Akka/" itemprop="url" rel="index">
+                    <span itemprop="name">Akka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Actor的创建-amp-引用-amp-声明周期"><a href="#Actor的创建-amp-引用-amp-声明周期" class="headerlink" title="Actor的创建&amp;引用&amp;声明周期"></a>Actor的创建&amp;引用&amp;声明周期</h1><h2 id="1-创建actor"><a href="#1-创建actor" class="headerlink" title="1.创建actor"></a>1.创建actor</h2><ul>
 <li>定义一个Actor类</li>
 </ul>
 <p>要定义自己的Actor类，需要继承Actor并实现receive方法。receive方法需要定义一系列case语句（类型为PartialFunction[Any, Unit]）来描述你的Actor能够处理哪些消息（使用标准的Scala模式匹配），以及消息如何被处理。<br>如下例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -122,7 +355,7 @@
 <blockquote>
 <p>警告<br>在另一个actor中声明一个actor是非常危险的，会打破actor的封装。永远不要将一个actor的this引用传进Props！<br>推荐做法</p>
 </blockquote>
-<p>在每一个Actor的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的Props，尽可能接近actor的定义。这也避免了使用Props.apply(…)方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">DemoActor</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Create Props for an actor of this type.</span><br><span class="line">   * @param magciNumber The magic number to be passed to this actor’s constructor.</span><br><span class="line">   * @return a Props for creating this actor, which can then be further configured</span><br><span class="line">   *         (e.g. calling `.withDispatcher()` on it)</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">props</span></span>(magicNumber: <span class="type">Int</span>): <span class="type">Props</span> = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">DemoActor</span>(magicNumber))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemoActor</span>(<span class="params">magicNumber: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> x: <span class="type">Int</span> =&gt; sender() ! (x + magicNumber)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeOtherActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Props(new DemoActor(42)) would not be safe</span></span><br><span class="line">  context.actorOf(<span class="type">DemoActor</span>.props(<span class="number">42</span>), <span class="string">"demo"</span>)</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在每一个Actor的伴生对象中提供工厂方法是一个好主意，这有助于保持创建合适的Props，尽可能接近actor的定义。这也避免了使用Props.apply(…)方法将采用一个“按名”（by-name）参数的缺陷，因为伴生对象的给定代码块中将不会保留包含作用域的引用：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">DemoActor</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Create Props for an actor of this type.</span></span><br><span class="line"><span class="comment">   * @param magciNumber The magic number to be passed to this actor’s constructor.</span></span><br><span class="line"><span class="comment">   * @return a Props for creating this actor, which can then be further configured</span></span><br><span class="line"><span class="comment">   *         (e.g. calling `.withDispatcher()` on it)</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">props</span></span>(magicNumber: <span class="type">Int</span>): <span class="type">Props</span> = <span class="type">Props</span>(<span class="keyword">new</span> <span class="type">DemoActor</span>(magicNumber))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemoActor</span>(<span class="params">magicNumber: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> x: <span class="type">Int</span> =&gt; sender() ! (x + magicNumber)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeOtherActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Props(new DemoActor(42)) would not be safe</span></span><br><span class="line">  context.actorOf(<span class="type">DemoActor</span>.props(<span class="number">42</span>), <span class="string">"demo"</span>)</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
 <li>使用Props创建Actor</li>
 </ul>
@@ -131,7 +364,7 @@
 <ul>
 <li>依赖注入</li>
 </ul>
-<p>如果你的actor有带参数的构造函数，则这些参数也需要成为Props的一部分，如上文所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">IndirectActorProducer</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DependencyInjector</span>(<span class="params">applicationContext: <span class="type">AnyRef</span>, beanName: <span class="type">String</span></span>)</span></span><br><span class="line">  <span class="keyword">extends</span> <span class="type">IndirectActorProducer</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">actorClass</span> </span>= classOf[<span class="type">Actor</span>]</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">produce</span> </span>=</span><br><span class="line">    <span class="comment">// obtain fresh Actor instance from DI framework ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> actorRef = system.actorOf(</span><br><span class="line">  <span class="type">Props</span>(classOf[<span class="type">DependencyInjector</span>], applicationContext, <span class="string">"hello"</span>),</span><br><span class="line">  <span class="string">"helloBean"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>如果你的actor有带参数的构造函数，则这些参数也需要成为Props的一部分，如上文所述。但有些情况下必须使用工厂方法，例如，当实际构造函数的参数由依赖注入框架决定。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">IndirectActorProducer</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DependencyInjector</span>(<span class="params">applicationContext: <span class="type">AnyRef</span>, beanName: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class">  <span class="keyword">extends</span> <span class="title">IndirectActorProducer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">actorClass</span> </span>= classOf[<span class="type">Actor</span>]</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">produce</span> </span>=</span><br><span class="line">    <span class="comment">// obtain fresh Actor instance from DI framework ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> actorRef = system.actorOf(</span><br><span class="line">  <span class="type">Props</span>(classOf[<span class="type">DependencyInjector</span>], applicationContext, <span class="string">"hello"</span>),</span><br><span class="line">  <span class="string">"helloBean"</span>)</span><br></pre></td></tr></table></figure></p>
 <h2 id="2-Actor-API"><a href="#2-Actor-API" class="headerlink" title="2.Actor API"></a>2.Actor API</h2><p>Actor trait只定义了一个抽象方法，就是上面提到的receive，用来实现actor的行为。</p>
 <p><strong>如果当前actor的行为与收到的消息不匹配，则会调用 unhandled，其缺省实现是向actor系统的事件流中发布一条akka.actor.UnhandledMessage(message, sender, recipient)</strong>（将配置项akka.actor.debug.unhandled设置为on来将它们转换为实际的调试消息）。</p>
 <p>另外，它还包括:</p>
@@ -202,7 +435,7 @@
 <h4 id="Tell-Fire-forget"><a href="#Tell-Fire-forget" class="headerlink" title="Tell: Fire-forget"></a>Tell: Fire-forget</h4><p>这是发送消息的推荐方式。 不会阻塞地等待消息。它拥有最好的并发性和可扩展性。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">actorRef ! message</span><br></pre></td></tr></table></figure></p>
 <p>如果是在一个Actor中调用 ，那么发送方的actor引用会被隐式地作为消息的sender(): ActorRef成员一起发送。目的actor可以使用它来向源actor发送回应， 使用sender() ! replyMsg。</p>
 <p>如果不是从Actor实例发送的，sender成员缺省为 deadLetters actor引用。</p>
-<h4 id="Ask-Send-And-Receive-Future"><a href="#Ask-Send-And-Receive-Future" class="headerlink" title="Ask: Send-And-Receive-Future"></a>Ask: Send-And-Receive-Future</h4><p>ask模式既包含actor也包含future，所以它是一种使用模式，而不是ActorRef的方法:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.&#123; ask, pipe &#125;</span><br><span class="line"><span class="keyword">import</span> system.dispatcher <span class="comment">// The ExecutionContext that will be used</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span>(<span class="params">x: <span class="type">Int</span>, s: <span class="type">String</span>, d: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Request</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> timeout = <span class="type">Timeout</span>(<span class="number">5</span> seconds) <span class="comment">// needed for `?` below</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f: <span class="type">Future</span>[<span class="type">Result</span>] =</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    x &lt;- ask(actorA, <span class="type">Request</span>).mapTo[<span class="type">Int</span>] <span class="comment">// call pattern directly</span></span><br><span class="line">    s &lt;- (actorB ask <span class="type">Request</span>).mapTo[<span class="type">String</span>] <span class="comment">// call by implicit conversion</span></span><br><span class="line">    d &lt;- (actorC ? <span class="type">Request</span>).mapTo[<span class="type">Double</span>] <span class="comment">// call by symbolic name</span></span><br><span class="line">  &#125; <span class="keyword">yield</span> <span class="type">Result</span>(x, s, d)</span><br><span class="line"></span><br><span class="line">f pipeTo actorD <span class="comment">// .. or ..</span></span><br><span class="line">pipe(f) to actorD</span><br></pre></td></tr></table></figure></p>
+<h4 id="Ask-Send-And-Receive-Future"><a href="#Ask-Send-And-Receive-Future" class="headerlink" title="Ask: Send-And-Receive-Future"></a>Ask: Send-And-Receive-Future</h4><p>ask模式既包含actor也包含future，所以它是一种使用模式，而不是ActorRef的方法:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.&#123; ask, pipe &#125;</span><br><span class="line"><span class="keyword">import</span> system.dispatcher <span class="comment">// The ExecutionContext that will be used</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span>(<span class="params">x: <span class="type">Int</span>, s: <span class="type">String</span>, d: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">Request</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">implicit</span> <span class="title">val</span> <span class="title">timeout</span> </span>= <span class="type">Timeout</span>(<span class="number">5</span> seconds) <span class="comment">// needed for `?` below</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> f: <span class="type">Future</span>[<span class="type">Result</span>] =</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    x &lt;- ask(actorA, <span class="type">Request</span>).mapTo[<span class="type">Int</span>] <span class="comment">// call pattern directly</span></span><br><span class="line">    s &lt;- (actorB ask <span class="type">Request</span>).mapTo[<span class="type">String</span>] <span class="comment">// call by implicit conversion</span></span><br><span class="line">    d &lt;- (actorC ? <span class="type">Request</span>).mapTo[<span class="type">Double</span>] <span class="comment">// call by symbolic name</span></span><br><span class="line">  &#125; <span class="keyword">yield</span> <span class="type">Result</span>(x, s, d)</span><br><span class="line"></span><br><span class="line">f pipeTo actorD <span class="comment">// .. or ..</span></span><br><span class="line">pipe(f) to actorD</span><br></pre></td></tr></table></figure></p>
 <h3 id="5-接收消息"><a href="#5-接收消息" class="headerlink" title="5.接收消息"></a>5.接收消息</h3><p>Actor必须实现receive方法来接收消息：</p>
 <p>protected def receive: PartialFunction[Any, Unit]<br>这个方法应返回一个PartialFunction，例如一个“match/case”子句，消息可以与其中的不同分支进行scala模式匹配。如下例:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Props</span></span><br><span class="line"><span class="keyword">import</span> akka.event.<span class="type">Logging</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> log = <span class="type">Logging</span>(context.system, <span class="keyword">this</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"test"</span> =&gt; log.info(<span class="string">"received test"</span>)</span><br><span class="line">    <span class="keyword">case</span> _      =&gt; log.info(<span class="string">"received unknown message"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="6-终止Actor"><a href="#6-终止Actor" class="headerlink" title="6.终止Actor"></a>6.终止Actor</h3><p>通过调用ActorRefFactory（即ActorContext或ActorSystem）的stop方法来终止一个actor。通常context用来终止子actor，而 system用来终止顶级actor。实际的终止操作是异步执行的，即stop可能在actor被终止之前返回。</p>
@@ -213,7 +446,7 @@
 <p>注意<br>由于actor的终止是异步的，你不能马上使用你刚刚终止的子actor的名字；这会导致InvalidActorNameException。你应该 监视watch()正在终止的actor，并在Terminated最终到达后作为回应创建它的替代者。</p>
 </blockquote>
 <p>优雅地终止</p>
-<p>如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用gracefulStop：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.gracefulStop</span><br><span class="line"><span class="keyword">import</span> scala.concurrent.<span class="type">Await</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">val</span> stopped: <span class="type">Future</span>[<span class="type">Boolean</span>] = gracefulStop(actorRef, <span class="number">5</span> seconds, <span class="type">Manager</span>.<span class="type">Shutdown</span>)</span><br><span class="line">  <span class="type">Await</span>.result(stopped, <span class="number">6</span> seconds)</span><br><span class="line">  <span class="comment">// the actor has been stopped</span></span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">  <span class="comment">// the actor wasn't stopped within 5 seconds</span></span><br><span class="line">  <span class="keyword">case</span> e: akka.pattern.<span class="type">AskTimeoutException</span> =&gt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Manager</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Shutdown</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Manager</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">import</span> <span class="type">Manager</span>._</span><br><span class="line">  <span class="keyword">val</span> worker = context.watch(context.actorOf(<span class="type">Props</span>[<span class="type">Cruncher</span>], <span class="string">"worker"</span>))</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; worker ! <span class="string">"crunch"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Shutdown</span> =&gt;</span><br><span class="line">      worker ! <span class="type">PoisonPill</span></span><br><span class="line">      context become shuttingDown</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">shuttingDown</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; sender() ! <span class="string">"service unavailable, shutting down"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`worker`) =&gt;</span><br><span class="line">      context stop self</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果你需要等待终止过程的结束，或者组合若干actor的终止次序，可以使用gracefulStop：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.pattern.gracefulStop</span><br><span class="line"><span class="keyword">import</span> scala.concurrent.<span class="type">Await</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">val</span> stopped: <span class="type">Future</span>[<span class="type">Boolean</span>] = gracefulStop(actorRef, <span class="number">5</span> seconds, <span class="type">Manager</span>.<span class="type">Shutdown</span>)</span><br><span class="line">  <span class="type">Await</span>.result(stopped, <span class="number">6</span> seconds)</span><br><span class="line">  <span class="comment">// the actor has been stopped</span></span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">  <span class="comment">// the actor wasn't stopped within 5 seconds</span></span><br><span class="line">  <span class="keyword">case</span> e: akka.pattern.<span class="type">AskTimeoutException</span> =&gt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Manager</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Shutdown</span></span></span><br><span class="line"><span class="class">&#125;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Manager</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">import</span> <span class="type">Manager</span>._</span><br><span class="line">  <span class="keyword">val</span> worker = context.watch(context.actorOf(<span class="type">Props</span>[<span class="type">Cruncher</span>], <span class="string">"worker"</span>))</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; worker ! <span class="string">"crunch"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Shutdown</span> =&gt;</span><br><span class="line">      worker ! <span class="type">PoisonPill</span></span><br><span class="line">      context become shuttingDown</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">shuttingDown</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"job"</span> =&gt; sender() ! <span class="string">"service unavailable, shutting down"</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Terminated</span>(`worker`) =&gt;</span><br><span class="line">      context stop self</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>当gracefulStop()成功返回时，actor的postStop() hook将会被执行：在postStop()结束和gracefulStop()返回之间存在happens-before边界。</p>
 <p>在上面的示例中自定义的Manager.Shutdown消息是发送到目标actor来启动actor的终止过程。你可以使用PoisonPill，但之后在停止目标actor之前，你与其他actor的互动的机会有限。在postStop中，可以处理简单的清理任务。</p>
 <blockquote>
@@ -225,531 +458,393 @@
 <p>警告<br>请注意actor被其监管者重启后将恢复其最初的行为。</p>
 </blockquote>
 <h3 id="8-使用PartialFunction链来扩展actor"><a href="#8-使用PartialFunction链来扩展actor" class="headerlink" title="8.使用PartialFunction链来扩展actor"></a>8.使用PartialFunction链来扩展actor</h3><p>有时在一些actor中分享共同的行为，或通过若干小的函数构成一个actor的行为是很有用的。这由于actor的receive方法返回一个Actor.Receive（PartialFunction[Any,Unit]的类型别名）而使之成为可能，多个偏函数可以使用PartialFunction#orElse链接在一起。你可以根据需要链接尽可能多的功能，但是你要牢记”第一个匹配”获胜——这在组合可以处理同一类型的消息的功能时会很重要。</p>
-<p>例如，假设你有一组actor是生产者Producers或消费者Consumers，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的receive实现为这些偏函数的组合。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> producerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">GiveMeThings</span> =&gt;</span><br><span class="line">      sender() ! <span class="type">Give</span>(<span class="string">"thing"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> <span class="keyword">with</span> <span class="type">ActorLogging</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> consumerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> ref: <span class="type">ActorRef</span> =&gt;</span><br><span class="line">      ref ! <span class="type">GiveMeThings</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Give</span>(thing) =&gt;</span><br><span class="line">      log.info(<span class="string">"Got a thing! It's &#123;&#125;"</span>, thing)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span> <span class="keyword">with</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProducerConsumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span></span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ProducerBehavior</span> <span class="keyword">with</span> <span class="type">ConsumerBehavior</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior orElse consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// protocol</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">GiveMeThings</span></span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Give</span>(<span class="params">thing: <span class="type">Any</span></span>)</span></span><br></pre></td></tr></table></figure></p>
+<p>例如，假设你有一组actor是生产者Producers或消费者Consumers，然而有时候需要actor分享这两种行为。这可以很容易实现而无需重复代码，通过提取行为的特质和并将actor的receive实现为这些偏函数的组合。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> producerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">GiveMeThings</span> =&gt;</span><br><span class="line">      sender() ! <span class="type">Give</span>(<span class="string">"thing"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>: <span class="type">Actor</span> <span class="keyword">with</span> <span class="type">ActorLogging</span> =&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> consumerBehavior: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> ref: <span class="type">ActorRef</span> =&gt;</span><br><span class="line">      ref ! <span class="type">GiveMeThings</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="type">Give</span>(thing) =&gt;</span><br><span class="line">      log.info(<span class="string">"Got a thing! It's &#123;&#125;"</span>, thing)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ProducerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span> <span class="keyword">with</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProducerConsumer</span> <span class="keyword">extends</span> <span class="title">Actor</span> <span class="keyword">with</span> <span class="title">ActorLogging</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ProducerBehavior</span> <span class="keyword">with</span> <span class="title">ConsumerBehavior</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">receive</span> </span>= producerBehavior orElse consumerBehavior</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// protocol</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">GiveMeThings</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">class</span> <span class="title">Give</span>(<span class="params">thing: <span class="type">Any</span></span>)</span></span><br></pre></td></tr></table></figure></p>
 <p>不同于继承，相同的模式可以通过组合实现——可以简单地通过委托的偏函数组合成receive方法。</p>
-  
-	</div>
-		<footer class="article-footer clearfix">
-<div class="article-catetags">
 
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Akka/">Akka</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Akka/">Akka</a>
-  </div>
-
-</div>
-
-
-
-	<div class="article-share" id="share">
-	
-	  <div data-url="slamke.github.io/2016/02/04/Akka Actor的创建-引用-声明周期/" data-title="Akka Actor的创建&amp;引用&amp;声明周期 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
-	  </div>
-	
-	</div>
-
-
-</footer>
-
-   	       
-	</article>
-	
-<nav class="article-nav clearfix">
- 
- <div class="prev" >
- <a href="/2016/02/04/Akka的监管和监控/" title="Akka的监管和监控">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Akka的监管和监控</span>
-</a>
-</div>
-
-
-<div class="next">
-<a href="/2016/02/03/Hystrix学习笔记/"  title="Hystrix学习笔记">
- <strong>下一篇：</strong><br/> 
- <span>Hystrix学习笔记
-</span>
-</a>
-</div>
-
-</nav>
-
-	
-
-</div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
-
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
- 
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="toc-number">1.</span> <span class="toc-text">Actor的创建&引用&声明周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-创建actor"><span class="toc-number">1.1.</span> <span class="toc-text">1.创建actor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor-API"><span class="toc-number">1.2.</span> <span class="toc-text">2.Actor API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Actor生命周期"><span class="toc-number">1.3.</span> <span class="toc-text">3.Actor生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通过Actor-Selection定位Actor"><span class="toc-number">1.4.</span> <span class="toc-text">3. 通过Actor Selection定位Actor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-发送消息"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.发送消息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tell-Fire-forget"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Tell: Fire-forget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ask-Send-And-Receive-Future"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-接收消息"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.接收消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-终止Actor"><span class="toc-number">1.4.3.</span> <span class="toc-text">6.终止Actor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-Become-Unbecome"><span class="toc-number">1.4.4.</span> <span class="toc-text">7.Become/Unbecome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-使用PartialFunction链来扩展actor"><span class="toc-number">1.4.5.</span> <span class="toc-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol>
- 
-  </div>
-
-<div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
-<aside class="clearfix">
-
-  
-<div class="github-card">
-<p class="asidetitle">Github 名片</p>
-<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
-<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
-</div>
-  </div>
-
-
-
-  
-<div class="categorieslist">
-	<p class="asidetitle">分類</p>
-		<ul>
-		
-		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ZooKeeper/" title="ZooKeeper">ZooKeeper<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
-		  
-		
-		</ul>
-</div>
-
-
-  
-<div class="tagslist">
-	<p class="asidetitle">標簽</p>
-		<ul class="clearfix">
-		
-			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
-			
-		
-		</ul>
-</div>
-
-
-  <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
-    <ul>
-        
-          <li>
-            
-            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
-            
-          </li>
-        
-    </ul>
-</div>
-
-  
-
-
-  <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
-</div>
-
-  <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
-    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
-</div>
-
-
-</aside>
-</div>
-    </div>
-    <footer><div id="footer" >
-	
-	<div class="line">
-		<span></span>
-		<div class="author"></div>
-	</div>
-	
-	
-	<section class="info">
-		<p> Hello ,I&#39;m Larry Page in Google. <br/>
-			This is my blog,believe it or not.</p>
-	</section>
-	 
-	<div class="social-font" class="clearfix">
-		
-		
-		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
-		
-	</div>
-			
-		
-
-		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
-		
-		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
-		
-		
-		</p>
-</div>
-</footer>
-    <script src="/js/jquery-2.0.3.min.js"></script>
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.navbar').click(function(){
-    $('header nav').toggleClass('shownav');
-  });
-  var myWidth = 0;
-  function getSize(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-  };
-  var m = $('#main'),
-      a = $('#asidepart'),
-      c = $('.closeaside'),
-      o = $('.openaside');
-  c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
-  });
-  o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
-  });
-  $(window).scroll(function(){
-    o.css("top",Math.max(80,260-$(this).scrollTop()));
-  });
-  
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else{
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
       
-      $('#toc.toc-aside').css('display', 'none');
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Akka/" rel="tag"># Akka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/03/Hystrix学习笔记/" rel="next" title="Hystrix学习笔记">
+                <i class="fa fa-chevron-left"></i> Hystrix学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/04/Akka的监管和监控/" rel="prev" title="Akka的监管和监控">
+                Akka的监管和监控 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
         
-    }
-  });
-});
-</script>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Sun Ke</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Actor的创建-amp-引用-amp-声明周期"><span class="nav-number">1.</span> <span class="nav-text">Actor的创建&amp;引用&amp;声明周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建actor"><span class="nav-number">1.1.</span> <span class="nav-text">1.创建actor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Actor-API"><span class="nav-number">1.2.</span> <span class="nav-text">2.Actor API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Actor生命周期"><span class="nav-number">1.3.</span> <span class="nav-text">3.Actor生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-通过Actor-Selection定位Actor"><span class="nav-number">1.4.</span> <span class="nav-text">3. 通过Actor Selection定位Actor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-发送消息"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.发送消息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Tell-Fire-forget"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">Tell: Fire-forget</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ask-Send-And-Receive-Future"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">Ask: Send-And-Receive-Future</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-接收消息"><span class="nav-number">1.4.2.</span> <span class="nav-text">5.接收消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-终止Actor"><span class="nav-number">1.4.3.</span> <span class="nav-text">6.终止Actor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Become-Unbecome"><span class="nav-number">1.4.4.</span> <span class="nav-text">7.Become/Unbecome</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-使用PartialFunction链来扩展actor"><span class="nav-number">1.4.5.</span> <span class="nav-text">8.使用PartialFunction链来扩展actor</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sun Ke</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
 
 <script type="text/javascript">
-$(document).ready(function(){ 
-  var ai = $('.article-content>iframe'),
-      ae = $('.article-content>embed'),
-      t  = $('#toc'),
-      ta = $('#toc.toc-aside'),
-      o  = $('.openaside'),
-      c  = $('.closeaside');
-  if(ai.length>0){
-    ai.wrap('<div class="video-container" />');
-  };
-  if(ae.length>0){
-   ae.wrap('<div class="video-container" />');
-  };
-  c.click(function(){
-    ta.css('display', 'block').addClass('fadeIn');
-  });
-  o.click(function(){
-    ta.css('display', 'none');
-  });
-  $(window).scroll(function(){
-    ta.css("top",Math.max(140,320-$(this).scrollTop()));
-  });
-});
-</script>
-
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var $this = $('.share'),
-      url = $this.attr('data-url'),
-      encodedUrl = encodeURIComponent(url),
-      title = $this.attr('data-title'),
-      tsina = $this.attr('data-tsina'),
-      description = $this.attr('description');
-  var html = [
-  '<div class="hoverqrcode clearfix"></div>',
-  '<a class="overlay" id="qrcode"></a>',
-  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
-  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
-  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
-  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
-  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
-  '<span title="Share to"></span>'
-  ].join('');
-  $this.append(html);
-
-  $('.hoverqrcode').hide();
-
-  var myWidth = 0;
-  function updatehoverqrcode(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-    var qrsize = myWidth > 1024 ? 200:100;
-    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
-    var p = $('.article-share-qrcode').position();
-    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
-                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
-                          .qrcode(options);
-  };
-  $(window).resize(function(){
-    $('.hoverqrcode').hide();
-  });
-  $('.article-share-qrcode').click(function(){
-    updatehoverqrcode();
-    $('.hoverqrcode').toggle();
-  });
-  $('.article-share-qrcode').hover(function(){}, function(){
-      $('.hoverqrcode').hide();
-  });
-});   
-</script>
-
-
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.article-content').each(function(i){
-    $(this).find('img').each(function(){
-      if ($(this).parent().hasClass('fancybox')) return;
-      var alt = this.alt;
-      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
-      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
-    });
-    $(this).find('.fancybox').each(function(){
-      $(this).attr('rel', 'article' + i);
-    });
-  });
-  if($.fancybox){
-    $('.fancybox').fancybox();
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
-}); 
 </script>
 
 
 
-<!-- Analytics Begin -->
 
 
 
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
 
 
 
-<!-- Analytics End -->
-
-<!-- Totop Begin -->
-
-	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
-	</div>
-	<script src="/js/totop.js"></script>
-
-<!-- Totop End -->
-
-<!-- MathJax Begin -->
-<!-- mathjax config similar to math.stackexchange -->
+  
 
 
-<!-- MathJax End -->
 
-<!-- Tiny_search Begin -->
 
-<!-- Tiny_search End -->
 
-  </body>
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
 </html>

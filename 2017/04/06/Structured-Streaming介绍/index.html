@@ -1,109 +1,351 @@
+<!DOCTYPE html>
 
- <!DOCTYPE HTML>
-<html >
-<head>
-  <meta charset="UTF-8">
+
+
   
-    <title>Structured Streaming介绍 | 雁渡寒潭 风吹疏竹</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
-    
-    <meta name="author" content="Sun Ke">
-    
 
-    
-    <meta name="description" content="中文入门编程指南官方文档Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1背景Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于e">
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spark,Streaming," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="中文入门编程指南官方文档Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1背景Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于e">
+<meta name="keywords" content="Spark,Streaming">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Structured Streaming介绍">
-<meta property="og:url" content="slamke.github.io/2017/04/06/Structured-Streaming介绍/index.html">
+<meta property="og:url" content="http://slamke.github.io/2017/04/06/Structured-Streaming介绍/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="中文入门编程指南官方文档Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1背景Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于e">
+<meta property="og:locale" content="default">
 <meta property="og:image" content="http://spark.apache.org/docs/latest/img/structured-streaming-stream-as-a-table.png">
 <meta property="og:image" content="http://spark.apache.org/docs/latest/img/structured-streaming-watermark.png">
-<meta property="og:updated_time" content="2017-04-07T09:53:48.071Z">
+<meta property="og:updated_time" content="2017-04-07T09:53:48.072Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Structured Streaming介绍">
 <meta name="twitter:description" content="中文入门编程指南官方文档Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1背景Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于e">
 <meta name="twitter:image" content="http://spark.apache.org/docs/latest/img/structured-streaming-stream-as-a-table.png">
 
-    
-    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
-    
-    
-    <link rel="icon" href="/img/favicon.ico">
-    
-    
-    <link rel="apple-touch-icon" href="/img/jacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
-    
-    <link rel="stylesheet" href="/css/style.css">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://slamke.github.io/2017/04/06/Structured-Streaming介绍/"/>
+
+
+
+
+
+  <title>Structured Streaming介绍 | 雁渡寒潭 风吹疏竹</title>
+  
+
+
+
+
+
+
+
+
 </head>
 
-  <body>
-    <header>
-      
-<div>
-		
-			<div id="imglogo">
-				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
-			</div>
-			
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/archives">Archives</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
- 					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:slamke.github.io">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
-</div>
-    </header>
-    <div id="container">
-      <div id="main" class="post" itemscope itemprop="blogPost">
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
   
-	<article itemprop="articleBody"> 
-		<header class="article-info clearfix">
-  <h1 itemprop="name">
+  
     
-      <a href="/2017/04/06/Structured-Streaming介绍/" title="Structured Streaming介绍" itemprop="url">Structured Streaming介绍</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-04-06T05:42:35.000Z" itemprop="datePublished"> 發表於 2017-04-06</time>
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
     
-  </p>
-</header>
-	<div class="article-content">
-		
-		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
-		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#中文入门编程指南"><span class="toc-number">1.</span> <span class="toc-text">中文入门编程指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#官方文档"><span class="toc-number">2.</span> <span class="toc-text">官方文档</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><span class="toc-number">3.</span> <span class="toc-text">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#背景"><span class="toc-number">4.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设计理念及所解决的问题"><span class="toc-number">5.</span> <span class="toc-text">设计理念及所解决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Demo-for-struct-streaming"><span class="toc-number">6.</span> <span class="toc-text">Demo for struct streaming</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-number">7.</span> <span class="toc-text">基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Source"><span class="toc-number">7.1.</span> <span class="toc-text">Source</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Output-Mode"><span class="toc-number">7.2.</span> <span class="toc-text">Output Mode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sink"><span class="toc-number">7.3.</span> <span class="toc-text">Sink</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Window"><span class="toc-number">7.4.</span> <span class="toc-text">Window</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Watermark"><span class="toc-number">7.5.</span> <span class="toc-text">Watermark</span></a></li></ol></li></ol>
-		
-		</div>
-		
-		<h2 id="中文入门编程指南"><a href="#中文入门编程指南" class="headerlink" title="中文入门编程指南"></a><a href="https://www.iteblog.com/archives/2084.html" target="_blank" rel="external">中文入门编程指南</a></h2><h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><a href="http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="external">官方文档</a></h2><h2 id="Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><a href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1" class="headerlink" title="Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1"></a><a href="https://databricks.com/blog/2017/01/19/real-time-streaming-etl-structured-streaming-apache-spark-2-1.html" target="_blank" rel="external">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</a></h2><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于event_time的window及watermark功能，虽然还在Alapha阶段，但从实现的完备程度及反馈来看已具备初步的功能需求。</p>
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">雁渡寒潭 风吹疏竹</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">教练，我想打篮球</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/04/06/Structured-Streaming介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Structured Streaming介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-06T13:42:35+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="中文入门编程指南"><a href="#中文入门编程指南" class="headerlink" title="中文入门编程指南"></a><a href="https://www.iteblog.com/archives/2084.html" target="_blank" rel="noopener">中文入门编程指南</a></h2><h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><a href="http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">官方文档</a></h2><h2 id="Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><a href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1" class="headerlink" title="Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1"></a><a href="https://databricks.com/blog/2017/01/19/real-time-streaming-etl-structured-streaming-apache-spark-2-1.html" target="_blank" rel="noopener">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</a></h2><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Structured Streaming接口在社区2.0版本发布测试接口，主要暴露最初的设计思路及基本接口，不具备在生产环境使用的能力；2.1版本中Structured Streaming作为主要功能发布，支持Kafka数据源、基于event_time的window及watermark功能，虽然还在Alapha阶段，但从实现的完备程度及反馈来看已具备初步的功能需求。</p>
 <h2 id="设计理念及所解决的问题"><a href="#设计理念及所解决的问题" class="headerlink" title="设计理念及所解决的问题"></a>设计理念及所解决的问题</h2><p>从Spark 0.7版本发布DStream接口及Spark Streaming模块以来，Spark具备流式处理功能且在业界有了一系列应用，但依旧存在一些问题，诟病较多的是如下几点：</p>
 <ul>
 <li>不支持event_time，按照到达绝对时间切分records组成DStream的方式对很多场景不适合</li>
@@ -121,21 +363,21 @@
 <li><strong>Append Mode</strong> : 从上次trigger到目前为止，不会在发生变化的数据append到最终的sink端</li>
 <li><strong>Update Mode</strong> : 从上次trigger到目前为止，发生变化的条目写入到最终的sink端</li>
 </ul>
-<p>简单用自带的StructuredNetworkWordCountWindowed实例对比下Complete mode与Update Mode:<br>数据输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[liyuanjian@MacBook~Pro ~]$ nc -l 9999</span><br><span class="line">apache spark</span><br><span class="line">apache hadoop</span><br><span class="line">baidu inf spark</span><br></pre></td></tr></table></figure></p>
-<p>Complete mode output:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">| baidu| 1|</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 2|</span><br><span class="line">| inf| 1|</span><br><span class="line">+------+-----+</span><br></pre></td></tr></table></figure></p>
-<p>Update mode output:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+-----+-----+</span><br><span class="line">|value|count|</span><br><span class="line">+-----+-----+</span><br><span class="line">|baidu| 1|</span><br><span class="line">| inf| 1|</span><br><span class="line">|spark| 2|</span><br><span class="line">+-----+-----+</span><br></pre></td></tr></table></figure></p>
+<p>简单用自带的StructuredNetworkWordCountWindowed实例对比下Complete mode与Update Mode:<br>数据输入：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[liyuanjian@MacBook~Pro ~]$ nc -l 9999</span><br><span class="line">apache spark</span><br><span class="line">apache hadoop</span><br><span class="line">baidu inf spark</span><br></pre></td></tr></table></figure></p>
+<p>Complete mode output:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">| baidu| 1|</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">| spark| 2|</span><br><span class="line">| inf| 1|</span><br><span class="line">+------+-----+</span><br></pre></td></tr></table></figure></p>
+<p>Update mode output:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 1|</span><br><span class="line">| spark| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+------+-----+</span><br><span class="line">| value|count|</span><br><span class="line">+------+-----+</span><br><span class="line">|apache| 2|</span><br><span class="line">|hadoop| 1|</span><br><span class="line">+------+-----+</span><br><span class="line"> </span><br><span class="line">+-----+-----+</span><br><span class="line">|value|count|</span><br><span class="line">+-----+-----+</span><br><span class="line">|baidu| 1|</span><br><span class="line">| inf| 1|</span><br><span class="line">|spark| 2|</span><br><span class="line">+-----+-----+</span><br></pre></td></tr></table></figure></p>
 <h3 id="Sink"><a href="#Sink" class="headerlink" title="Sink"></a>Sink</h3><p>作为struct streaming的下游抽象，sink代表将最终处理完成的dataframe写出的方式，目前支持：</p>
 <ol>
 <li><strong>File sink</strong> : 将数据写入hdfs目录，可以支持带partition的table写入</li>
 <li><strong>Console sink</strong> : 将数据直接调用dataframe.show()打印在stdout，调试作用，demo中使用的都是console sink</li>
 <li><strong>Memory sink</strong> : 将所有下游存储在driver的内存中，抽象为一张表，也只能做调试使用</li>
-<li><strong>Foreach sink</strong> : 依赖用户实现ForeachWriter接口配合使用，foreach sink中对每次触发的dataframe，按逐个partition调用ForeachWriter的接口进行处理，可以实现ForeachWriter写入任何需要的下游存储或处理系统，接口如下：<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ForeachWriter</span>[<span class="type">T</span>] <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// <span class="doctag">TODO:</span> Move this to org.apache.spark.sql.util or consolidate this with batch API.</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called when starting to process one partition of new data in the executor. The `version` is</span><br><span class="line">   * for data deduplication when there are failures. When recovering from a failure, some data may</span><br><span class="line">   * be generated multiple times but they will always have the same version.</span><br><span class="line">   *</span><br><span class="line">   * If this method finds using the `partitionId` and `version` that this partition has already been</span><br><span class="line">   * processed, it can return `false` to skip the further data processing. However, `close` still</span><br><span class="line">   * will be called for cleaning up resources.</span><br><span class="line">   *</span><br><span class="line">   * @param partitionId the partition id.</span><br><span class="line">   * @param version a unique id for data deduplication.</span><br><span class="line">   * @return `true` if the corresponding partition and version id should be processed. `false`</span><br><span class="line">   *         indicates the partition should be skipped.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">open</span></span>(partitionId: <span class="type">Long</span>, version: <span class="type">Long</span>): <span class="type">Boolean</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called to process the data in the executor side. This method will be called only when `open`</span><br><span class="line">   * returns `true`.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process</span></span>(value: <span class="type">T</span>): <span class="type">Unit</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Called when stopping to process one partition of new data in the executor side. This is</span><br><span class="line">   * guaranteed to be called either `open` returns `true` or `false`. However,</span><br><span class="line">   * `close` won't be called in the following cases:</span><br><span class="line">   *  - JVM crashes without throwing a `Throwable`</span><br><span class="line">   *  - `open` throws a `Throwable`.</span><br><span class="line">   *</span><br><span class="line">   * @param errorOrNull the error thrown during processing data or null if there was no error.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>(errorOrNull: <span class="type">Throwable</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><strong>Foreach sink</strong> : 依赖用户实现ForeachWriter接口配合使用，foreach sink中对每次触发的dataframe，按逐个partition调用ForeachWriter的接口进行处理，可以实现ForeachWriter写入任何需要的下游存储或处理系统，接口如下：<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ForeachWriter</span>[<span class="type">T</span>] <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// <span class="doctag">TODO:</span> Move this to org.apache.spark.sql.util or consolidate this with batch API.</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Called when starting to process one partition of new data in the executor. The `version` is</span></span><br><span class="line"><span class="comment">   * for data deduplication when there are failures. When recovering from a failure, some data may</span></span><br><span class="line"><span class="comment">   * be generated multiple times but they will always have the same version.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * If this method finds using the `partitionId` and `version` that this partition has already been</span></span><br><span class="line"><span class="comment">   * processed, it can return `false` to skip the further data processing. However, `close` still</span></span><br><span class="line"><span class="comment">   * will be called for cleaning up resources.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * @param partitionId the partition id.</span></span><br><span class="line"><span class="comment">   * @param version a unique id for data deduplication.</span></span><br><span class="line"><span class="comment">   * @return `true` if the corresponding partition and version id should be processed. `false`</span></span><br><span class="line"><span class="comment">   *         indicates the partition should be skipped.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">open</span></span>(partitionId: <span class="type">Long</span>, version: <span class="type">Long</span>): <span class="type">Boolean</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Called to process the data in the executor side. This method will be called only when `open`</span></span><br><span class="line"><span class="comment">   * returns `true`.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process</span></span>(value: <span class="type">T</span>): <span class="type">Unit</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Called when stopping to process one partition of new data in the executor side. This is</span></span><br><span class="line"><span class="comment">   * guaranteed to be called either `open` returns `true` or `false`. However,</span></span><br><span class="line"><span class="comment">   * `close` won't be called in the following cases:</span></span><br><span class="line"><span class="comment">   *  - JVM crashes without throwing a `Throwable`</span></span><br><span class="line"><span class="comment">   *  - `open` throws a `Throwable`.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * @param errorOrNull the error thrown during processing data or null if there was no error.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>(errorOrNull: <span class="type">Throwable</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <h3 id="Window"><a href="#Window" class="headerlink" title="Window"></a>Window</h3><p>和其他流式系统一样，基于滑动时间窗的数据统计、聚合是必不可少的需求，2.1实现了基于event-time的window定义，接口如下：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Bucketize rows into one or more time windows given a timestamp specifying column. Window</span><br><span class="line"> * starts are inclusive but the window ends are exclusive, e.g. 12:05 will be in the window</span><br><span class="line"> * [12:05,12:10) but not in [12:00,12:05). Windows can support microsecond precision. Windows in</span><br><span class="line"> * the order of months are not supported. The windows start beginning at 1970-01-01 00:00:00 UTC.</span><br><span class="line"> * The following example takes the average stock price for a one minute window every 10 seconds:</span><br><span class="line"> *</span><br><span class="line"> * &#123;&#123;&#123;</span><br><span class="line"> *   val df = ... // schema =&gt; timestamp: TimestampType, stockId: StringType, price: DoubleType</span><br><span class="line"> *   df.groupBy(window($"time", "1 minute", "10 seconds"), $"stockId")</span><br><span class="line"> *     .agg(mean("price"))</span><br><span class="line"> * &#125;&#125;&#125;</span><br><span class="line"> *</span><br><span class="line"> * The windows will look like:</span><br><span class="line"> *</span><br><span class="line"> * &#123;&#123;&#123;</span><br><span class="line"> *   09:00:00-09:01:00</span><br><span class="line"> *   09:00:10-09:01:10</span><br><span class="line"> *   09:00:20-09:01:20 ...</span><br><span class="line"> * &#125;&#125;&#125;</span><br><span class="line"> *</span><br><span class="line"> * For a streaming query, you may use the function `current_timestamp` to generate windows on</span><br><span class="line"> * processing time.</span><br><span class="line"> *</span><br><span class="line"> * @param timeColumn The column or the expression to use as the timestamp for windowing by time.</span><br><span class="line"> *                   The time column must be of TimestampType.</span><br><span class="line"> * @param windowDuration A string specifying the width of the window, e.g. `10 minutes`,</span><br><span class="line"> *                       `1 second`. Check [[org.apache.spark.unsafe.types.CalendarInterval]] for</span><br><span class="line"> *                       valid duration identifiers. Note that the duration is a fixed length of</span><br><span class="line"> *                       time, and does not vary over time according to a calendar. For example,</span><br><span class="line"> *                       `1 day` always means 86,400,000 milliseconds, not a calendar day.</span><br><span class="line"> * @param slideDuration A string specifying the sliding interval of the window, e.g. `1 minute`.</span><br><span class="line"> *                      A new window will be generated every `slideDuration`. Must be less than</span><br><span class="line"> *                      or equal to the `windowDuration`. Check</span><br><span class="line"> *                      [[org.apache.spark.unsafe.types.CalendarInterval]] for valid duration</span><br><span class="line"> *                      identifiers. This duration is likewise absolute, and does not vary</span><br><span class="line"> *                     according to a calendar.</span><br><span class="line"> *</span><br><span class="line"> * @group datetime_funcs</span><br><span class="line"> * @since 2.0.0</span><br><span class="line"> */</span></span><br><span class="line"><span class="meta">@Experimental</span></span><br><span class="line"><span class="meta">@InterfaceStability</span>.<span class="type">Evolving</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">window</span></span>(timeColumn: <span class="type">Column</span>, windowDuration: <span class="type">String</span>, slideDuration: <span class="type">String</span>): <span class="type">Column</span> = &#123;</span><br><span class="line">  window(timeColumn, windowDuration, slideDuration, <span class="string">"0 second"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Bucketize rows into one or more time windows given a timestamp specifying column. Window</span></span><br><span class="line"><span class="comment"> * starts are inclusive but the window ends are exclusive, e.g. 12:05 will be in the window</span></span><br><span class="line"><span class="comment"> * [12:05,12:10) but not in [12:00,12:05). Windows can support microsecond precision. Windows in</span></span><br><span class="line"><span class="comment"> * the order of months are not supported. The windows start beginning at 1970-01-01 00:00:00 UTC.</span></span><br><span class="line"><span class="comment"> * The following example takes the average stock price for a one minute window every 10 seconds:</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &#123;&#123;&#123;</span></span><br><span class="line"><span class="comment"> *   val df = ... // schema =&gt; timestamp: TimestampType, stockId: StringType, price: DoubleType</span></span><br><span class="line"><span class="comment"> *   df.groupBy(window($"time", "1 minute", "10 seconds"), $"stockId")</span></span><br><span class="line"><span class="comment"> *     .agg(mean("price"))</span></span><br><span class="line"><span class="comment"> * &#125;&#125;&#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The windows will look like:</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &#123;&#123;&#123;</span></span><br><span class="line"><span class="comment"> *   09:00:00-09:01:00</span></span><br><span class="line"><span class="comment"> *   09:00:10-09:01:10</span></span><br><span class="line"><span class="comment"> *   09:00:20-09:01:20 ...</span></span><br><span class="line"><span class="comment"> * &#125;&#125;&#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * For a streaming query, you may use the function `current_timestamp` to generate windows on</span></span><br><span class="line"><span class="comment"> * processing time.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param timeColumn The column or the expression to use as the timestamp for windowing by time.</span></span><br><span class="line"><span class="comment"> *                   The time column must be of TimestampType.</span></span><br><span class="line"><span class="comment"> * @param windowDuration A string specifying the width of the window, e.g. `10 minutes`,</span></span><br><span class="line"><span class="comment"> *                       `1 second`. Check [[org.apache.spark.unsafe.types.CalendarInterval]] for</span></span><br><span class="line"><span class="comment"> *                       valid duration identifiers. Note that the duration is a fixed length of</span></span><br><span class="line"><span class="comment"> *                       time, and does not vary over time according to a calendar. For example,</span></span><br><span class="line"><span class="comment"> *                       `1 day` always means 86,400,000 milliseconds, not a calendar day.</span></span><br><span class="line"><span class="comment"> * @param slideDuration A string specifying the sliding interval of the window, e.g. `1 minute`.</span></span><br><span class="line"><span class="comment"> *                      A new window will be generated every `slideDuration`. Must be less than</span></span><br><span class="line"><span class="comment"> *                      or equal to the `windowDuration`. Check</span></span><br><span class="line"><span class="comment"> *                      [[org.apache.spark.unsafe.types.CalendarInterval]] for valid duration</span></span><br><span class="line"><span class="comment"> *                      identifiers. This duration is likewise absolute, and does not vary</span></span><br><span class="line"><span class="comment"> *                     according to a calendar.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @group datetime_funcs</span></span><br><span class="line"><span class="comment"> * @since 2.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Experimental</span></span><br><span class="line"><span class="meta">@InterfaceStability</span>.<span class="type">Evolving</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">window</span></span>(timeColumn: <span class="type">Column</span>, windowDuration: <span class="type">String</span>, slideDuration: <span class="type">String</span>): <span class="type">Column</span> = &#123;</span><br><span class="line">  window(timeColumn, windowDuration, slideDuration, <span class="string">"0 second"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>window通常与groupBy算子连用，通过设置dataframe中的timeColumn，windowDuration(window大小)，sildeDuration(步长)，来定义整个window的行为，如windowDuration = 10min, slideDuration = 5min，则代表由event-time触发每5分钟计算一次，计算的对象是当前window中10min的数据</p>
-<h3 id="Watermark"><a href="#Watermark" class="headerlink" title="Watermark"></a>Watermark</h3><p>接上述window的介绍，对于任何基于window\event-time的聚合场景，我们都需要考虑对于乱序的过期event-time数据到达的处理行为。watermark用来给用户提供一个接口，让用户能够定义”比当前处理时间慢多久的数据可以丢弃，不再处理”，祥设文档参见：<a href="https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2" target="_blank" rel="external">https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2</a></p>
+<h3 id="Watermark"><a href="#Watermark" class="headerlink" title="Watermark"></a>Watermark</h3><p>接上述window的介绍，对于任何基于window\event-time的聚合场景，我们都需要考虑对于乱序的过期event-time数据到达的处理行为。watermark用来给用户提供一个接口，让用户能够定义”比当前处理时间慢多久的数据可以丢弃，不再处理”，祥设文档参见：<a href="https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2" target="_blank" rel="noopener">https://docs.google.com/document/d/1z-Pazs5v4rA31azvmYhu4I5xwqaNQl6ZLIS03xhkfCQ/edit#heading=h.yx3tjr1mrnl2</a></p>
 <p><img src="http://spark.apache.org/docs/latest/img/structured-streaming-watermark.png" alt=""></p>
 <ul>
 <li>watermark的计算规则</li>
@@ -144,529 +386,393 @@
 <li>在每次trigger触发计算时，先找到trigger data中的最大(近)event-time</li>
 <li>trigger结束后，   <code>new watermark = MAX(event-time before trigger, max event-time in trigger[步骤1]) - threashold</code><br>watermark的限制<br>watermark操作只能在logical plan中有一个，而且只能应用在从sink出发的单child关系链，简单理解就是处理不了复杂的多留join、union的各自设置watermark</li>
 </ol>
-  
-	</div>
-		<footer class="article-footer clearfix">
-<div class="article-catetags">
 
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Spark/">Spark</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Spark/">Spark</a><a href="/tags/Streaming/">Streaming</a>
-  </div>
-
-</div>
-
-
-
-	<div class="article-share" id="share">
-	
-	  <div data-url="slamke.github.io/2017/04/06/Structured-Streaming介绍/" data-title="Structured Streaming介绍 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
-	  </div>
-	
-	</div>
-
-
-</footer>
-
-   	       
-	</article>
-	
-<nav class="article-nav clearfix">
- 
- <div class="prev" >
- <a href="/2017/04/10/流式计算概述和Spark-Streaming-tips/" title="流式计算概述和Spark Streaming tips">
-  <strong>上一篇：</strong><br/>
-  <span>
-  流式计算概述和Spark Streaming tips</span>
-</a>
-</div>
-
-
-<div class="next">
-<a href="/2017/03/30/如何在Spark平台搭建ThriftServer/"  title="如何在Spark平台搭建ThriftServer">
- <strong>下一篇：</strong><br/> 
- <span>如何在Spark平台搭建ThriftServer
-</span>
-</a>
-</div>
-
-</nav>
-
-	
-
-</div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
-
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
- 
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#中文入门编程指南"><span class="toc-number">1.</span> <span class="toc-text">中文入门编程指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#官方文档"><span class="toc-number">2.</span> <span class="toc-text">官方文档</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><span class="toc-number">3.</span> <span class="toc-text">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#背景"><span class="toc-number">4.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设计理念及所解决的问题"><span class="toc-number">5.</span> <span class="toc-text">设计理念及所解决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Demo-for-struct-streaming"><span class="toc-number">6.</span> <span class="toc-text">Demo for struct streaming</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-number">7.</span> <span class="toc-text">基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Source"><span class="toc-number">7.1.</span> <span class="toc-text">Source</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Output-Mode"><span class="toc-number">7.2.</span> <span class="toc-text">Output Mode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sink"><span class="toc-number">7.3.</span> <span class="toc-text">Sink</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Window"><span class="toc-number">7.4.</span> <span class="toc-text">Window</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Watermark"><span class="toc-number">7.5.</span> <span class="toc-text">Watermark</span></a></li></ol></li></ol>
- 
-  </div>
-
-<div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
-<aside class="clearfix">
-
-  
-<div class="github-card">
-<p class="asidetitle">Github 名片</p>
-<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
-<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
-</div>
-  </div>
-
-
-
-  
-<div class="categorieslist">
-	<p class="asidetitle">分類</p>
-		<ul>
-		
-		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ZooKeeper/" title="ZooKeeper">ZooKeeper<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
-		  
-		
-		</ul>
-</div>
-
-
-  
-<div class="tagslist">
-	<p class="asidetitle">標簽</p>
-		<ul class="clearfix">
-		
-			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
-			
-		
-		</ul>
-</div>
-
-
-  <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
-    <ul>
-        
-          <li>
-            
-            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
-            
-          </li>
-        
-    </ul>
-</div>
-
-  
-
-
-  <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
-</div>
-
-  <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
-    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
-</div>
-
-
-</aside>
-</div>
-    </div>
-    <footer><div id="footer" >
-	
-	<div class="line">
-		<span></span>
-		<div class="author"></div>
-	</div>
-	
-	
-	<section class="info">
-		<p> Hello ,I&#39;m Larry Page in Google. <br/>
-			This is my blog,believe it or not.</p>
-	</section>
-	 
-	<div class="social-font" class="clearfix">
-		
-		
-		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
-		
-	</div>
-			
-		
-
-		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
-		
-		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
-		
-		
-		</p>
-</div>
-</footer>
-    <script src="/js/jquery-2.0.3.min.js"></script>
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.navbar').click(function(){
-    $('header nav').toggleClass('shownav');
-  });
-  var myWidth = 0;
-  function getSize(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-  };
-  var m = $('#main'),
-      a = $('#asidepart'),
-      c = $('.closeaside'),
-      o = $('.openaside');
-  c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
-  });
-  o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
-  });
-  $(window).scroll(function(){
-    o.css("top",Math.max(80,260-$(this).scrollTop()));
-  });
-  
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else{
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
       
-      $('#toc.toc-aside').css('display', 'none');
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"># Spark</a>
+          
+            <a href="/tags/Streaming/" rel="tag"># Streaming</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/30/如何在Spark平台搭建ThriftServer/" rel="next" title="如何在Spark平台搭建ThriftServer">
+                <i class="fa fa-chevron-left"></i> 如何在Spark平台搭建ThriftServer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/10/流式计算概述和Spark-Streaming-tips/" rel="prev" title="流式计算概述和Spark Streaming tips">
+                流式计算概述和Spark Streaming tips <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
         
-    }
-  });
-});
-</script>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Sun Ke</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#中文入门编程指南"><span class="nav-number">1.</span> <span class="nav-text">中文入门编程指南</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#官方文档"><span class="nav-number">2.</span> <span class="nav-text">官方文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Real-time-Streaming-ETL-with-Structured-Streaming-in-Apache-Spark-2-1"><span class="nav-number">3.</span> <span class="nav-text">Real-time Streaming ETL with Structured Streaming in Apache Spark 2.1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">4.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计理念及所解决的问题"><span class="nav-number">5.</span> <span class="nav-text">设计理念及所解决的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo-for-struct-streaming"><span class="nav-number">6.</span> <span class="nav-text">Demo for struct streaming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">7.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Source"><span class="nav-number">7.1.</span> <span class="nav-text">Source</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Output-Mode"><span class="nav-number">7.2.</span> <span class="nav-text">Output Mode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sink"><span class="nav-number">7.3.</span> <span class="nav-text">Sink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Window"><span class="nav-number">7.4.</span> <span class="nav-text">Window</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Watermark"><span class="nav-number">7.5.</span> <span class="nav-text">Watermark</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sun Ke</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
 
 <script type="text/javascript">
-$(document).ready(function(){ 
-  var ai = $('.article-content>iframe'),
-      ae = $('.article-content>embed'),
-      t  = $('#toc'),
-      ta = $('#toc.toc-aside'),
-      o  = $('.openaside'),
-      c  = $('.closeaside');
-  if(ai.length>0){
-    ai.wrap('<div class="video-container" />');
-  };
-  if(ae.length>0){
-   ae.wrap('<div class="video-container" />');
-  };
-  c.click(function(){
-    ta.css('display', 'block').addClass('fadeIn');
-  });
-  o.click(function(){
-    ta.css('display', 'none');
-  });
-  $(window).scroll(function(){
-    ta.css("top",Math.max(140,320-$(this).scrollTop()));
-  });
-});
-</script>
-
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var $this = $('.share'),
-      url = $this.attr('data-url'),
-      encodedUrl = encodeURIComponent(url),
-      title = $this.attr('data-title'),
-      tsina = $this.attr('data-tsina'),
-      description = $this.attr('description');
-  var html = [
-  '<div class="hoverqrcode clearfix"></div>',
-  '<a class="overlay" id="qrcode"></a>',
-  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
-  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
-  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
-  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
-  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
-  '<span title="Share to"></span>'
-  ].join('');
-  $this.append(html);
-
-  $('.hoverqrcode').hide();
-
-  var myWidth = 0;
-  function updatehoverqrcode(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-    var qrsize = myWidth > 1024 ? 200:100;
-    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
-    var p = $('.article-share-qrcode').position();
-    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
-                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
-                          .qrcode(options);
-  };
-  $(window).resize(function(){
-    $('.hoverqrcode').hide();
-  });
-  $('.article-share-qrcode').click(function(){
-    updatehoverqrcode();
-    $('.hoverqrcode').toggle();
-  });
-  $('.article-share-qrcode').hover(function(){}, function(){
-      $('.hoverqrcode').hide();
-  });
-});   
-</script>
-
-
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.article-content').each(function(i){
-    $(this).find('img').each(function(){
-      if ($(this).parent().hasClass('fancybox')) return;
-      var alt = this.alt;
-      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
-      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
-    });
-    $(this).find('.fancybox').each(function(){
-      $(this).attr('rel', 'article' + i);
-    });
-  });
-  if($.fancybox){
-    $('.fancybox').fancybox();
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
-}); 
 </script>
 
 
 
-<!-- Analytics Begin -->
 
 
 
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
 
 
 
-<!-- Analytics End -->
-
-<!-- Totop Begin -->
-
-	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
-	</div>
-	<script src="/js/totop.js"></script>
-
-<!-- Totop End -->
-
-<!-- MathJax Begin -->
-<!-- mathjax config similar to math.stackexchange -->
+  
 
 
-<!-- MathJax End -->
 
-<!-- Tiny_search Begin -->
 
-<!-- Tiny_search End -->
 
-  </body>
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
 </html>

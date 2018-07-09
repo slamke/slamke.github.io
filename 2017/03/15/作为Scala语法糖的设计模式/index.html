@@ -1,109 +1,348 @@
+<!DOCTYPE html>
 
- <!DOCTYPE HTML>
-<html >
-<head>
-  <meta charset="UTF-8">
+
+
   
-    <title>作为Scala语法糖的设计模式 | 雁渡寒潭 风吹疏竹</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
-    
-    <meta name="author" content="Sun Ke">
-    
 
-    
-    <meta name="description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar
-Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Scala,设计模式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
+<meta name="keywords" content="Scala,设计模式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="作为Scala语法糖的设计模式">
-<meta property="og:url" content="slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/index.html">
+<meta property="og:url" content="http://slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar
-Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
+<meta property="og:description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
+<meta property="og:locale" content="default">
 <meta property="og:updated_time" content="2017-03-15T07:52:11.874Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="作为Scala语法糖的设计模式">
-<meta name="twitter:description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar
-Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
+<meta name="twitter:description" content="转载: http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scal">
 
-    
-    <link rel="alternative" href="/atom.xml" title="雁渡寒潭 风吹疏竹" type="application/atom+xml">
-    
-    
-    <link rel="icon" href="/img/favicon.ico">
-    
-    
-    <link rel="apple-touch-icon" href="/img/jacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
-    
-    <link rel="stylesheet" href="/css/style.css">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/"/>
+
+
+
+
+
+  <title>作为Scala语法糖的设计模式 | 雁渡寒潭 风吹疏竹</title>
+  
+
+
+
+
+
+
+
+
 </head>
 
-  <body>
-    <header>
-      
-<div>
-		
-			<div id="imglogo">
-				<a href="/"><img src="/img/logo.png" alt="雁渡寒潭 风吹疏竹" title="雁渡寒潭 风吹疏竹"/></a>
-			</div>
-			
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="雁渡寒潭 风吹疏竹">雁渡寒潭 风吹疏竹</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/archives">Archives</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
- 					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:slamke.github.io">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
-</div>
-    </header>
-    <div id="container">
-      <div id="main" class="post" itemscope itemprop="blogPost">
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
   
-	<article itemprop="articleBody"> 
-		<header class="article-info clearfix">
-  <h1 itemprop="name">
+  
     
-      <a href="/2017/03/15/作为Scala语法糖的设计模式/" title="作为Scala语法糖的设计模式" itemprop="url">作为Scala语法糖的设计模式</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Sun Ke" target="_blank" itemprop="author">Sun Ke</a>
-		
-  <p class="article-time">
-    <time datetime="2017-03-15T07:49:22.000Z" itemprop="datePublished"> 發表於 2017-03-15</time>
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
     
-  </p>
-</header>
-	<div class="article-content">
-		
-		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
-		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lazy-Initialization"><span class="toc-number">1.</span> <span class="toc-text">Lazy Initialization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Singleton-Pattern"><span class="toc-number">2.</span> <span class="toc-text">Singleton Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adapter-Pattern"><span class="toc-number">3.</span> <span class="toc-text">Adapter Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Value-Object"><span class="toc-number">4.</span> <span class="toc-text">Value Object</span></a></li></ol>
-		
-		</div>
-		
-		<p>转载: <a href="http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar" target="_blank" rel="external">http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar</a></p>
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">雁渡寒潭 风吹疏竹</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">教练，我想打篮球</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">作为Scala语法糖的设计模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-15T15:49:22+08:00">
+                2017-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Scala/" itemprop="url" rel="index">
+                    <span itemprop="name">Scala</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转载: <a href="http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar" target="_blank" rel="noopener">http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar</a></p>
 <p>Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scala Style的拙劣代码；倘若过分追求FP的不变性等特性，因为Scala在类型系统以及Monad实现的繁琐性，又可能导致代码变得复杂，不易阅读，反而得不偿失。</p>
 <p>看来，赋予程序员选择的自由，有时候未必是好事！</p>
 <p>在OO世界里，设计模式曾经风靡全世界，你不懂设计模式，都不好意思说自己是程序员。现在呢？说你懂设计模式，倒显得你逼格低了，心里鄙视：“这年头谁还用设计模式，早过时了！”程序员心中的鄙视链开始加成，直接失血二十格。</p>
@@ -127,7 +366,7 @@ Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使�
 <h2 id="Singleton-Pattern"><a href="#Singleton-Pattern" class="headerlink" title="Singleton Pattern"></a>Singleton Pattern</h2><p>C#提供了静态类的概念，但Java没有，而Scala则通过引入Object弥补了Java的这一缺失，而且从语义上讲，似乎比静态类（Static Class）更容易让人理解。</p>
 <p>Object可以派生自多个trait。例如派生自App trait，就可直接享有main函数的福利。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">DelayedInit</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) = &#123;</span><br><span class="line">    <span class="keyword">this</span>._args = args</span><br><span class="line">    <span class="keyword">for</span> (proc &lt;- initCode) proc()</span><br><span class="line">    <span class="keyword">if</span> (util.<span class="type">Properties</span>.propIsSet(<span class="string">"scala.time"</span>)) &#123;</span><br><span class="line">      <span class="keyword">val</span> total = currentTime - executionStart</span><br><span class="line">      <span class="type">Console</span>.println(<span class="string">"[total "</span> + total + <span class="string">"ms]"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">App</span></span></span><br></pre></td></tr></table></figure>
-<p>继承多个trait的好处是代码复用。我们可以将许多小粒度方法的实现定义在多个trait中。这些方法如果被类继承，则成为实例方法，如果被Object继承，则变成了线程安全的静态方法（因为继承trait的实现就是一个mixin）。多么奇妙！所以很多时候，我们会尽量保证Obejct的短小精悍，然后将许多逻辑放到trait中。当你看到如下代码时，其实不必惊讶：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">App</span> </span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">InitHook</span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ShutdownHook</span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ActorSystemProvider</span></span><br><span class="line">  <span class="keyword">with</span> <span class="type">ScheduledTaskSupport</span></span><br></pre></td></tr></table></figure></p>
+<p>继承多个trait的好处是代码复用。我们可以将许多小粒度方法的实现定义在多个trait中。这些方法如果被类继承，则成为实例方法，如果被Object继承，则变成了线程安全的静态方法（因为继承trait的实现就是一个mixin）。多么奇妙！所以很多时候，我们会尽量保证Obejct的短小精悍，然后将许多逻辑放到trait中。当你看到如下代码时，其实不必惊讶：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">App</span> </span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">InitHook</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ShutdownHook</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ActorSystemProvider</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ScheduledTaskSupport</span></span></span><br></pre></td></tr></table></figure></p>
 <p>这种小粒度的trait既可以保证代码的复用，也有助于职责分离，还有利于测试。真是再好不过了！</p>
 <h2 id="Adapter-Pattern"><a href="#Adapter-Pattern" class="headerlink" title="Adapter Pattern"></a>Adapter Pattern</h2><p>隐式转换当然可以用作Adapter。在Scala中，之所以可以更好地调用Java库，隐式转换功不可没。从语法上看，隐式转换比C#提供的扩展方法更强大，适用范围更广。</p>
 <p>Pavel Fatin给出了日志转换的Adapter案例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Log</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">warning</span></span>(message: <span class="type">String</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">error</span></span>(message: <span class="type">String</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Logger</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">log</span></span>(level: <span class="type">Level</span>, message: <span class="type">String</span>) &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="class"><span class="keyword">class</span> <span class="title">LoggerToLogAdapter</span>(<span class="params">logger: <span class="type">Logger</span></span>) <span class="keyword">extends</span> <span class="title">Log</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">warning</span></span>(message: <span class="type">String</span>) &#123; logger.log(<span class="type">WARNING</span>, message) &#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">error</span></span>(message: <span class="type">String</span>) &#123; logger.log(<span class="type">ERROR</span>, message) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> log: <span class="type">Log</span> = <span class="keyword">new</span> <span class="type">Logger</span>()</span><br></pre></td></tr></table></figure></p>
@@ -139,531 +378,395 @@ Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使�
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span> &lt;: <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>():<span class="type">Unit</span>, <span class="type">B</span>][resource: <span class="type">A</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">B</span> =</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        f(resource)</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        resource.close()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">using(io.<span class="type">Source</span>.fromFile(<span class="string">"example.txt"</span>)) &#123; source =&gt; &#123;</span><br><span class="line">    <span class="keyword">for</span> (line &lt;- source.getLines) &#123;</span><br><span class="line">        println(line)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>因为FileResource定义了close()函数，所以可以作为参数传给using()函数。</p>
 <h2 id="Value-Object"><a href="#Value-Object" class="headerlink" title="Value Object"></a>Value Object</h2><p>Value Object来自DDD中的概念，通常指的是没有唯一标识的不变对象。Java没有Value Object的语法，然而因其在多数业务领域中被频繁使用，Scala为其提供了快捷语法Case Class。在几乎所有的Scala项目中，都可以看到Case Class的身影。除了在业务中表现Value Object之外，还可以用于消息传递（例如AKKA在Actor之间传递的消息）、序列化等场景。此外，Case Class又可以很好地支持模式匹配，或者作为典型的代数数据类型（ADT）。例如Scala中的List，可以被定义为：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">List</span>[+<span class="type">T</span>]</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">Nil</span> <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">Nothing</span>]</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Cons</span>[+<span class="type">T</span>](<span class="params">h: <span class="type">T</span>, t: <span class="type">List</span>[<span class="type">T</span>]</span>) <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">T</span>]</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">List</span>[+<span class="type">T</span>]</span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">Nil</span> <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">Nothing</span>]</span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">class</span> <span class="title">Cons</span>[+<span class="type">T</span>](<span class="params">h: <span class="type">T</span>, t: <span class="type">List</span>[<span class="type">T</span>]</span>) <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">T</span>]</span></span><br></pre></td></tr></table></figure>
 <p>这里，case object是一个单例的值对象。而Nil与Cons又都同时继承自一个sealed trait。在消息定义时，我们常常采用这样的ADT定义。例如List定义中，Nil与Cons就是List ADT的sum或者union，而Cons构造器则被称之为是参数h（代表List的head）与t（代表List的tail）的product。这也是ADT（algebraic data type）之所以得名。注意它与OO中的ADT（抽象数据类型）是风马牛不相及的两个概念。</p>
-  
-	</div>
-		<footer class="article-footer clearfix">
-<div class="article-catetags">
 
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/Scala/">Scala</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Scala/">Scala</a><a href="/tags/设计模式/">设计模式</a>
-  </div>
-
-</div>
-
-
-
-	<div class="article-share" id="share">
-	
-	  <div data-url="slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/" data-title="作为Scala语法糖的设计模式 | 雁渡寒潭 风吹疏竹" data-tsina="null" class="share clearfix">
-	  </div>
-	
-	</div>
-
-
-</footer>
-
-   	       
-	</article>
-	
-<nav class="article-nav clearfix">
- 
- <div class="prev" >
- <a href="/2017/03/19/Java的通用I-O-API设计/" title="Java的通用I/O API设计">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Java的通用I/O API设计</span>
-</a>
-</div>
-
-
-<div class="next">
-<a href="/2017/03/15/Spark的UDF/"  title="Spark的UDF">
- <strong>下一篇：</strong><br/> 
- <span>Spark的UDF
-</span>
-</a>
-</div>
-
-</nav>
-
-	
-
-</div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
-
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
- 
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lazy-Initialization"><span class="toc-number">1.</span> <span class="toc-text">Lazy Initialization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Singleton-Pattern"><span class="toc-number">2.</span> <span class="toc-text">Singleton Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adapter-Pattern"><span class="toc-number">3.</span> <span class="toc-text">Adapter Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Value-Object"><span class="toc-number">4.</span> <span class="toc-text">Value Object</span></a></li></ol>
- 
-  </div>
-
-<div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
-<aside class="clearfix">
-
-  
-<div class="github-card">
-<p class="asidetitle">Github 名片</p>
-<div class="github-card" data-github="slamke" data-width="220" data-height="119" data-theme="medium">
-<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
-</div>
-  </div>
-
-
-
-  
-<div class="categorieslist">
-	<p class="asidetitle">分類</p>
-		<ul>
-		
-		  
-			<li><a href="/categories/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/HDFS/" title="HDFS">HDFS<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Java/" title="Java">Java<sup>12</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Kafka/" title="Kafka">Kafka<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ML/" title="ML">ML<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Python/" title="Python">Python<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/REST/" title="REST">REST<sup>2</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Reactor/" title="Reactor">Reactor<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spark/" title="Spark">Spark<sup>29</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Spring/" title="Spring">Spring<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Tomcat/" title="Tomcat">Tomcat<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Web/" title="Web">Web<sup>6</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/ZooKeeper/" title="ZooKeeper">ZooKeeper<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/多线程/" title="多线程">多线程<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/数据仓库/" title="数据仓库">数据仓库<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/算法/" title="算法">算法<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/重构/" title="重构">重构<sup>1</sup></a></li>
-		  
-		
-		</ul>
-</div>
-
-
-  
-<div class="tagslist">
-	<p class="asidetitle">標簽</p>
-		<ul class="clearfix">
-		
-			
-				<li><a href="/tags/Spark/" title="Spark">Spark<sup>26</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Java/" title="Java">Java<sup>11</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Web/" title="Web">Web<sup>9</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Akka/" title="Akka">Akka<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spring/" title="Spring">Spring<sup>7</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hive/" title="Hive">Hive<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Hadoop/" title="Hadoop">Hadoop<sup>6</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Scala/" title="Scala">Scala<sup>5</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Yarn/" title="Yarn">Yarn<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/多线程/" title="多线程">多线程<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark-Streaming/" title="Spark Streaming">Spark Streaming<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/算法/" title="算法">算法<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Session/" title="Session">Session<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Cookie/" title="Cookie">Cookie<sup>3</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HDFS/" title="HDFS">HDFS<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Spark2-0/" title="Spark2.0">Spark2.0<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Junit/" title="Junit">Junit<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/REST/" title="REST">REST<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/java/" title="java">java<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/UDF/" title="UDF">UDF<sup>2</sup></a></li>
-			
-		
-		</ul>
-</div>
-
-
-  <div class="linkslist">
-  <p class="asidetitle">友情鏈接</p>
-    <ul>
-        
-          <li>
-            
-            	<a href="http://slamke.blogspot.com/" target="_blank" title="我的博客">我的博客</a>
-            
-          </li>
-        
-    </ul>
-</div>
-
-  
-
-
-  <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
-</div>
-
-  <div class="weiboshow">
-  <p class="asidetitle">新浪微博</p>
-    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=&dpc=1"></iframe>
-</div>
-
-
-</aside>
-</div>
-    </div>
-    <footer><div id="footer" >
-	
-	<div class="line">
-		<span></span>
-		<div class="author"></div>
-	</div>
-	
-	
-	<section class="info">
-		<p> Hello ,I&#39;m Larry Page in Google. <br/>
-			This is my blog,believe it or not.</p>
-	</section>
-	 
-	<div class="social-font" class="clearfix">
-		
-		
-		<a href="https://github.com/slamke" target="_blank" class="icon-github" title="github"></a>
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		<a href="mailto:sunke3296@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
-		
-	</div>
-			
-		
-
-		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
-		
-		<a href="/about" target="_blank" title="Sun Ke">Sun Ke</a>
-		
-		
-		</p>
-</div>
-</footer>
-    <script src="/js/jquery-2.0.3.min.js"></script>
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.navbar').click(function(){
-    $('header nav').toggleClass('shownav');
-  });
-  var myWidth = 0;
-  function getSize(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-  };
-  var m = $('#main'),
-      a = $('#asidepart'),
-      c = $('.closeaside'),
-      o = $('.openaside');
-  c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
-  });
-  o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
-  });
-  $(window).scroll(function(){
-    o.css("top",Math.max(80,260-$(this).scrollTop()));
-  });
-  
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else{
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
       
-      $('#toc.toc-aside').css('display', 'none');
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Scala/" rel="tag"># Scala</a>
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/15/Spark的UDF/" rel="next" title="Spark的UDF">
+                <i class="fa fa-chevron-left"></i> Spark的UDF
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/19/Java的通用I-O-API设计/" rel="prev" title="Java的通用I/O API设计">
+                Java的通用I/O API设计 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
         
-    }
-  });
-});
-</script>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Sun Ke</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lazy-Initialization"><span class="nav-number">1.</span> <span class="nav-text">Lazy Initialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Singleton-Pattern"><span class="nav-number">2.</span> <span class="nav-text">Singleton Pattern</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Adapter-Pattern"><span class="nav-number">3.</span> <span class="nav-text">Adapter Pattern</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Value-Object"><span class="nav-number">4.</span> <span class="nav-text">Value Object</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sun Ke</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
 
 <script type="text/javascript">
-$(document).ready(function(){ 
-  var ai = $('.article-content>iframe'),
-      ae = $('.article-content>embed'),
-      t  = $('#toc'),
-      ta = $('#toc.toc-aside'),
-      o  = $('.openaside'),
-      c  = $('.closeaside');
-  if(ai.length>0){
-    ai.wrap('<div class="video-container" />');
-  };
-  if(ae.length>0){
-   ae.wrap('<div class="video-container" />');
-  };
-  c.click(function(){
-    ta.css('display', 'block').addClass('fadeIn');
-  });
-  o.click(function(){
-    ta.css('display', 'none');
-  });
-  $(window).scroll(function(){
-    ta.css("top",Math.max(140,320-$(this).scrollTop()));
-  });
-});
-</script>
-
-
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var $this = $('.share'),
-      url = $this.attr('data-url'),
-      encodedUrl = encodeURIComponent(url),
-      title = $this.attr('data-title'),
-      tsina = $this.attr('data-tsina'),
-      description = $this.attr('description');
-  var html = [
-  '<div class="hoverqrcode clearfix"></div>',
-  '<a class="overlay" id="qrcode"></a>',
-  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
-  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
-  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
-  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
-  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
-  '<span title="Share to"></span>'
-  ].join('');
-  $this.append(html);
-
-  $('.hoverqrcode').hide();
-
-  var myWidth = 0;
-  function updatehoverqrcode(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-    var qrsize = myWidth > 1024 ? 200:100;
-    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
-    var p = $('.article-share-qrcode').position();
-    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
-                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
-                          .qrcode(options);
-  };
-  $(window).resize(function(){
-    $('.hoverqrcode').hide();
-  });
-  $('.article-share-qrcode').click(function(){
-    updatehoverqrcode();
-    $('.hoverqrcode').toggle();
-  });
-  $('.article-share-qrcode').hover(function(){}, function(){
-      $('.hoverqrcode').hide();
-  });
-});   
-</script>
-
-
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){ 
-  $('.article-content').each(function(i){
-    $(this).find('img').each(function(){
-      if ($(this).parent().hasClass('fancybox')) return;
-      var alt = this.alt;
-      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
-      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
-    });
-    $(this).find('.fancybox').each(function(){
-      $(this).attr('rel', 'article' + i);
-    });
-  });
-  if($.fancybox){
-    $('.fancybox').fancybox();
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
-}); 
 </script>
 
 
 
-<!-- Analytics Begin -->
 
 
 
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
 
 
 
-<!-- Analytics End -->
-
-<!-- Totop Begin -->
-
-	<div id="totop">
-	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
-	</div>
-	<script src="/js/totop.js"></script>
-
-<!-- Totop End -->
-
-<!-- MathJax Begin -->
-<!-- mathjax config similar to math.stackexchange -->
+  
 
 
-<!-- MathJax End -->
 
-<!-- Tiny_search Begin -->
 
-<!-- Tiny_search End -->
 
-  </body>
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
 </html>
