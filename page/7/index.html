@@ -249,6 +249,374 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/10/Scala-mutable和immutable类型转换/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/08/10/Scala-mutable和immutable类型转换/" itemprop="url">Scala mutable和immutable类型转换</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-10T09:46:12+08:00">
+                2016-08-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Scala/" itemprop="url" rel="index">
+                    <span itemprop="name">Scala</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/10/Scala-mutable和immutable类型转换/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/08/10/Scala-mutable和immutable类型转换/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>一般而言，from mutable to immutable, 使用 to<em> 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.<br>from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _</em>).</p>
+<blockquote>
+<p>Note that the to* methods like toList, toMap are is performed in constant time.</p>
+</blockquote>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> mutableMap1 = immutableMap.toMap() <span class="comment">// after 2.8</span></span><br><span class="line"><span class="keyword">val</span> mutbaleMap2 = collection.immutable.<span class="type">Map</span>(x.toList: _*) <span class="comment">// before 2.8</span></span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableMap = scala.collection.immutable.<span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="string">"1"</span>, <span class="number">2</span> -&gt; <span class="string">"2"</span>)</span><br><span class="line"><span class="keyword">val</span> mutableMap = scala.collection.mutable.<span class="type">Map</span>(immutableMap: _*)</span><br></pre></td></tr></table></figure>
+<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = mutableListBuffer.toList</span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = scala.collection.immutable.<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> mutableListBuffer = scala.collection.mutable.<span class="type">ListBuffer</span>(immutableList: _*)</span><br></pre></td></tr></table></figure>
+<p><a href="http://qiita.com/visualskyrim/items/1e92fc99fc3eaf004778" target="_blank" rel="noopener">参考链接</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/04/Spark性能优化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/08/04/Spark性能优化/" itemprop="url">Spark性能优化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-04T12:33:05+08:00">
+                2016-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/04/Spark性能优化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/08/04/Spark性能优化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>参考:<br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-1/" target="_blank" rel="noopener">how-to-tune-your-apache-spark-jobs-part-1</a><br><a href="http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/" target="_blank" rel="noopener">how-to-tune-your-apache-spark-jobs-part-2</a><br><a href="http://gitlab.baidu.com/metastore/metastore_doc/blob/master/file/tuning_spark_streaming.md" target="_blank" rel="noopener">tuning_spark_streaming</a><br><a href="http://www.iteblog.com/archives/1333" target="_blank" rel="noopener">Spark Streaming性能调优详解</a></p>
+<p><a href="http://www.iteblog.com/archives/1672" target="_blank" rel="noopener">Spark性能优化：shuffle调优</a><br><a href="http://www.iteblog.com/archives/1671" target="_blank" rel="noopener">Spark性能优化：数据倾斜调优</a></p>
+<p><a href="http://www.iteblog.com/archives/1657" target="_blank" rel="noopener">Spark性能优化：开发调优篇</a><br><a href="https://spark-summit.org/east-2016/events/top-5-mistakes-when-writing-spark-applications/" target="_blank" rel="noopener">top-5-mistakes-when-writing-spark-applications</a>  强力推荐</p>
+<h2 id="一-基础说明"><a href="#一-基础说明" class="headerlink" title="一 基础说明"></a>一 基础说明</h2><ul>
+<li>job–&gt;stage–&gt;task<br>job划分为stage，stage划分为Task，一个Task运行在一个core上</li>
+<li>executor–&gt;core<br>The number of tasks in a stage is the same as the number of partitions in the last RDD in the stage. </li>
+</ul>
+<h2 id="二-Tuning-Resource-Allocation"><a href="#二-Tuning-Resource-Allocation" class="headerlink" title="二 Tuning Resource Allocation"></a>二 Tuning Resource Allocation</h2><p><a href="http://www.infoq.com/cn/presentations/gc-tuning-of-spark-application" target="_blank" rel="noopener">Spark应用的GC调优</a> –&gt;重点讲解了G1垃圾回收器的调优工作<br><a href="http://www.iteblog.com/archives/1659" target="_blank" rel="noopener">Spark性能优化：资源调优篇</a><br>Every Spark executor in an application has the same fixed number of cores and same fixed heap size.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--executor-cores/ spark.executor.cores 提交时通过该参数设置每个executor的core数量，决定了<span class="type">Task</span>的并行度</span><br><span class="line">--executor-memory/spark.executor.memory 设置executor的<span class="type">JVM</span> memory</span><br><span class="line">--num-executors/spark.executor.instances 设置executor的数量</span><br><span class="line">spark.dynamicAllocation.enabled 设置动态申请资源(value设为<span class="literal">true</span>)，此时不要设置num-executors</span><br><span class="line">spark.yarn.executor.memoryOverhead 设置堆外的memory大小</span><br></pre></td></tr></table></figure>
+<h3 id="spark-dynamicAllocation-enabled"><a href="#spark-dynamicAllocation-enabled" class="headerlink" title="spark.dynamicAllocation.enabled"></a>spark.dynamicAllocation.enabled</h3><p>executor空闲超时后，会被移除<br>对于Spark Streaming，数据按时间段到达，为了防止executor频繁出现添加移除现象，应该禁用该功能。</p>
+<h3 id="内存格局"><a href="#内存格局" class="headerlink" title="内存格局"></a>内存格局</h3><p><img src="https://github.com/slamke/image/blob/master/spark/spark-memory.png?raw=true" alt=""></p>
+<p>说明:</p>
+<ul>
+<li><p>The application master, which is a non-executor container with the special capability of requesting containers from YARN, takes up resources of its own that must be budgeted in. In yarn-client mode, it defaults to a 1024MB and one vcore. In yarn-cluster mode, the application master runs the driver, so it’s often useful to bolster its resources with the –driver-memory and –driver-cores properties.</p>
+</li>
+<li><p>Running executors with too much memory often results in excessive garbage collection delays. 64GB is a rough guess at a good upper limit for a single executor.最多4G内存，防止GC压力过大。</p>
+</li>
+<li><p>I’ve noticed that the HDFS client has trouble with tons of concurrent threads. A rough guess is that at most five tasks per executor can achieve full write throughput, so it’s good to keep the number of cores per executor below that number. 最多5个Task可以同时达到最高的HDFS写入带宽</p>
+</li>
+<li><p>Running tiny executors (with a single core and just enough memory needed to run a single task, for example) throws away the benefits that come from running multiple tasks in a single JVM. For example, broadcast variables need to be replicated once on each executor, so many small executors will result in many more copies of the data.</p>
+</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h3><p>保留内存和core给hadoop ，yarn等系统运行</p>
+<h3 id="Slimming-Down-Your-Data-Structures"><a href="#Slimming-Down-Your-Data-Structures" class="headerlink" title="Slimming Down Your Data Structures"></a>Slimming Down Your Data Structures</h3><p>定制序列化方法,减少序列化后的存储占用<br>spark.serializer=org.apache.spark.serializer.KryoSerializer</p>
+<h2 id="三-Tuning-Parallelism"><a href="#三-Tuning-Parallelism" class="headerlink" title="三 Tuning Parallelism"></a>三 Tuning Parallelism</h2><p>分区过少时，Task数量有限，无法充分利用机器资源。<br>方法:</p>
+<ul>
+<li>Use the repartition transformation, which will trigger a shuffle.</li>
+<li>Configure your InputFormat to create more splits.</li>
+<li>Write the input data out to HDFS with a smaller block size.</li>
+</ul>
+<h3 id="3-1-参数spark-default-parallelism"><a href="#3-1-参数spark-default-parallelism" class="headerlink" title="3.1 参数spark.default.parallelism"></a>3.1 参数spark.default.parallelism</h3><p>参数说明：该参数用于设置每个stage的默认task数量。这个参数极为重要，如果不设置可能会直接影响你的Spark作业性能。</p>
+<p>　　参数调优建议：Spark作业的默认task数量为500~1000个较为合适。很多同学常犯的一个错误就是不去设置这个参数，那么此时就会导致Spark自己根据底层HDFS的block数量来设置task的数量，默认是一个HDFS block对应一个task。通常来说，Spark默认设置的数量是偏少的（比如就几十个task），如果task数量偏少的话，就会导致你前面设置好的Executor的参数都前功尽弃。</p>
+<h2 id="减少shuffle以及shuffle的数据量"><a href="#减少shuffle以及shuffle的数据量" class="headerlink" title="减少shuffle以及shuffle的数据量"></a>减少shuffle以及shuffle的数据量</h2><ul>
+<li><p>操作<strong>repartition</strong> , <strong>join</strong>, <strong>cogroup</strong>, and any of the <strong>*By</strong> or <strong>*ByKey</strong> transformations can result in shuffles. </p>
+</li>
+<li><p>Avoid <strong>groupByKey</strong> when performing an associative reductive operation. For example, <strong>rdd.groupByKey().mapValues(_.sum)</strong> will produce the same results as <strong>rdd.reduceByKey(_ + _)</strong><br>However, the former will transfer the entire dataset across the network, while the latter will compute local sums for each key in each partition and combine those local sums into larger sums after shuffling.<br><img src="https://github.com/slamke/image/blob/master/spark/reduce_by.png?raw=true" alt=""><br><img src="https://github.com/slamke/image/blob/master/spark/group_by.png?raw=true" alt=""><br>以下函数应该优先于 groupByKey ：</p>
+</li>
+</ul>
+<ol>
+<li>combineByKey组合数据，但是组合之后的数据类型与输入时值的类型不一样。</li>
+<li>foldByKey 合并每一个 key 的所有值，在级联函数和“零值”中使用。</li>
+</ol>
+<ul>
+<li>Avoid <strong>reduceByKey</strong> When the input and output value types are different. <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map(kv =&gt; (kv._1, <span class="keyword">new</span> <span class="type">Set</span>[<span class="type">String</span>]() + kv._2))</span><br><span class="line">    .reduceByKey(_ ++ _)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>This code results in tons of unnecessary object creation because a new set must be allocated for each record. It’s better to use aggregateByKey, which performs the map-side aggregation more efficiently:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> zero = <span class="keyword">new</span> collection.mutable.<span class="type">Set</span>[<span class="type">String</span>]()</span><br><span class="line">rdd.aggregateByKey(zero)(</span><br><span class="line">    (set, v) =&gt; set += v,</span><br><span class="line">    (set1, set2) =&gt; set1 ++= set2)</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>Avoid the <figure class="highlight plain"><figcaption><span>pattern. When two datasets are already grouped by key and you want to join them and keep them grouped, you can just use ```cogroup```. That avoids all the overhead associated with unpacking and repacking the groups.     join数据源时直接使用```cogroup```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 四 shuffle不发生的情况</span><br><span class="line">- 两个数据源进行join时，已经进行group分组后，如果分组时使用的是同样的partitioner，那么进行join时是不需要进行shuffle的。</span><br><span class="line">- 当数据量较少时，使用广播变量，不需要shuffle</span><br><span class="line"></span><br><span class="line">## When More Shuffles are Better</span><br><span class="line">当数据partition较少，数据量较大时，进行shuffle可以提高partition数量，提高并行度，从而达到提高效率的目的。</span><br><span class="line"></span><br><span class="line">## 五 RDD</span><br><span class="line">[Spark性能优化：开发调优篇](http://www.iteblog.com/archives/1657)</span><br><span class="line">- 原则一：避免创建重复的RDD</span><br><span class="line">- 原则二：尽可能复用同一个RDD</span><br><span class="line">- 原则三：对多次使用的RDD进行持久化  cache persist</span><br><span class="line">- 原则四：尽量避免使用shuffle类算子  广播大变量 </span><br><span class="line">- 原则五：使用map-side预聚合的shuffle操作</span><br><span class="line">- 原则六：使用高性能的算子</span><br><span class="line">	- **使用reduceByKey/aggregateByKey替代groupByKey**</span><br><span class="line">	- **使用mapPartitions替代普通map(mapPartitions类的算子**，一次函数调用会处理一个partition所有的数据，而不是一次函数调用处理一条，性能相对来说会高一些。)</span><br><span class="line">	- **使用foreachPartitions替代foreach**(一次函数调用处理一个partition的所有数据，而不是一次函数调用处理一条数据)</span><br><span class="line">	- **使用filter之后进行coalesce操作**(通常对一个RDD执行filter算子过滤掉RDD中较多数据后（比如30%以上的数据），建议使用coalesce算子，手动减少RDD的partition数量，将RDD中的数据压缩到更少的partition中去。)</span><br><span class="line">- 原则七：广播大变量 </span><br><span class="line">- 原则八：使用Kryo优化序列化性能</span><br><span class="line">- 原则九：优化数据结构</span><br><span class="line">## 5.1 不要将大型RDD中所有元素发送到Driver端</span><br><span class="line">慎重使用```collect countByKey countByValue collectAsMap```等函数，使用```take或者takeSample```来限制数据大小的上限</span><br><span class="line"></span><br><span class="line">## 六 其他</span><br><span class="line">### 6.1 Spark优化：禁止应用程序将依赖的Jar包传到HDFS</span><br><span class="line">[Spark优化：禁止应用程序将依赖的Jar包传到HDFS](http://www.iteblog.com/archives/1173)</span><br><span class="line">编辑spark-default.conf文件，添加以下内容：</span><br><span class="line">spark.yarn.jar=hdfs://my/home/iteblog/spark_lib/spark-assembly-1.1.0-hadoop2.2.0.jar</span><br><span class="line">也就是使得spark.yarn.jar指向我们HDFS上的Spark lib库。</span><br><span class="line">### 6.2 参数配置相关</span><br><span class="line">1. Always use ```–-verbose``` option on ‘spark-submit’ command to run your workload    log会打印相关的spark参数信息</span><br><span class="line">Example command:</span><br><span class="line">spark-submit --driver-memory 10g --verbose --master yarn --executor-memory </span><br><span class="line">2. Use ```--packages``` to include comma-separated list of Maven coordinates of JARs</span><br><span class="line">This includes JARs on both driver and executor classpaths</span><br><span class="line"></span><br><span class="line">3. Typical workloads that need large driver heap size</span><br><span class="line">- Spark SQL</span><br><span class="line">- Spark Streaming</span><br><span class="line"></span><br><span class="line">4. GC policies Tuning options</span><br><span class="line">- Spark default is -XX:UseParallelGC</span><br><span class="line">- Try overwrite with –XX:G1GC</span><br><span class="line"></span><br><span class="line">5.  No space left on device</span><br><span class="line">``` shell</span><br><span class="line">Lost task 38.4 in stage 89.3 (TID 30100, rhel4.cisco.com): java.io.IOException: No space left on device</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>Complains about ‘/tmp’ is full<br>§ Controlled by ‘spark.local.dir’ parameter</p>
+<ul>
+<li>Default is ‘/tmp’</li>
+<li>Stores map output files and RDDs<br>Two reasons ‘/tmp’ is not an ideal place for Spark “scratch” space</li>
+<li>‘/tmp’ usually is small and for OS</li>
+<li>‘/tmp’ usually is a single disk, a potential IO bottleneck<br>§ To fix, add the following line to ‘spark-defaults.conf’ file:<br>spark.local.dir /data/disk1/tmp,/data/disk2/tmp,/data/disk3/tmp,/data/disk4/tmp,</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/07/31/Java动态技术/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1635,322 +2003,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/05/常见Web容器的ClassLoader机制/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/05/05/常见Web容器的ClassLoader机制/" itemprop="url">常见Web容器的ClassLoader机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-05T16:59:40+08:00">
-                2016-05-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web/" itemprop="url" rel="index">
-                    <span itemprop="name">Web</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/05/05/常见Web容器的ClassLoader机制/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/05/05/常见Web容器的ClassLoader机制/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="http://jm.taobao.org/2013/11/24/3217/" target="_blank" rel="noopener">流web容器(jetty,tomcat,jboss)的classloader机制对比和相关问题分析</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/04/SpringTest整合JUnit4使用总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/05/04/SpringTest整合JUnit4使用总结/" itemprop="url">SpringTest整合JUnit4使用总结</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-04T21:11:50+08:00">
-                2016-05-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/05/04/SpringTest整合JUnit4使用总结/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/05/04/SpringTest整合JUnit4使用总结/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="一-加入依赖包"><a href="#一-加入依赖包" class="headerlink" title="一 加入依赖包"></a>一 加入依赖包</h1><p>使用Spring的测试框架需要加入以下依赖包：</p>
-<ul>
-<li>JUnit 4 （官方下载：<a href="http://www.junit.org/）" target="_blank" rel="noopener">http://www.junit.org/）</a></li>
-<li>Spring Test （Spring框架中的test包）</li>
-<li>Spring 相关其他依赖包（不再赘述了，就是context等包）<h1 id="二-创建测试源目录和包"><a href="#二-创建测试源目录和包" class="headerlink" title="二 创建测试源目录和包"></a>二 创建测试源目录和包</h1>在此，推荐创建一个和src平级的源文件目录，因为src内的类都是为日后产品准备的，而此处的类仅仅用于测试。而包的名称可以和src中的目录同名，这样由于在test源目录中，所以不会有冲突，而且名称又一模一样，更方便检索。<h1 id="三-创建测试类"><a href="#三-创建测试类" class="headerlink" title="三 创建测试类"></a>三 创建测试类</h1>创建一个测试用的类，推荐名称为 “被测试类名称 + Test”。<br>测试类应该继承与 <figure class="highlight plain"><figcaption><span>```AbstractTransactionalJUnit4SpringContextTests```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">对于 AbstractJUnit4springcontextTests 和 AbstractTransactionalJUnit4SpringContextTests 类的选择：</span><br><span class="line">如果再你的测试类中，需要用到事务管理（比如要在测试结果出来之后回滚测试内容），就可以使用AbstractTransactionalJUnit4SpringTests类。事务管理的使用方法和正常使用Spring事务管理是一样的。再此需要注意的是，如果想要使用声明式事务管理，即使用AbstractTransactionalJUnitSpringContextTests类，请在applicationContext.xml文件中加入transactionManager bean：</span><br><span class="line">``` xml</span><br><span class="line">&lt;bean id=&quot;transactionManager&quot;</span><br><span class="line">    class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>如果没有添加上述bean，将会抛出NoSuchBeanDefinitionException，指明 No bean named ‘transactionManager’ is definded.</p>
-<h1 id="四-配置测试类"><a href="#四-配置测试类" class="headerlink" title="四 配置测试类"></a>四 配置测试类</h1><p>添加如下内容在class前，用于配置applicationContext.xml文件的位置。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br></pre></td></tr></table></figure></p>
-<h1 id="五-创建测试方法"><a href="#五-创建测试方法" class="headerlink" title="五 创建测试方法"></a>五 创建测试方法</h1><p>创建测试用方法，推荐名称为 “被测方法名称+ Test”。<br>测试方法上方加入 @Test</p>
-<h1 id="六-通过JUnit-4-执行"><a href="#六-通过JUnit-4-执行" class="headerlink" title="六 通过JUnit 4 执行"></a>六 通过JUnit 4 执行</h1><p>右键方法名，选择则“Run As”→“JUnit Test”即可</p>
-<p>附录1：整体测试类文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @(#) UserDaoTest.java</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> com.phj.dao;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.phj.entity.User;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class)</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(locations = <span class="string">"classpath:applicationContext.xml"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoTest</span> <span class="keyword">extends</span> <span class="title">AbstractJUnit4SpringContextTests</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> UserDaoInterface userDao;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saveTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        User user1 = <span class="keyword">new</span> User();</span><br><span class="line">        user1.setUsername(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user1.setNickName(<span class="string">"tom"</span>);</span><br><span class="line">        user1.setEmail(<span class="string">"tom@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user2 = <span class="keyword">new</span> User();</span><br><span class="line">        user2.setUsername(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user2.setNickName(<span class="string">"admin"</span>);</span><br><span class="line">        user2.setEmail(<span class="string">"admin@admin.com"</span>);</span><br><span class="line">        </span><br><span class="line">        User user3 = <span class="keyword">new</span> User();</span><br><span class="line">        user3.setUsername(<span class="string">"feihong"</span>);</span><br><span class="line">        user3.setPassword(<span class="string">"123456"</span>);</span><br><span class="line">        user3.setNickName(<span class="string">"phj"</span>);</span><br><span class="line">        user3.setEmail(<span class="string">"test@gmail.com"</span>);</span><br><span class="line">        </span><br><span class="line">        userDao.save(user1);</span><br><span class="line">        userDao.save(user2);</span><br><span class="line">        userDao.save(user3);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2001,7 +2053,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-count">100</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2023,7 +2075,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

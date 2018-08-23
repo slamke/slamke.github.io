@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,JDK," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java生产环境下问题排查 Java内存泄漏分析系列之一：使用jstack定位线程堆栈信息 Java内存泄漏分析系列之二：jstack生成的Thread Dump日志结构解析 Java内存泄漏分析系列之三：jstat命令的使用及VM Thread分析 Java内存泄漏分析系列之四：jstack生成的Thread Dump日志线程状态 Java内存泄漏分析系列之五：常见的Thread Dump日志案">
+<meta name="keywords" content="Java,JDK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JDK的bin下的工具有哪些功能">
+<meta property="og:url" content="http://slamke.github.io/2018/08/23/JDK的bin下的工具有哪些功能/index.html">
+<meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
+<meta property="og:description" content="Java生产环境下问题排查 Java内存泄漏分析系列之一：使用jstack定位线程堆栈信息 Java内存泄漏分析系列之二：jstack生成的Thread Dump日志结构解析 Java内存泄漏分析系列之三：jstat命令的使用及VM Thread分析 Java内存泄漏分析系列之四：jstack生成的Thread Dump日志线程状态 Java内存泄漏分析系列之五：常见的Thread Dump日志案">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-23T03:10:54.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JDK的bin下的工具有哪些功能">
+<meta name="twitter:description" content="Java生产环境下问题排查 Java内存泄漏分析系列之一：使用jstack定位线程堆栈信息 Java内存泄漏分析系列之二：jstack生成的Thread Dump日志结构解析 Java内存泄漏分析系列之三：jstat命令的使用及VM Thread分析 Java内存泄漏分析系列之四：jstack生成的Thread Dump日志线程状态 Java内存泄漏分析系列之五：常见的Thread Dump日志案">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://slamke.github.io/2018/08/23/JDK的bin下的工具有哪些功能/"/>
+
+
+
+
+
+  <title>JDK的bin下的工具有哪些功能 | 雁渡寒潭 风吹疏竹</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">雁渡寒潭 风吹疏竹</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">教练，我想打篮球</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2018/08/23/JDK的bin下的工具有哪些功能/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JDK的bin下的工具有哪些功能</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-23T11:08:23+08:00">
+                2018-08-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/23/JDK的bin下的工具有哪些功能/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/23/JDK的bin下的工具有哪些功能/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://www.wangtianyi.top/blog/2018/07/20/javasheng-chan-huan-jing-xia-wen-ti-pai-cha/" target="_blank" rel="noopener">Java生产环境下问题排查</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/19/33151873.html" target="_blank" rel="noopener">Java内存泄漏分析系列之一：使用jstack定位线程堆栈信息</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/19/51301886.html" target="_blank" rel="noopener">Java内存泄漏分析系列之二：jstack生成的Thread Dump日志结构解析</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/20/12131956.html" target="_blank" rel="noopener">Java内存泄漏分析系列之三：jstat命令的使用及VM Thread分析</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/25/36441958.html" target="_blank" rel="noopener">Java内存泄漏分析系列之四：jstack生成的Thread Dump日志线程状态</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/26/08572060.html" target="_blank" rel="noopener">Java内存泄漏分析系列之五：常见的Thread Dump日志案例分析</a></p>
+<p><a href="https://www.javatang.com/archives/2017/10/30/53562102.html" target="_blank" rel="noopener">Java内存泄漏分析系列之六：JVM Heap Dump（堆转储文件）的生成和MAT的使用</a></p>
+<h3 id="查看JVM参数"><a href="#查看JVM参数" class="headerlink" title="查看JVM参数"></a>查看JVM参数</h3><p><code>jps -l</code> 查看所有正在运行的Java程序，同时显示启动类类名，获取到PID</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">4706 org.apache.catalina.startup.Bootstrap</span><br><span class="line">5023 sun.tools.jps.Jps</span><br></pre></td></tr></table></figure>
+<p><code>jinfo -flags PID</code> 查看运行时进程参数与JVM参数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Attaching to process ID 28987, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.171-b11</span><br><span class="line">Non-default VM flags: -XX:CICompilerCount=3 -XX:InitialHeapSize=132120576 -XX:MaxHeapSize=2092957696 -XX:MaxNewSize=697303040 -XX:MinHeapDeltaBytes=524288 -XX:NewSize=44040192 -XX:OldSize=88080384 -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseParallelGC</span><br><span class="line">Command line:  -Dspring.config.location=application.properties -Dspring.profiles.active=staging</span><br></pre></td></tr></table></figure>
+<p><code>java -XX:+PrintFlagsFinal -version</code> 查看当前虚拟机默认JVM参数</p>
+<h3 id="查看即时GC状态"><a href="#查看即时GC状态" class="headerlink" title="查看即时GC状态"></a>查看即时GC状态</h3><p><code>jstat -gc PID 1000 10</code> 每秒查看一次gc信息，共10次</p>
+<p>输出比较多的参数，每个字段的解释参看 <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT   </span><br><span class="line">512.0  512.0   15.3   0.0    4416.0   1055.2   11372.0     7572.5   14720.0 14322.5 1664.0 1522.8     40    0.137   8      0.039    0.176</span><br></pre></td></tr></table></figure>
+<p>期间可能碰到提示<code>sun.jvm.hotspot.runtime.VMVersionMismatchException: Supported versions are 24.181-b01. Target VM is 25.171-b11</code>的问题，原因在于安装了多个版本，使用<code>which</code>、<code>ls -l</code>可简介定位到与当前执行Java程序相同的Java版本</p>
+<h3 id="内存问题"><a href="#内存问题" class="headerlink" title="内存问题"></a>内存问题</h3><p>内存泄露导致OOM？内存占用异常的高？这是生产环境常常出现的问题，Java提供dump文件供我们对内存里发生过的事情进行了记录，我们需要借助一些工具从中获取有价值的信息。</p>
+<h4 id="导出Dump文件"><a href="#导出Dump文件" class="headerlink" title="导出Dump文件"></a>导出Dump文件</h4><ol>
+<li>提前对Java程序加上这些<strong>参数</strong>印dump文件 <code>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./</code></li>
+<li>对正在运行的程序使用<strong>jmap</strong>：<code>jmap -dump:format=b,file=heap.hprof PID</code></li>
+</ol>
+<h4 id="分析Dump文件"><a href="#分析Dump文件" class="headerlink" title="分析Dump文件"></a>分析Dump文件</h4><p>如果Dump文件不太大的话，可以传到 <a href="http://heaphero.io/index.jsp" target="_blank" rel="noopener">http://heaphero.io/index.jsp</a> 来分析</p>
+<p>文件比较大，且想进行更加系统的分析，推荐使用<a href="https://www.eclipse.org/mat/" target="_blank" rel="noopener">MAT</a>分析，有如下几种常用查看方式</p>
+<ol>
+<li>首页中的【Leak Suspects】能推测出问题所在</li>
+<li>点击【Create a histogram from an arbitrary set of objects】查到所有对象的数量</li>
+<li>右键点击某个对象【Merge Shortest Paths to GC Roots】-&gt; 【exclude all phantom/weak/soft etc. references】能查询到大量数量的某个对象是哪个GC ROOT引用的</li>
+</ol>
+<h3 id="线程问题"><a href="#线程问题" class="headerlink" title="线程问题"></a>线程问题</h3><p>任务长时间不退出？CPU 负载过高？很可能因为死循环或者死锁，导致某些线程一直执行不被中断，但是不报错是最烦人的，所以日志里看不到错误信息，并且又不能用dump文件分析，因为跟内存无关。这个时候就需要用线程分析工具来帮我们了。</p>
+<h4 id="导出jstack文件"><a href="#导出jstack文件" class="headerlink" title="导出jstack文件"></a>导出jstack文件</h4><p>使用<code>jstack PID &gt; 文件</code>，如果失败请加<code>-F</code>参数，如果还失败请使用Java程序启动时使用的用户执行jstack</p>
+<h4 id="排查步骤"><a href="#排查步骤" class="headerlink" title="排查步骤"></a>排查步骤</h4><ol>
+<li><code>top</code> 查看到哪个java程序负载高</li>
+<li><code>top -p PID -H</code> 查看该进程所有进程的运行状态</li>
+<li>记录下高负载的线程ID，<code>printf &quot;&amp;x&quot; PID</code>转换成16进制</li>
+<li><code>jstack PID &gt; 文件</code></li>
+<li>在jstack文件中用转换成16进制之后的线程ID查询线程运行堆栈</li>
+<li>从堆栈中了解到线程在执行什么任务，并结合业务与代码判断问题所在</li>
+</ol>
+<p>以下转载自:  <a href="http://www.codingwhy.com/view/858.html" target="_blank" rel="noopener">http://www.codingwhy.com/view/858.html</a></p>
+<p>Java开发人员肯定都知道JDK的bin目录中有“java”、“javac”这两个命令行工具，但并非所有的程序员都了解过JDK的bin目录之中的其他工具的作用。</p>
+<p>这些工具被Sun公司作为“礼物”附赠给JDK的使用者，并在软件的使用说明中把他们申明为“没有技术支持并且是试验性质的（unsupported and experimental）”的产品，但事实上，这些工具都非常的稳定且功能强大，能在处理应用程序性能问题、定位故障时发挥很大的作用。</p>
+<p>细心的可能会发现，这些工具都非常小，是因为这些工具大多是jdk/lib/tools.jar类库的一层包装而已，他们主要的功能代码是在tools类库中实现的。</p>
+<h2 id="Java故障检修，程序概要分析，监视和管理工具"><a href="#Java故障检修，程序概要分析，监视和管理工具" class="headerlink" title="Java故障检修，程序概要分析，监视和管理工具"></a>Java故障检修，程序概要分析，监视和管理工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jvisualvm</td>
+<td>一个图形化的Java虚拟机  参考: <a href="https://blog.csdn.net/a19881029/article/details/8432368" target="_blank" rel="noopener"> Java jvisualvm简要说明</a></td>
+</tr>
+<tr>
+<td>jconsole</td>
+<td>java监视台和管理控制台 参考: <a href="http://jiajun.iteye.com/blog/810150" target="_blank" rel="noopener">如何利用 JConsole观察分析Java程序的运行，进行排错调优</a>  <a href="https://www.ibm.com/support/knowledgecenter/zh/SSYKE2_8.0.0/com.ibm.java.vm.80.doc/docs/jconsole.html" target="_blank" rel="noopener">https://www.ibm.com/support/knowledgecenter/zh/SSYKE2_8.0.0/com.ibm.java.vm.80.doc/docs/jconsole.html</a></td>
+</tr>
+<tr>
+<td>jps</td>
+<td>JVM Process Status进程状态工具。列出目标系统的HotSpot JJVM  可以列出本机所有java进程的pid</td>
+</tr>
+<tr>
+<td>jstat</td>
+<td>按照命令行的具体要求记录和收集一个JVM的性能数据</td>
+</tr>
+<tr>
+<td>jstatd</td>
+<td>JVM jstat 的守护进程</td>
+</tr>
+<tr>
+<td>jmc</td>
+<td>Java任务控制工具(Java Mission Control)，主要用于HotSpot JVM的生产时间监测、分析、诊断。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="故障检测和修理工具"><a href="#故障检测和修理工具" class="headerlink" title="故障检测和修理工具"></a>故障检测和修理工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jinfo</td>
+<td>配置或打印某个Java进程VM flag</td>
+</tr>
+<tr>
+<td>jhat</td>
+<td>堆储存查看器</td>
+</tr>
+<tr>
+<td>jmap</td>
+<td>Java内存图</td>
+</tr>
+<tr>
+<td>jsadebugd</td>
+<td>Java的 Serviceability Agent Debug的守护进程</td>
+</tr>
+<tr>
+<td>jstack</td>
+<td>Java堆栈跟踪</td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://my.oschina.net/feichexia/blog/196575" target="_blank" rel="noopener">JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof使用详解</a></p>
+<h2 id="基本工具"><a href="#基本工具" class="headerlink" title="基本工具"></a>基本工具</h2><p>这些工具是JDK的基础，用这些工具来编写应用程序。</p>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>javac</td>
+<td>Java语言编译器</td>
+</tr>
+<tr>
+<td>java</td>
+<td>Java应用程序启动器</td>
+</tr>
+<tr>
+<td>javaw</td>
+<td>Java运行工具，用于运行.class字节码文件或.jar文件，但不会显示控制台输出信息，适用于运行图形化程序。</td>
+</tr>
+<tr>
+<td>javadoc</td>
+<td>Java API文档生成器</td>
+</tr>
+<tr>
+<td>apt</td>
+<td>java 注解处理器  <a href="https://www.jianshu.com/p/82093e5160ae" target="_blank" rel="noopener">「深入Java」Annotation注解</a></td>
+</tr>
+<tr>
+<td>appletviewer</td>
+<td>java applet小程序查看器</td>
+</tr>
+<tr>
+<td>jar</td>
+<td>java文件压缩打包工具</td>
+</tr>
+<tr>
+<td>jdb</td>
+<td>Java调试器</td>
+</tr>
+<tr>
+<td>javah</td>
+<td>C头文件和stub生成器，用于写本地化方法，例如生产JNI样式的头文件</td>
+</tr>
+<tr>
+<td>javap</td>
+<td>class文件反编译工具</td>
+</tr>
+<tr>
+<td>extcheck</td>
+<td>用于检测jar包中的问题</td>
+</tr>
+<tr>
+<td>jcmd</td>
+<td>Java命令行(Java Command)，用于向正在运行的JVM发送诊断命令请求。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安全工具"><a href="#安全工具" class="headerlink" title="安全工具"></a>安全工具</h2><p>这些工具用于设置系统的安全规则和生产可以工作在远端的安全规则下的应用程序</p>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>keytool</td>
+<td>管理密钥库和证书</td>
+</tr>
+<tr>
+<td>jarsigner</td>
+<td>生产和校验JAR签名</td>
+</tr>
+<tr>
+<td>policytool</td>
+<td>有用户界面的规则管理工具</td>
+</tr>
+<tr>
+<td>kinit</td>
+<td>用于获得和缓存网络认证协议Kerberos 票证的授予票证</td>
+</tr>
+<tr>
+<td>klist</td>
+<td>凭据高速缓存和密钥表中的 Kerberos 显示条目</td>
+</tr>
+<tr>
+<td>ktab</td>
+<td>密钥和证书管理工具</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Java国际化工具"><a href="#Java国际化工具" class="headerlink" title="Java国际化工具"></a>Java国际化工具</h2><p>这些工具可以帮助你创建可本地化的应用程序</p>
+<p>native2ascii</p>
+<h2 id="远程方法调用工具"><a href="#远程方法调用工具" class="headerlink" title="远程方法调用工具"></a>远程方法调用工具</h2><p>这些工具可以帮助创建可以和web和网络交互的应用程序</p>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rmic</td>
+<td>生成远程对象的stubs and skeletons(存根和框架)</td>
+</tr>
+<tr>
+<td>rmid</td>
+<td>Java远程方法调用(RMI:Remote Method Invocation)活化系统守护进程</td>
+</tr>
+<tr>
+<td>rmiregistry</td>
+<td>Java远程对象注册表</td>
+</tr>
+<tr>
+<td>serialver</td>
+<td>返回类的 serialVersionUID</td>
+</tr>
+<tr>
+<td>java-rmi</td>
+<td>Java远程方法调用(Java Remote Method Invocation)工具，主要用于在客户机上调用远程服务器上的对象</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Java-IDL-and-RMI-IIOP-工具"><a href="#Java-IDL-and-RMI-IIOP-工具" class="headerlink" title="Java IDL and RMI-IIOP 工具"></a>Java IDL and RMI-IIOP 工具</h2><p>这些工具用于创建使用OMG-Standard IDL 和 CORBA/IIOP 的应用程序</p>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tnameserv</td>
+<td>Java IDL瞬时命名服</td>
+</tr>
+<tr>
+<td>idlj</td>
+<td>生产映射到OMG IDL接口可以使Java应用程序使用CORBA的.java文件</td>
+</tr>
+<tr>
+<td>orbd</td>
+<td>为客户可以在CORBA环境下透明的定位和调用服务器的稳定的对象提供支持</td>
+</tr>
+<tr>
+<td>servertool</td>
+<td>为应用程序提供易于使用的接口用于注册，注销，启动，关闭服务器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Java部署工具"><a href="#Java部署工具" class="headerlink" title="Java部署工具"></a>Java部署工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pack200</td>
+<td>使用java gzip压缩工具将JAR文件转换为压缩的pack200文件，生产打包文件是高度压缩的JAR包，可以直接部署，减少下载时间</td>
+</tr>
+<tr>
+<td>unpack200</td>
+<td>解包pack200文件为JARs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Java-web工具"><a href="#Java-web工具" class="headerlink" title="Java web工具"></a>Java web工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>javaws</td>
+<td>Java web 启动命令行工具</td>
+</tr>
+<tr>
+<td>schemagen</td>
+<td>Java构架的XML Schema生成器</td>
+</tr>
+<tr>
+<td>wsgen</td>
+<td>生成 JAX-WS</td>
+</tr>
+<tr>
+<td>wsimport</td>
+<td>生成 JAX-WS</td>
+</tr>
+<tr>
+<td>xjc</td>
+<td>绑定编译器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Java脚本工具"><a href="#Java脚本工具" class="headerlink" title="Java脚本工具"></a>Java脚本工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jrunscript</td>
+<td>运行脚本</td>
+</tr>
+</tbody>
+</table>
+<h2 id="其他工具"><a href="#其他工具" class="headerlink" title="其他工具"></a>其他工具</h2><table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jabswitch</td>
+<td>Java Access Bridge Switch的简称，用于控制Java访问桥的开/关。Java访问桥是一种技术，让Java应用程序实现Accessibility API，以供Microsoft Windows系统的辅助技术访问。</td>
+</tr>
+<tr>
+<td>javafxpackager</td>
+<td>JavaFX打包工具</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/JDK/" rel="tag"># JDK</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/27/实时流计算-SparkStreaming-Kafka-Redis-Exactly-once-实时去重/" rel="next" title="实时流计算+SparkStreaming+Kafka+Redis+Exactly-once+实时去重">
+                <i class="fa fa-chevron-left"></i> 实时流计算+SparkStreaming+Kafka+Redis+Exactly-once+实时去重
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/23/JMC和JCMD使用/" rel="prev" title="JMC和JCMD使用">
+                JMC和JCMD使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Sun Ke</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">61</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看JVM参数"><span class="nav-number">1.</span> <span class="nav-text">查看JVM参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看即时GC状态"><span class="nav-number">2.</span> <span class="nav-text">查看即时GC状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存问题"><span class="nav-number">3.</span> <span class="nav-text">内存问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#导出Dump文件"><span class="nav-number">3.1.</span> <span class="nav-text">导出Dump文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析Dump文件"><span class="nav-number">3.2.</span> <span class="nav-text">分析Dump文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程问题"><span class="nav-number">4.</span> <span class="nav-text">线程问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#导出jstack文件"><span class="nav-number">4.1.</span> <span class="nav-text">导出jstack文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排查步骤"><span class="nav-number">4.2.</span> <span class="nav-text">排查步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java故障检修，程序概要分析，监视和管理工具"><span class="nav-number"></span> <span class="nav-text">Java故障检修，程序概要分析，监视和管理工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#故障检测和修理工具"><span class="nav-number"></span> <span class="nav-text">故障检测和修理工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本工具"><span class="nav-number"></span> <span class="nav-text">基本工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全工具"><span class="nav-number"></span> <span class="nav-text">安全工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java国际化工具"><span class="nav-number"></span> <span class="nav-text">Java国际化工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远程方法调用工具"><span class="nav-number"></span> <span class="nav-text">远程方法调用工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-IDL-and-RMI-IIOP-工具"><span class="nav-number"></span> <span class="nav-text">Java IDL and RMI-IIOP 工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java部署工具"><span class="nav-number"></span> <span class="nav-text">Java部署工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-web工具"><span class="nav-number"></span> <span class="nav-text">Java web工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java脚本工具"><span class="nav-number"></span> <span class="nav-text">Java脚本工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他工具"><span class="nav-number"></span> <span class="nav-text">其他工具</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sun Ke</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://Sunke.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://slamke.github.io/2018/08/23/JDK的bin下的工具有哪些功能/';
+          this.page.identifier = '2018/08/23/JDK的bin下的工具有哪些功能/';
+          this.page.title = 'JDK的bin下的工具有哪些功能';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://Sunke.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

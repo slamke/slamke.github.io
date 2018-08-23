@@ -249,6 +249,335 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/09/14/Reactor模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/14/Reactor模式/" itemprop="url">Reactor模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-14T16:43:25+08:00">
+                2017-09-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Reactor/" itemprop="url" rel="index">
+                    <span itemprop="name">Reactor</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/14/Reactor模式/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/14/Reactor模式/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Reactor，反应堆还是核电站？"><a href="#Reactor，反应堆还是核电站？" class="headerlink" title="Reactor，反应堆还是核电站？"></a>Reactor，反应堆还是核电站？</h2><h3 id="Reactor的由来"><a href="#Reactor的由来" class="headerlink" title="Reactor的由来"></a>Reactor的由来</h3><p>Reactor是一种广泛应用在服务器端开发的设计模式。Reactor中文大多译为“反应堆”，我当初接触这个概念的时候，就感觉很厉害，是不是它的原理就跟“核反应”差不多？后来才知道其实没有什么关系，从Reactor的兄弟“Proactor”（多译为前摄器）就能看得出来，这两个词的中文翻译其实都不是太好，不够形象。实际上，Reactor模式又有别名“Dispatcher”或者“Notifier”，我觉得这两个都更加能表明它的本质。</p>
+<p>那么，Reactor模式究竟是个什么东西呢？这要从事件驱动的开发方式说起。我们知道，对于应用服务器，一个主要规律就是，CPU的处理速度是要远远快于IO速度的，如果CPU为了IO操作（例如从Socket读取一段数据）而阻塞显然是不划算的。好一点的方法是分为多进程或者线程去进行处理，但是这样会带来一些进程切换的开销，试想一个进程一个数据读了500ms，期间进程切换到它3次，但是CPU却什么都不能干，就这么切换走了，是不是也不划算？</p>
+<p>这时先驱们找到了事件驱动，或者叫回调的方式，来完成这件事情。这种方式就是，应用业务向一个中间人注册一个回调（event handler），当IO就绪后，就这个中间人产生一个事件，并通知此handler进行处理。这种回调的方式，也体现了“好莱坞原则”（Hollywood principle）-“Don’t call us, we’ll call you”，在我们熟悉的IoC中也有用到。看来软件开发真是互通的！</p>
+<p>好了，我们现在来看Reactor模式。在前面事件驱动的例子里有个问题：我们如何知道IO就绪这个事件，谁来充当这个中间人？Reactor模式的答案是：由一个不断等待和循环的单独进程（线程）来做这件事，它接受所有handler的注册，并负责先操作系统查询IO是否就绪，在就绪后就调用指定handler进行处理，这个角色的名字就叫做Reactor。</p>
+<h3 id="Reactor与NIO"><a href="#Reactor与NIO" class="headerlink" title="Reactor与NIO"></a>Reactor与NIO</h3><p>Java中的NIO可以很好的和Reactor模式结合。关于NIO中的Reactor模式，我想没有什么资料能比Doug Lea大神（不知道Doug Lea？看看JDK集合包和并发包的作者吧）在<a href="http://gee.cs.oswego.edu/dl/cpjslides/nio.pdf" target="_blank" rel="noopener">《Scalable IO in Java》</a>解释的更简洁和全面了。NIO中Reactor的核心是Selector，我写了一个简单的Reactor示例，这里我贴一个核心的Reactor的循环（这种循环结构又叫做EventLoop），剩余代码在这里。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">while</span> (!Thread.interrupted()) &#123;</span><br><span class="line">			selector.select();</span><br><span class="line">			Set selected = selector.selectedKeys();</span><br><span class="line">			Iterator it = selected.iterator();</span><br><span class="line">			<span class="keyword">while</span> (it.hasNext())</span><br><span class="line">				dispatch((SelectionKey) (it.next()));</span><br><span class="line">			selected.clear();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (IOException ex) &#123; <span class="comment">/* ... */</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="与Reactor相关的其他概念"><a href="#与Reactor相关的其他概念" class="headerlink" title="与Reactor相关的其他概念"></a>与Reactor相关的其他概念</h3><p>前面提到了Proactor模式，这又是什么呢？简单来说，Reactor模式里，操作系统只负责通知IO就绪，具体的IO操作（例如读写）仍然是要在业务进程里阻塞的去做的，而Proactor模式则更进一步，由操作系统将IO操作执行好（例如读取，会将数据直接读到内存buffer中），而handler只负责处理自己的逻辑，真正做到了IO与程序处理异步执行。所以我们一般又说Reactor是同步IO，Proactor是异步IO。</p>
+<p>关于阻塞和非阻塞、异步和非异步，以及UNIX底层的机制，大家可以看看这篇文章<a href="http://blog.csdn.net/historyasamirror/article/details/5778378" target="_blank" rel="noopener">IO – 同步，异步，阻塞，非阻塞 （亡羊补牢篇）</a>，以及陶辉（《深入理解nginx》的作者）《高性能网络编程》的系列。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Reactor reactor = <span class="keyword">new</span> Reactor();</span><br><span class="line">        <span class="keyword">new</span> Handler(reactor.selector);</span><br><span class="line">        reactor.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SelectionKey;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.Selector;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Reactor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	Selector selector;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Reactor</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		selector = Selector.open();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">while</span> (!Thread.interrupted()) &#123;</span><br><span class="line">                <span class="comment">//循环，等待事件</span></span><br><span class="line">				selector.select();</span><br><span class="line">				Set selected = selector.selectedKeys();</span><br><span class="line">				Iterator it = selected.iterator();</span><br><span class="line">				<span class="keyword">while</span> (it.hasNext())</span><br><span class="line">                    <span class="comment">//调用handler，处理事件</span></span><br><span class="line">					dispatch((SelectionKey) (it.next()));</span><br><span class="line">				selected.clear();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException ex) &#123; <span class="comment">/* ... */</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">dispatch</span><span class="params">(SelectionKey k)</span> </span>&#123;</span><br><span class="line">		Runnable r = (Runnable) (k.attachment());</span><br><span class="line">		<span class="keyword">if</span> (r != <span class="keyword">null</span>)</span><br><span class="line">			r.run();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/09/13/数据归一化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/13/数据归一化/" itemprop="url">数据归一化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-13T15:00:01+08:00">
+                2017-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML/" itemprop="url" rel="index">
+                    <span itemprop="name">ML</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/13/数据归一化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/13/数据归一化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="http://www.cnblogs.com/chaosimple/p/3227271.html" target="_blank" rel="noopener">数据归一化和两种常用的归一化方法</a></p>
+<p><a href="https://uqer.io/community/share/56c3e9c6228e5b0fe6b17d95" target="_blank" rel="noopener">数据预处理 归一化 标准化</a></p>
+<p>数据标准化（归一化）处理是数据挖掘的一项基础工作，不同评价指标往往具有不同的量纲和量纲单位，这样的情况会影响到数据分析的结果，为了消除指标之间的量纲影响，需要进行数据标准化处理，以解决数据指标之间的可比性。原始数据经过数据标准化处理后，各指标处于同一数量级，适合进行综合对比评价。以下是两种常用的归一化方法：</p>
+<h2 id="min-max标准化（Min-Max-Normalization）"><a href="#min-max标准化（Min-Max-Normalization）" class="headerlink" title="min-max标准化（Min-Max Normalization）"></a>min-max标准化（Min-Max Normalization）</h2><p>也称为离差标准化，是对原始数据的线性变换，使结果值映射到[0 - 1]之间。转换函数如下：</p>
+<p>x` = (x -min)/(max -min) </p>
+<p>其中max为样本数据的最大值，min为样本数据的最小值。这种方法有个缺陷就是当有新数据加入时，可能导致max和min的变化，需要重新定义。</p>
+<ul>
+<li>适用场景</li>
+</ul>
+<p>这种归一化方法比较适用在数值比较集中的情况。但是，如果max和min不稳定，很容易使得归一化结果不稳定，使得后续使用效果也不稳定，实际使用中可以用经验常量值来替代max和min。而且当有新数据加入时，可能导致max和min的变化，需要重新定义。</p>
+<p>在不涉及距离度量、协方差计算、数据不符合正太分布的时候，可以使用第一种方法或其他归一化方法。比如图像处理中，将RGB图像转换为灰度图像后将其值限定在[0 255]的范围。</p>
+<h2 id="Z-score标准化方法"><a href="#Z-score标准化方法" class="headerlink" title="Z-score标准化方法"></a>Z-score标准化方法</h2><p>这种方法给予原始数据的均值（mean）和标准差（standard deviation）进行数据的标准化。经过处理的数据符合标准正态分布，即均值为0，标准差为1，转化函数为：</p>
+<p>x` = (x- μ) / σ</p>
+<p>其中, μ为所有样本数据的均值，σ 为所有样本数据的标准差。 在分类、聚类算法中，需要使用距离来度量相似性的时候、或者使用PCA技术进行降维的时候，第二种方法(Z-score standardization)表现更好。</p>
+<h2 id="非线性归一化"><a href="#非线性归一化" class="headerlink" title="非线性归一化"></a>非线性归一化</h2><p>经常用在数据分化比较大的场景，有些数值很大，有些很小。通过一些数学函数，将原始值进行映射。该方法包括 log、指数，正切等。需要根据数据分布的情况，决定非线性函数的曲线，比如log(V, 2)还是log(V, 10)等。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/09/13/深入解析Spark中的RPC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1562,390 +1891,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/05/04/谈谈Spark的计算本地性/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/04/谈谈Spark的计算本地性/" itemprop="url">谈谈Spark的计算本地性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T10:51:46+08:00">
-                2017-05-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/05/04/谈谈Spark的计算本地性/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/04/谈谈Spark的计算本地性/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>转载：<a href="http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7" target="_blank" rel="noopener">http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7</a></p>
-<p>Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据， 就会碰到很大的带宽占用和性能下降， 这个时候就比较适合让计算去找数据.</p>
-<p>但是在计算找数据的过程中， 是怎么让计算找到数据呢， 这个就是这篇文章谈的， spark 的计算本地性</p>
-<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local1.jpg" alt=""></p>
-<h2 id="不同的-Locality-Level"><a href="#不同的-Locality-Level" class="headerlink" title="不同的 Locality Level"></a>不同的 Locality Level</h2><ul>
-<li>PROCESS_LOCAL: 数据和 task 在同一个executor jvm 中，最好的就是这种 locality。</li>
-<li>NODE_LOCAL: 数据在同一个节点上。比如数据在同一个节点的另一个 executor上；或在 HDFS 上，恰好有 block 在同一个节点上。速度比 PROCESS_LOCAL 稍慢，因为数据需要在不同进程之间传递或从文件中读取</li>
-<li>NO_PREF: 数据从哪里访问都一样快，不需要位置优先</li>
-<li>RACK_LOCAL: 数据在同一机架的不同节点上。需要通过网络传输数据及文件 IO，比 NODE_LOCAL 慢</li>
-<li>ANY: 数据在非同一机架的网络上，速度最慢</li>
-</ul>
-<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local2.jpg" alt=""></p>
-<h2 id="Task-自己想在哪里执行"><a href="#Task-自己想在哪里执行" class="headerlink" title="Task 自己想在哪里执行"></a>Task 自己想在哪里执行</h2><p>我们来看下 task 自己想在哪里执行， 这要根据 task 处理的数据是否缓存， task 的数据所在的 host 和 rack来判断， 在 DAGScheduler 中， 每个分区每个 stage 会成为一个task， 每个 task 会根据自己分区的数据的情况，进行判断自己的 本地性Level，</p>
-<p>getPreferredLocs -&gt; getPreferredLocsInternal</p>
-<p>函数中， 会先判断是否rdd 本分区的数据是否已经缓存在 blockManager， 如果已经缓存， 获取到数据所在的 host 和 executorId， 然后设置本 task 的数据本地性 Level 为 PROCESS_LOCAL， 偏好某个 host 上的某个 executor 去执行，</p>
-<p>如果没有缓存， 那么就不能是PROCESS_LOCAL ， 最多也就是个 NODE_LOCAL，会根据不同的RDD类型，来调用具体的 getPreferredLocations 来判断数据本地性 Level， 和数据本地性偏好</p>
-<p>假如这里是HadoopRDD， 那么每个 task 处理的数据就是一个 HadoopPartition， 其实代表 hdfs 中的一份数据 InputSplit， 它定义了分割的长度及位置。分割长度 是指分割数据的大小（以字节为单位），而分割位置 是分割所在的机器结点名称组成的列表， 分割位置中就能获取到 数据所在的 host 和 rack，</p>
-<p>如果数据源头是 kafka， 那么每个 task 处理的数据就是 KafkaRDDPartition， 其实对应每一个topic的每一个partition， preferredHosts 中记录着每个 topic 中每个 partition 所在的 host， 就直接可以当做 偏好的 host， 如果kafka中broker和Spark在同一个集群中，此时getPreferredLocations获取本地性就可以极大提高效率，因为没有了数据网络传输的成本。</p>
-<p>以上两种都偏好某个 host 去执行</p>
-<p>这里需要注意的是，这里找的数据源头是 rdd的顺着窄依赖， 往上找父依赖， 直到找到第一个窄依赖， 也就找到了数据读取源头， 来决定数据本地性</p>
-<p>如果读取的是 shuffle 的数据， 就不用考虑那么多了， 因为shuffle中的read task 是需要去所有的write task的disk上拉取数据的。</p>
-<h2 id="怎么能最大程度的满足-task-的本地性"><a href="#怎么能最大程度的满足-task-的本地性" class="headerlink" title="怎么能最大程度的满足 task 的本地性"></a>怎么能最大程度的满足 task 的本地性</h2><p>我们都知道， 数据传输对内网带宽和性能有极大的损耗，所以要千方百计的最大程度的满足 更高级别的本地性，从优到差排， PROCESS_LOCAL &gt; NODE_LOCAL &gt; NO_PREF &gt; RACK_LOCAL</p>
-<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task， 如果对应需要是用到的 executor 正在使用中（跑别的task），满足不了， 就等一会（等待时间是有spark.locality.wait.process或spark.locality.wait.node或spark.locality.wait.rack来控制的）， 看看过一会这个忙线的host 或者 executor是不是解脱了， 如果已经空闲了，我就可以把 task 放在它最期望的 host 或者 executor 上去运行了， 这里赌的就是一般来说，task 执行耗时相对于网络传输/文件IO 要小得多，调度器多等待1 2秒可能就可以以更好的本地性执行 task，避免了更耗时的网络传输或文件IO， 也是极棒的。</p>
-<h2 id="Spark的延迟调度"><a href="#Spark的延迟调度" class="headerlink" title="Spark的延迟调度"></a>Spark的延迟调度</h2><p>我们来看下 spark 的延迟调度的策略，</p>
-<p>有时候 task 自己偏好某个 executor 中，</p>
-<p>可以看下面的图直观理解一下</p>
-<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local3.jpg" alt=""></p>
-<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task，<br>我举个例子， 假如 一个 task 要处理的数据，在上一个 stage 中缓存下来了， 这个 task 期望的 就是以 PROCESS_LOCAL 来运行， 这个时候缓存数据的executor 不巧正在执行 其他的task， 那么我就等一会， 等多长时间呢， spark.locality.wait.process这么长时间， 如果时间超了， executor 还是没有空闲下来， 那么我没有办法， 我就以NODE_LOCAL 来运行 task， 这个时候我想到 同一台机器上其他 executor 上跨jvm 去拉取数据， 如果同一台机器上有其他空闲的 executor 可以满足， 就这么干， 如果没有， 等待 spark.locality.wait.node 时间， 还没有就以更低的 Locality Level 去执行这个 task。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/04/13/如何重构箭头型代码/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/13/如何重构箭头型代码/" itemprop="url">如何重构箭头型代码</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-13T10:37:03+08:00">
-                2017-04-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/重构/" itemprop="url" rel="index">
-                    <span itemprop="name">重构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/04/13/如何重构箭头型代码/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/04/13/如何重构箭头型代码/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>转载自： <a href="http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io" target="_blank" rel="noopener">http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io</a></p>
-<p>本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文章，不过我觉得很多东西可以从一个简单的东西出发，到达本质，所以，我觉得有必要在这里写一篇的文章。不一定全对，只希望得到更多的讨论，因为有了更深入的讨论才能进步。</p>
-<p>文章有点长，我在文章最后会给出相关的思考和总结陈词，你可以跳到结尾。</p>
-<p>所谓箭头型代码，基本上来说就是下面这个图片所示的情况。</p>
-<p><img src="http://coolshell.cn//wp-content/uploads/2017/04/IMG_7411.jpg" alt=""></p>
-<p>那么，这样“箭头型”的代码有什么问题呢？看上去也挺好看的，有对称美。但是……</p>
-<p>关于箭头型代码的问题有如下几个：</p>
-<p>1）我的显示器不够宽，箭头型代码缩进太狠了，需要我来回拉水平滚动条，这让我在读代码的时候，相当的不舒服。</p>
-<p>2）除了宽度外还有长度，有的代码的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">总而言之，**“箭头型代码”如果嵌套太多，代码太长的话，会相当容易让维护代码的人（包括自己）迷失在代码中，因为看到最内层的代码时，你已经不知道前面的那一层一层的条件判断是什么样的，代码是怎么运行到这里的，所以，箭头型代码是非常难以维护和Debug的**。</span><br><span class="line"></span><br><span class="line">## 微博上的案例 与 Guard Clauses</span><br><span class="line">OK，我们先来看一下微博上的那个示例，代码量如果再大一点，嵌套再多一点，你很容易会在条件中迷失掉（下面这个示例只是那个“大箭头”下的一个小箭头）</span><br><span class="line">``` java</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    int index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    if (index != -1) &#123;</span><br><span class="line">        auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">        if (! types.Contains(type.Obj())) &#123;</span><br><span class="line">            types.Add(type.Obj());</span><br><span class="line">            if (auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L&quot;CastResult&quot;, true)) &#123;</span><br><span class="line">                int count = group-&gt;GetMethodCount();</span><br><span class="line">                for (int i = 0; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">                    if (method-&gt;IsStatic()) &#123;</span><br><span class="line">                        if (method-&gt;GetParameterCount() == 1 &amp;&amp;</span><br><span class="line">                            method-&gt;GetParameter(0)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">                            method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;void&gt;() ) &#123;</span><br><span class="line">                            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面这段代码，可以把条件反过来写，然后就可以把箭头型的代码解掉了，重构的代码如下所示：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>)  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj()))  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line"> </span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> (! method-&gt;IsStatic()) <span class="keyword">continue</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">               method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">               method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这种代码的重构方式叫 Guard Clauses</p>
-<p>Martin Fowler 的 Refactoring 的网站上有相应的说明《Replace Nested Conditional with Guard Clauses》。<br>Coding Horror 上也有一篇文章讲了这种重构的方式 —— 《Flattening Arrow Code》<br>StackOverflow 上也有相关的问题说了这种方式 —— 《Refactor nested IF statement for clarity》<br>这里的思路其实就是，<strong>让出错的代码先返回，前面把所有的错误判断全判断掉，然后就剩下的就是正常的代码了</strong>。</p>
-<h2 id="抽取成函数"><a href="#抽取成函数" class="headerlink" title="抽取成函数"></a>抽取成函数</h2><p>微博上有些人说，continue 语句破坏了阅读代码的通畅，我觉得他们一定没有好好读这里面的代码，其实，我们可以看到，所有的 if 语句都是在判断是否出错的情况，所以，在维护代码的时候，你可以完全不理会这些 if 语句，因为都是出错处理的，而剩下的代码都是正常的功能代码，反而更容易阅读了。当然，一定有不是上面代码里的这种情况，那么，不用continue ，我们还能不能重构呢？</p>
-<p>当然可以，抽成函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">CopyMethodTypeInfo</span><span class="params">(auto &amp;method, auto &amp;group, auto &amp;symbol)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! method-&gt;IsStatic()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">           method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">           method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">        symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ExpressionResolvings</span><span class="params">(auto &amp;manager, auto &amp;argument, auto &amp;symbol)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj())) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> ( ! CopyMethodTypeInfo(method, group, symbol) ) <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    ExpressionResolvings(manager, arguments, symbol)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<p>你发出现，抽成函数后，代码比之前变得更容易读和更容易维护了。不是吗？</p>
-<p>有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护。这才是函数的作用。</p>
-<h2 id="嵌套的-if-外的代码"><a href="#嵌套的-if-外的代码" class="headerlink" title="嵌套的 if 外的代码"></a>嵌套的 if 外的代码</h2><p>微博上还有人问，原来的代码如果在各个 if 语句后还有要执行的代码，那么应该如何重构。比如下面这样的代码。</p>
-<p>原版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1()</span><br><span class="line">    <span class="keyword">if</span> (cond1) &#123;</span><br><span class="line">        do_before_cond2();</span><br><span class="line">        <span class="keyword">if</span> (cond2) &#123;</span><br><span class="line">            do_before_cond3();</span><br><span class="line">            <span class="keyword">if</span> (cond3) &#123;</span><br><span class="line">                do_something();</span><br><span class="line">            &#125;</span><br><span class="line">            do_after_cond3();</span><br><span class="line">        &#125;</span><br><span class="line">        do_after_cond2();</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond1();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面这段代码中的那些 <strong>do_after_condX()</strong> 是无论条件成功与否都要执行的。所以，我们拉平后的代码如下所示：</p>
-<p>重构第一版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) &#123;</span><br><span class="line">        do_after_cond1();</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    &#125; </span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) &#123; </span><br><span class="line">        do_after_cond2();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) &#123;</span><br><span class="line">        do_after_cond3();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>你会发现，上面的 do_after_condX 出现了两份。<strong>如果 if 语句块中的代码改变了某些do_after_condX依赖的状态，那么这是最终版本</strong>。</p>
-<p>但是，如果它们之前没有依赖关系的话，根据 DRY 原则，我们就可以只保留一份，那么直接掉到 if 条件前就好了，如下所示：</p>
-<p>重构第二版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>此时，你会说，我靠，居然，改变了执行的顺序，把条件放到 do_after_condX() 后面去了。这会不会有问题啊？</p>
-<p>其实，你再分析一下之前的代码，你会发现，本来，cond1 是判断 do_before_cond1() 是否出错的，如果有成功了，才会往下执行。而 do_after_cond1() 是无论如何都要执行的。从逻辑上来说，do_after_cond1()其实和do_before_cond1()的执行结果无关，而 cond1 却和是否去执行 do_before_cond2() 相关了。如果我把断行变成下面这样，反而代码逻辑更清楚了。</p>
-<p>重构第三版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line"> </span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;  <span class="comment">// &lt;-- cond1 成了是否做第二个语句块的条件</span></span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>; <span class="comment">// &lt;-- cond2 成了是否做第三个语句块的条件</span></span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>; <span class="comment">//&lt;-- cond3 成了是否做第四个语句块的条件</span></span><br><span class="line">    do_something(); </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>于是乎，在未来维护代码的时候，维护人一眼看上去就明白，代码在什么时候会执行到哪里。 这个时候，你会发现，把这些语句块抽成函数，代码会干净的更多，再重构一版：</p>
-<p>重构第四版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">do_func3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond3;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond2;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond1();</span><br><span class="line">   do_after_cond1();</span><br><span class="line">   <span class="keyword">return</span> cond1;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 你可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    bool cond = do_func1();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func2();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func3();</span><br><span class="line">    <span class="keyword">if</span> (cond) do_something();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 也可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func1() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func2() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func3() ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">   do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面，我给出了两个版本的for-loop，你喜欢哪个？我喜欢第二个。这个时候，因为for-loop里的代码非常简单，就算你不喜欢 continue ，这样的代码阅读成本已经很低了。</p>
-<h2 id="状态检查嵌套"><a href="#状态检查嵌套" class="headerlink" title="状态检查嵌套"></a>状态检查嵌套</h2><p>接下来，我们再来看另一个示例。下面的代码的伪造了一个场景——把两个人拉到一个一对一的聊天室中，因为要检查双方的状态，所以，代码可能会写成了“箭头型”。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare(pB);</span><br><span class="line">            <span class="keyword">if</span> ( manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">                pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                <span class="keyword">return</span> S_OK;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> S_ERROR;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            pA-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare();</span><br><span class="line">            pB-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            pA-&gt;Close();</span><br><span class="line">            pB-&gt;Close();</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Shouldn't be here!</span></span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>重构上面的代码，我们可以先分析一下上面的代码，说明了，上面的代码就是对 PeerA 和 PeerB 的两个状态 “连上”， “未连上” 做组合 “状态” （注：实际中的状态应该比这个还要复杂，可能还会有“断开”、“错误”……等等状态）， 于是，我们可以把代码写成下面这样，合并上面的嵌套条件，对于每一种组合都做出判断。这样一来，逻辑就会非常的干净和清楚。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pB);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = NO</span></span><br><span class="line">    <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; ! pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        pA-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = NO &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> ( !pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected() ) &#123;</span><br><span class="line">        pB-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        <span class="keyword">if</span> ( ! manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">        pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_OK;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = NO, pB = NO</span></span><br><span class="line">    pA-&gt;Close();</span><br><span class="line">    pB-&gt;Close();</span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="延伸思考"><a href="#延伸思考" class="headerlink" title="延伸思考"></a>延伸思考</h2><p>对于<strong> if-else</strong> 语句来说，一般来说，就是检查两件事：<strong>错误</strong> 和 <strong>状态</strong>。</p>
-<p>检查错误</p>
-<p>对于检查错误来说，使用 Guard Clauses 会是一种标准解，但我们还需要注意下面几件事：</p>
-<p>1）当然，出现错误的时候，还会出现需要释放资源的情况。你可以使用 <code>goto fail</code>; 这样的方式，但是最优雅的方式应该是C++面向对象式的 RAII 方式。</p>
-<p>2）以错误码返回是一种比较简单的方式，这种方式有很一些问题，比如，如果错误码太多，判断出错的代码会非常复杂，另外，正常的代码和错误的代码会混在一起，影响可读性。所以，在更为高组的语言中，使用<code>try-catch</code>异常捕捉的方式，会让代码更为易读一些。</p>
-<p><strong>检查状态</strong></p>
-<p>对于检查状态来说，实际中一定有更为复杂的情况，比如下面几种情况：</p>
-<p>1）像TCP协议中的两端的状态变化。</p>
-<p>2）像shell各个命令的命令选项的各种组合。</p>
-<p>3）像游戏中的状态变化（一棵非常复杂的状态树）。</p>
-<p>4）像语法分析那样的状态变化。</p>
-<p>对于这些复杂的状态变化，其本上来说，你需要先定义一个状态机，或是一个子状态的组合状态的查询表，或是一个状态查询分析树。</p>
-<p><strong>写代码时，代码的运行中的控制状态或业务状态是会让你的代码流程变得混乱的一个重要原因，重构“箭头型”代码的一个很重要的工作就是重新梳理和描述这些状态的变迁关系。</strong></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>好了，下面总结一下，把“箭头型”代码重构掉的几个手段如下：</p>
-<p>1）<strong>使用 Guard Clauses</strong> 。 尽可能的让出错的先返回， 这样后面就会得到干净的代码。</p>
-<p>2）<strong>把条件中的语句块抽取成函数</strong>。 有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护，<strong>写出让人易读易维护的代码才是重构代码的初衷</strong>！</p>
-<p>3）<strong>对于出错处理，使用try-catch异常处理和RAII机制</strong>。返回码的出错处理有很多问题，比如：A) 返回码可以被忽略，B) 出错处理的代码和正常处理的代码混在一起，C) 造成函数接口污染，比如像atoi()这种错误码和返回值共用的糟糕的函数。</p>
-<p>4）对于多个状态的判断和组合，如果复杂了，可以使用“组合状态表”，或是状态机加Observer的状态订阅的设计模式。这样的代码即解了耦，也干净简单，同样有很强的扩展性。</p>
-<p>5） 重构“箭头型”代码其实是在帮你重新梳理所有的代码和逻辑，这个过程非常值得为之付出。重新整思路去想尽一切办法简化代码的过程本身就可以让人成长。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1996,7 +1941,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-count">100</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2018,7 +1963,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

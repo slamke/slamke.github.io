@@ -249,6 +249,361 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2018/01/05/Python知识点/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/05/Python知识点/" itemprop="url">Python知识点</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-05T11:03:26+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/05/Python知识点/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/05/Python知识点/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-sys-path-append-添加模块至模块扫描路径"><a href="#1-sys-path-append-添加模块至模块扫描路径" class="headerlink" title="1. sys.path.append() 添加模块至模块扫描路径"></a>1. sys.path.append() 添加模块至模块扫描路径</h2><p>当我们导入一个模块时：import  xxx，默认情况下python解析器会搜索当前目录、已安装的内置模块和第三方模块，搜索路径存放在sys模块的path中：<br>sys.path 返回的是一个列表！<br>该路径已经添加到系统的环境变量了，当我们要添加自己的搜索目录时，可以通过列表的append()方法；</p>
+<p>对于模块和自己写的脚本不在同一个目录下，在脚本开头加sys.path.append(‘xxx’)：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys  </span><br><span class="line">sys.path.append(’引用模块的地址<span class="string">')</span></span><br></pre></td></tr></table></figure>
+<p>这种方法是运行时修改，脚本运行后就会失效的。</p>
+<p>另外一种方法是：</p>
+<p>把路径添加到系统的环境变量，或把该路径的文件夹放进已经添加到系统环境变量的路径内。环境变量的内容会自动添加到模块搜索路径中。</p>
+<p>sys模块包含了与python解释器和它的环境有关的函数，这个你可以通过dir(sys)来查看他里面的方法和成员属性。<br>下面的两个方法可以将模块路径加到当前模块扫描的路径里：<br>sys.path.append(‘你的模块的名称’)。<br>sys.path.insert(0,’模块的名称’)<br>永久添加路径到sys.path中，方式有三，如下：<br>1）将写好的py文件放到 已经添加到系统环境变量的 目录下 ；<br>2) 在 /usr/lib/python2.6/site-packages 下面新建一个.pth 文件(以pth作为后缀名)<br>将模块的路径写进去，一行一个路径，如： vim pythonmodule.pth<br>/home/liu/shell/config<br>/home/liu/shell/base<br>3) 使用PYTHONPATH环境变量<br>export PYTHONPATH=$PYTHONPATH:/home/liu/shell/config</p>
+<h2 id="2-Python-ConfigParser模块常用方法示例"><a href="#2-Python-ConfigParser模块常用方法示例" class="headerlink" title="2. Python ConfigParser模块常用方法示例"></a>2. Python ConfigParser模块常用方法示例</h2><p>在程序中使用配置文件来灵活的配置一些参数是一件很常见的事情，配置文件的解析并不复杂，在Python里更是如此，在官方发布的库中就包含有做这件事情的库，那就是ConfigParser，这里简单的做一些介绍。  </p>
+<p>Python ConfigParser模块解析的配置文件的格式比较象ini的配置文件格式，就是文件中由多个section构成，每个section下又有多个配置项，比如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">[db]    </span><br><span class="line">db_host=192.168.1.1   </span><br><span class="line">db_port=3306   </span><br><span class="line">db_user=root   </span><br><span class="line">db_pass=password   </span><br><span class="line">[concurrent]    </span><br><span class="line">thread=200   </span><br><span class="line">processor=400</span><br><span class="line">```   </span><br><span class="line">假设上面的配置文件的名字为test.conf。里面包含两个section,一个是db, 另一个是concurrent, db里面还包含有4项，concurrent里面有两项。这里来做做解析：  </span><br><span class="line">``` python</span><br><span class="line"><span class="meta">#</span>-*- encoding: gb2312 -*-    </span><br><span class="line">import ConfigParser,string,os,sys    </span><br><span class="line">cf = ConfigParser.ConfigParser()    </span><br><span class="line">cf.read("test.conf")   </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span> 返回所有的section    </span><br><span class="line">s = cf.sections()    </span><br><span class="line">print 'section:', s    </span><br><span class="line">o = cf.options("db")    </span><br><span class="line">print 'options:', o    </span><br><span class="line">v = cf.items("db")    </span><br><span class="line">print 'db:', v    </span><br><span class="line">print '-'*60    </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span>可以按照类型读取出来  </span><br><span class="line">db_host = cf.get("db", "db_host")    </span><br><span class="line">db_port = cf.getint("db", "db_port")    </span><br><span class="line">db_user = cf.get("db", "db_user")    </span><br><span class="line">db_pass = cf.get("db", "db_pass")   </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span> 返回的是整型的    </span><br><span class="line">threads = cf.getint("concurrent", "thread")    </span><br><span class="line">processors = cf.getint("concurrent", "processor")    </span><br><span class="line">print "db_host:", db_host    </span><br><span class="line">print "db_port:", db_port    </span><br><span class="line">print "db_user:", db_user    </span><br><span class="line">print "db_pass:", db_pass    </span><br><span class="line">print "thread:", threads    </span><br><span class="line">print "processor:", processors   </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span>修改一个值，再写回去    </span><br><span class="line">cf.set("db", "db_pass", "zhaowei")    </span><br><span class="line">cf.write(open("test.conf", "w"))   </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span>添加一个section。（同样要写回）  </span><br><span class="line">cf.add_section('liuqing')  </span><br><span class="line">cf.set('liuqing', 'int', '15')  </span><br><span class="line">cf.set('liuqing', 'bool', 'true')  </span><br><span class="line">cf.set('liuqing', 'float', '3.1415')  </span><br><span class="line">cf.set('liuqing', 'baz', 'fun')  </span><br><span class="line">cf.set('liuqing', 'bar', 'Python')  </span><br><span class="line">cf.set('liuqing', 'foo', '%(bar)s is %(baz)s!')  </span><br><span class="line">cf.write(open("test.conf", "w"))  </span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span>移除section 或者option 。（只要进行了修改就要写回的哦）  </span><br><span class="line">cf.remove_option('liuqing','int')  </span><br><span class="line">cf.remove_section('liuqing')  </span><br><span class="line">cf.write(open("test.conf", "w"))</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-Decorator-的本质"><a href="#3-Decorator-的本质" class="headerlink" title="3. Decorator 的本质"></a>3. Decorator 的本质</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line"></span><br><span class="line">foo()</span><br></pre></td></tr></table></figure>
+<p>返回:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hello, foo</span><br><span class="line">i am foo</span><br><span class="line">goodby, foo</span><br></pre></td></tr></table></figure></p>
+<p>对于Python的这个@注解语法糖- Syntactic Sugar 来说，当你在用某个@decorator来修饰某个函数func时，如下所示:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@decorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
+<p>其解释器会解释成下面这样的语句：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">func = decorator(func)</span><br></pre></td></tr></table></figure></p>
+<p>尼玛，这不就是把一个函数当参数传到另一个函数中，然后再回调吗？是的，但是，我们需要注意，那里还有一个赋值语句，把decorator这个函数的返回值赋值回了原来的func。<br>根据《函数式编程》中的first class functions中的定义的，你可以把函数当成变量来使用，所以，decorator必需得返回了一个函数出来给func，这就是所谓的higher order function 高阶函数，不然，后面当func()调用的时候就会出错。 就我们上面那个hello.py里的例子来说，<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br></pre></td></tr></table></figure></p>
+<p>被解释成了：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">foo = hello(foo)</span><br><span class="line">``` </span><br><span class="line"><span class="comment">### class式的 Decorator</span></span><br><span class="line">首先，先得说一下，decorator的<span class="class"><span class="keyword">class</span>方式，还是看个示例：</span></span><br><span class="line"><span class="class">``` <span class="title">python</span> </span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">myDecorator</span><span class="params">(object)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, fn)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__init__()"</span></span><br><span class="line">        self.fn = fn</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__call__()"</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">@myDecorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aFunction</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"inside aFunction()"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> <span class="string">"Finished decorating aFunction()"</span></span><br><span class="line"> </span><br><span class="line">aFunction()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># inside myDecorator.__init__()</span></span><br><span class="line"><span class="comment"># Finished decorating aFunction()</span></span><br><span class="line"><span class="comment"># inside aFunction()</span></span><br><span class="line"><span class="comment"># inside myDecorator.__call__()</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="一些decorator的示例"><a href="#一些decorator的示例" class="headerlink" title="一些decorator的示例"></a>一些decorator的示例</h3><h4 id="给函数调用做缓存"><a href="#给函数调用做缓存" class="headerlink" title="给函数调用做缓存"></a>给函数调用做缓存</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">memo</span><span class="params">(fn)</span>:</span></span><br><span class="line">    cache = &#123;&#125;</span><br><span class="line">    miss = object()</span><br><span class="line"> </span><br><span class="line"><span class="meta">    @wraps(fn)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args)</span>:</span></span><br><span class="line">        result = cache.get(args, miss)</span><br><span class="line">        <span class="keyword">if</span> result <span class="keyword">is</span> miss:</span><br><span class="line">            result = fn(*args)</span><br><span class="line">            cache[args] = result</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@memo</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    <span class="keyword">return</span> fib(n - <span class="number">1</span>) + fib(n - <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p>上面这个例子中，是一个斐波拉契数例的递归算法。我们知道，这个递归是相当没有效率的，因为会重复调用。比如：我们要计算fib(5)，于是其分解成fib(4) + fib(3)，而fib(4)分解成fib(3)+fib(2)，fib(3)又分解成fib(2)+fib(1)…… 你可看到，基本上来说，fib(3), fib(2), fib(1)在整个递归过程中被调用了两次。</p>
+<p>而我们用decorator，在调用函数前查询一下缓存，如果没有才调用了，有了就从缓存中返回值。一下子，这个递归从二叉树式的递归成了线性的递归。</p>
+<h4 id="注册回调函数"><a href="#注册回调函数" class="headerlink" title="注册回调函数"></a>注册回调函数</h4><p>下面这个示例展示了通过URL的路由来调用相关注册的函数示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyApp</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.func_map = &#123;&#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(self, name)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">func_wrapper</span><span class="params">(func)</span>:</span></span><br><span class="line">            self.func_map[name] = func</span><br><span class="line">            <span class="keyword">return</span> func</span><br><span class="line">        <span class="keyword">return</span> func_wrapper</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call_method</span><span class="params">(self, name=None)</span>:</span></span><br><span class="line">        func = self.func_map.get(name, <span class="keyword">None</span>)</span><br><span class="line">        <span class="keyword">if</span> func <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> Exception(<span class="string">"No function registered against - "</span> + str(name))</span><br><span class="line">        <span class="keyword">return</span> func()</span><br><span class="line"> </span><br><span class="line">app = MyApp()</span><br><span class="line"> </span><br><span class="line"><span class="meta">@app.register('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main_page_func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"This is the main page."</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">@app.register('/next_page')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">next_page_func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"This is the next page."</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> app.call_method(<span class="string">'/'</span>)</span><br><span class="line"><span class="keyword">print</span> app.call_method(<span class="string">'/next_page'</span>)</span><br></pre></td></tr></table></figure>
+<p>注意：<br>1）上面这个示例中，用类的实例来做decorator。<br>2）decorator类中没有<strong>call</strong>()，但是wrapper返回了原函数。所以，原函数没有发生任何变化。</p>
+<h4 id="线程异步"><a href="#线程异步" class="headerlink" title="线程异步"></a>线程异步</h4><p>下面量个非常简单的异步执行的decorator，注意，异步处理并不简单，下面只是一个示例。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">async</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">    @wraps(func)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">async_func</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        func_hl = Thread(target = func, args = args, kwargs = kwargs)</span><br><span class="line">        func_hl.start()</span><br><span class="line">        <span class="keyword">return</span> func_hl</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> async_func</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"> </span><br><span class="line"><span class="meta">    @async</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">print_somedata</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">'starting print_somedata'</span></span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'print_somedata: 2 sec passed'</span></span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'print_somedata: 2 sec passed'</span></span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'finished print_somedata'</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">        print_somedata()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'back in main'</span></span><br><span class="line">        print_somedata()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">'back in main'</span></span><br><span class="line"> </span><br><span class="line">    main()</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-Python的getattr-setattr-delattr-hasattr"><a href="#4-Python的getattr-setattr-delattr-hasattr" class="headerlink" title="4.Python的getattr(),setattr(),delattr(),hasattr()"></a>4.Python的getattr(),setattr(),delattr(),hasattr()</h2><h3 id="获取对象引用getattr"><a href="#获取对象引用getattr" class="headerlink" title="获取对象引用getattr"></a>获取对象引用getattr</h3><p>getattr()函数是Python自省的核心函数，具体使用大体如下：</p>
+<p>Getattr用于返回一个对象属性，或者方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span>   </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>   </span><br><span class="line">        self.name = <span class="string">'zhangjing'</span>  </span><br><span class="line">　　  <span class="comment">#self.age='24'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">method</span><span class="params">(self)</span>:</span>   </span><br><span class="line">        <span class="keyword">print</span><span class="string">"method print"</span>  </span><br><span class="line">  </span><br><span class="line">Instance = A()   </span><br><span class="line"><span class="keyword">print</span> getattr(Instance , <span class="string">'name, '</span><span class="keyword">not</span> find<span class="string">') #如果Instance 对象中有属性name则打印self.name的值，否则打印'</span><span class="keyword">not</span> find<span class="string">'</span></span><br><span class="line"><span class="string">print getattr(Instance , '</span>age<span class="string">', '</span><span class="keyword">not</span> find<span class="string">')   #如果Instance 对象中有属性age则打印self.age的值，否则打印'</span><span class="keyword">not</span> find<span class="string">'</span></span><br><span class="line"><span class="string">print getattr(a, '</span>method<span class="string">', '</span>default<span class="string">')   </span></span><br><span class="line"><span class="string">#如果有方法method，否则打印其地址，否则打印default   </span></span><br><span class="line"><span class="string">print getattr(a, '</span>method<span class="string">', '</span>default<span class="string">')()   </span></span><br><span class="line"><span class="string">#如果有方法method，运行函数并打印None否则打印default</span></span><br></pre></td></tr></table></figure>
+<p>注：使用getattr可以轻松实现工厂模式。<br>例：一个模块支持html、text、xml等格式的打印，根据传入的formate参数的不同，调用不同的函数实现几种格式的输出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> statsout   </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">output</span><span class="params">(data, format=<span class="string">"text"</span>)</span>:</span>                                </span><br><span class="line">     output_function = getattr(statsout, <span class="string">"output_%s"</span> % format)   </span><br><span class="line">    <span class="keyword">return</span> output_function(data)</span><br></pre></td></tr></table></figure>
+<h3 id="setattr"><a href="#setattr" class="headerlink" title="setattr"></a>setattr</h3><p>这是相对应的getattr()。参数是一个对象,一个字符串和一个任意值。字符串可能会列出一个现有的属性或一个新的属性。这个函数将值赋给属性的。该对象允许它提供。例如,setattr(x,“foobar”,123)相当于x.foobar = 123。</p>
+<h3 id="delattr"><a href="#delattr" class="headerlink" title="delattr"></a>delattr</h3><p>与setattr()相关的一组函数。参数是由一个对象(记住python中一切皆是对象)和一个字符串组成的。string参数必须是对象属性名之一。该函数删除该obj的一个由string指定的属性。delattr(x, ‘foobar’)=del x.foobar</p>
+<h3 id="hasattr"><a href="#hasattr" class="headerlink" title="hasattr"></a>hasattr</h3><p>hasattr用于确定一个对象是否具有某个属性。</p>
+<p>语法：<br> hasattr(object, name) -&gt; bool<br>判断object中是否有name属性，返回一个布尔值。</p>
+<h2 id="5-使用-property"><a href="#5-使用-property" class="headerlink" title="5. 使用@property"></a>5. 使用@property</h2><p>在绑定属性时，如果我们直接把属性暴露出去，虽然写起来很简单，但是，没办法检查参数，导致可以把成绩随便改：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = Student()</span><br><span class="line">s.score = <span class="number">9999</span></span><br></pre></td></tr></table></figure></p>
+<p>这显然不合逻辑。为了限制score的范围，可以通过一个set_score()方法来设置成绩，再通过一个get_score()来获取成绩，这样，在set_score()方法里，就可以检查参数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_score</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_score</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(value, int):</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">'score must be an integer!'</span>)</span><br><span class="line">        <span class="keyword">if</span> value &lt; <span class="number">0</span> <span class="keyword">or</span> value &gt; <span class="number">100</span>:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">'score must between 0 ~ 100!'</span>)</span><br><span class="line">        self._score = value</span><br></pre></td></tr></table></figure></p>
+<p>现在，对任意的Student实例进行操作，就不能随心所欲地设置score了：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s = Student()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.set_score(<span class="number">60</span>) <span class="comment"># ok!</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.get_score()</span><br><span class="line"><span class="number">60</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.set_score(<span class="number">9999</span>)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  ...</span><br><span class="line">ValueError: score must between <span class="number">0</span> ~ <span class="number">100</span>!</span><br></pre></td></tr></table></figure></p>
+<p>但是，上面的调用方法又略显复杂，没有直接用属性这么直接简单。</p>
+<p>有没有既能检查参数，又可以用类似属性这样简单的方式来访问类的变量呢？对于追求完美的Python程序员来说，这是必须要做到的！</p>
+<p>还记得装饰器（decorator）可以给函数动态加上功能吗？对于类的方法，装饰器一样起作用。Python内置的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">``` python </span><br><span class="line">class Student(object):</span><br><span class="line"></span><br><span class="line">    @property</span><br><span class="line">    def score(self):</span><br><span class="line">        return self._score</span><br><span class="line"></span><br><span class="line">    @score.setter</span><br><span class="line">    def score(self, value):</span><br><span class="line">        if not isinstance(value, int):</span><br><span class="line">            raise ValueError(&apos;score must be an integer!&apos;)</span><br><span class="line">        if value &lt; 0 or value &gt; 100:</span><br><span class="line">            raise ValueError(&apos;score must between 0 ~ 100!&apos;)</span><br><span class="line">        self._score = value</span><br></pre></td></tr></table></figure></p>
+<p>@property的实现比较复杂，我们先考察如何使用。把一个getter方法变成属性，只需要加上<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">``` python </span><br><span class="line">&gt;&gt;&gt; s = Student()</span><br><span class="line">&gt;&gt;&gt; s.score = 60 # OK，实际转化为s.set_score(60)</span><br><span class="line">&gt;&gt;&gt; s.score # OK，实际转化为s.get_score()</span><br><span class="line">60</span><br><span class="line">&gt;&gt;&gt; s.score = 9999</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  ...</span><br><span class="line">ValueError: score must between 0 ~ 100!</span><br></pre></td></tr></table></figure></p>
+<p>注意到这个神奇的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">还可以定义只读属性，只定义getter方法，不定义setter方法就是一个只读属性：</span><br><span class="line">``` python </span><br><span class="line">class Student(object):</span><br><span class="line"></span><br><span class="line">    @property</span><br><span class="line">    def birth(self):</span><br><span class="line">        return self._birth</span><br><span class="line"></span><br><span class="line">    @birth.setter</span><br><span class="line">    def birth(self, value):</span><br><span class="line">        self._birth = value</span><br><span class="line"></span><br><span class="line">    @property</span><br><span class="line">    def age(self):</span><br><span class="line">        return 2014 - self._birth</span><br></pre></td></tr></table></figure></p>
+<p>上面的birth是可读写属性，而age就是一个只读属性，因为age可以根据birth和当前时间计算出来。</p>
+<p>###小结</p>
+<p><strong>@property</strong>广泛应用在类的定义中，可以让调用者写出简短的代码，同时保证对参数进行必要的检查，这样，程序运行时就减少了出错的可能性。</p>
+<h2 id="6-Python-中的-classmethod-和-staticmethod-有什么具体用途？"><a href="#6-Python-中的-classmethod-和-staticmethod-有什么具体用途？" class="headerlink" title="6. Python 中的 classmethod 和 staticmethod 有什么具体用途？"></a>6. Python 中的 classmethod 和 staticmethod 有什么具体用途？</h2><p>@classmethod means: when this method is called, we pass the class as the first argument instead of the instance of that class (as we normally do with methods). This means you can use the class and its properties inside that method rather than a particular instance.</p>
+<p>@staticmethod means: when this method is called, we don’t pass an instance of the class to it (as we normally do with methods). This means you can put a function inside a class but you can’t access the instance of that class (this is useful when your method does not use the instance).</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Kls</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, data)</span>:</span></span><br><span class="line">        self.data = data</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">printd</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(self.data)</span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">smethod</span><span class="params">(*arg)</span>:</span></span><br><span class="line">        print(<span class="string">'Static:'</span>, arg)</span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cmethod</span><span class="params">(*arg)</span>:</span></span><br><span class="line">        print(<span class="string">'Class:'</span>, arg)</span><br><span class="line"> </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ik = Kls(<span class="number">23</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ik.printd()</span><br><span class="line"><span class="number">23</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ik.smethod()</span><br><span class="line">Static: ()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ik.cmethod()</span><br><span class="line">Class: (&lt;class '__main__.Kls'&gt;,)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Kls.printd()</span><br><span class="line">TypeError: unbound method printd() must be called <span class="keyword">with</span> Kls instance <span class="keyword">as</span> first argument (got nothing instead)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Kls.smethod()</span><br><span class="line">Static: ()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Kls.cmethod()</span><br><span class="line">Class: (&lt;class '__main__.Kls'&gt;,)</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/12/12/Spark写GBK文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/12/Spark写GBK文件/" itemprop="url">Spark写GBK文件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-12T10:18:25+08:00">
+                2017-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/12/Spark写GBK文件/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/12/Spark写GBK文件/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result: <span class="type">RDD</span>[(<span class="type">NullWritable</span>, <span class="type">Text</span>)] = totalData.map &#123;</span><br><span class="line">        item =&gt;</span><br><span class="line">          <span class="keyword">val</span> line = <span class="string">s"<span class="subst">$&#123;item.query&#125;</span>"</span></span><br><span class="line">          (<span class="type">NullWritable</span>.get(), <span class="keyword">new</span> <span class="type">Text</span>(line.getBytes(<span class="string">"GBK"</span>)))</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//设置输出格式，以GBK存储</span></span><br><span class="line">      result.saveAsNewAPIHadoopFile(path, classOf[<span class="type">NullWritable</span>],</span><br><span class="line">        classOf[<span class="type">Text</span>], classOf[<span class="type">TextOutputFormat</span>[<span class="type">NullWritable</span>, <span class="type">Text</span>]])</span><br></pre></td></tr></table></figure>
+<p>参考:</p>
+<p><a href="http://lxw1234.com/archives/2015/07/404.htm" target="_blank" rel="noopener">RDD行动Action操作(6)–saveAsHadoopFile</a></p>
+<p><a href="https://www.iteblog.com/archives/1281.html" target="_blank" rel="noopener">Spark多文件输出(MultipleOutputFormat)</a></p>
+<p><a href="https://www.iteblog.com/archives/842.html" target="_blank" rel="noopener">Hadoop多文件输出：MultipleOutputFormat和MultipleOutputs深究(一)</a></p>
+<p><a href="https://www.iteblog.com/archives/848.html" target="_blank" rel="noopener">Hadoop多文件输出：MultipleOutputFormat和MultipleOutputs深究(二)</a></p>
+<p><a href="http://blog.csdn.net/zklth/article/details/11829563" target="_blank" rel="noopener">Hadoop 中文编码相关问题 – mapreduce程序处理GBK编码数据并输出GBK编码数据</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/12/05/如何有效地记录JavaSQL日志/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1529,335 +1884,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/09/14/Reactor模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/14/Reactor模式/" itemprop="url">Reactor模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-14T16:43:25+08:00">
-                2017-09-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Reactor/" itemprop="url" rel="index">
-                    <span itemprop="name">Reactor</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/09/14/Reactor模式/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/09/14/Reactor模式/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Reactor，反应堆还是核电站？"><a href="#Reactor，反应堆还是核电站？" class="headerlink" title="Reactor，反应堆还是核电站？"></a>Reactor，反应堆还是核电站？</h2><h3 id="Reactor的由来"><a href="#Reactor的由来" class="headerlink" title="Reactor的由来"></a>Reactor的由来</h3><p>Reactor是一种广泛应用在服务器端开发的设计模式。Reactor中文大多译为“反应堆”，我当初接触这个概念的时候，就感觉很厉害，是不是它的原理就跟“核反应”差不多？后来才知道其实没有什么关系，从Reactor的兄弟“Proactor”（多译为前摄器）就能看得出来，这两个词的中文翻译其实都不是太好，不够形象。实际上，Reactor模式又有别名“Dispatcher”或者“Notifier”，我觉得这两个都更加能表明它的本质。</p>
-<p>那么，Reactor模式究竟是个什么东西呢？这要从事件驱动的开发方式说起。我们知道，对于应用服务器，一个主要规律就是，CPU的处理速度是要远远快于IO速度的，如果CPU为了IO操作（例如从Socket读取一段数据）而阻塞显然是不划算的。好一点的方法是分为多进程或者线程去进行处理，但是这样会带来一些进程切换的开销，试想一个进程一个数据读了500ms，期间进程切换到它3次，但是CPU却什么都不能干，就这么切换走了，是不是也不划算？</p>
-<p>这时先驱们找到了事件驱动，或者叫回调的方式，来完成这件事情。这种方式就是，应用业务向一个中间人注册一个回调（event handler），当IO就绪后，就这个中间人产生一个事件，并通知此handler进行处理。这种回调的方式，也体现了“好莱坞原则”（Hollywood principle）-“Don’t call us, we’ll call you”，在我们熟悉的IoC中也有用到。看来软件开发真是互通的！</p>
-<p>好了，我们现在来看Reactor模式。在前面事件驱动的例子里有个问题：我们如何知道IO就绪这个事件，谁来充当这个中间人？Reactor模式的答案是：由一个不断等待和循环的单独进程（线程）来做这件事，它接受所有handler的注册，并负责先操作系统查询IO是否就绪，在就绪后就调用指定handler进行处理，这个角色的名字就叫做Reactor。</p>
-<h3 id="Reactor与NIO"><a href="#Reactor与NIO" class="headerlink" title="Reactor与NIO"></a>Reactor与NIO</h3><p>Java中的NIO可以很好的和Reactor模式结合。关于NIO中的Reactor模式，我想没有什么资料能比Doug Lea大神（不知道Doug Lea？看看JDK集合包和并发包的作者吧）在<a href="http://gee.cs.oswego.edu/dl/cpjslides/nio.pdf" target="_blank" rel="noopener">《Scalable IO in Java》</a>解释的更简洁和全面了。NIO中Reactor的核心是Selector，我写了一个简单的Reactor示例，这里我贴一个核心的Reactor的循环（这种循环结构又叫做EventLoop），剩余代码在这里。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">while</span> (!Thread.interrupted()) &#123;</span><br><span class="line">			selector.select();</span><br><span class="line">			Set selected = selector.selectedKeys();</span><br><span class="line">			Iterator it = selected.iterator();</span><br><span class="line">			<span class="keyword">while</span> (it.hasNext())</span><br><span class="line">				dispatch((SelectionKey) (it.next()));</span><br><span class="line">			selected.clear();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (IOException ex) &#123; <span class="comment">/* ... */</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="与Reactor相关的其他概念"><a href="#与Reactor相关的其他概念" class="headerlink" title="与Reactor相关的其他概念"></a>与Reactor相关的其他概念</h3><p>前面提到了Proactor模式，这又是什么呢？简单来说，Reactor模式里，操作系统只负责通知IO就绪，具体的IO操作（例如读写）仍然是要在业务进程里阻塞的去做的，而Proactor模式则更进一步，由操作系统将IO操作执行好（例如读取，会将数据直接读到内存buffer中），而handler只负责处理自己的逻辑，真正做到了IO与程序处理异步执行。所以我们一般又说Reactor是同步IO，Proactor是异步IO。</p>
-<p>关于阻塞和非阻塞、异步和非异步，以及UNIX底层的机制，大家可以看看这篇文章<a href="http://blog.csdn.net/historyasamirror/article/details/5778378" target="_blank" rel="noopener">IO – 同步，异步，阻塞，非阻塞 （亡羊补牢篇）</a>，以及陶辉（《深入理解nginx》的作者）《高性能网络编程》的系列。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Reactor reactor = <span class="keyword">new</span> Reactor();</span><br><span class="line">        <span class="keyword">new</span> Handler(reactor.selector);</span><br><span class="line">        reactor.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SelectionKey;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.Selector;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Reactor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	Selector selector;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Reactor</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		selector = Selector.open();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">while</span> (!Thread.interrupted()) &#123;</span><br><span class="line">                <span class="comment">//循环，等待事件</span></span><br><span class="line">				selector.select();</span><br><span class="line">				Set selected = selector.selectedKeys();</span><br><span class="line">				Iterator it = selected.iterator();</span><br><span class="line">				<span class="keyword">while</span> (it.hasNext())</span><br><span class="line">                    <span class="comment">//调用handler，处理事件</span></span><br><span class="line">					dispatch((SelectionKey) (it.next()));</span><br><span class="line">				selected.clear();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException ex) &#123; <span class="comment">/* ... */</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">dispatch</span><span class="params">(SelectionKey k)</span> </span>&#123;</span><br><span class="line">		Runnable r = (Runnable) (k.attachment());</span><br><span class="line">		<span class="keyword">if</span> (r != <span class="keyword">null</span>)</span><br><span class="line">			r.run();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/09/13/数据归一化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/13/数据归一化/" itemprop="url">数据归一化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-13T15:00:01+08:00">
-                2017-09-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ML/" itemprop="url" rel="index">
-                    <span itemprop="name">ML</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/09/13/数据归一化/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/09/13/数据归一化/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="http://www.cnblogs.com/chaosimple/p/3227271.html" target="_blank" rel="noopener">数据归一化和两种常用的归一化方法</a></p>
-<p><a href="https://uqer.io/community/share/56c3e9c6228e5b0fe6b17d95" target="_blank" rel="noopener">数据预处理 归一化 标准化</a></p>
-<p>数据标准化（归一化）处理是数据挖掘的一项基础工作，不同评价指标往往具有不同的量纲和量纲单位，这样的情况会影响到数据分析的结果，为了消除指标之间的量纲影响，需要进行数据标准化处理，以解决数据指标之间的可比性。原始数据经过数据标准化处理后，各指标处于同一数量级，适合进行综合对比评价。以下是两种常用的归一化方法：</p>
-<h2 id="min-max标准化（Min-Max-Normalization）"><a href="#min-max标准化（Min-Max-Normalization）" class="headerlink" title="min-max标准化（Min-Max Normalization）"></a>min-max标准化（Min-Max Normalization）</h2><p>也称为离差标准化，是对原始数据的线性变换，使结果值映射到[0 - 1]之间。转换函数如下：</p>
-<p>x` = (x -min)/(max -min) </p>
-<p>其中max为样本数据的最大值，min为样本数据的最小值。这种方法有个缺陷就是当有新数据加入时，可能导致max和min的变化，需要重新定义。</p>
-<ul>
-<li>适用场景</li>
-</ul>
-<p>这种归一化方法比较适用在数值比较集中的情况。但是，如果max和min不稳定，很容易使得归一化结果不稳定，使得后续使用效果也不稳定，实际使用中可以用经验常量值来替代max和min。而且当有新数据加入时，可能导致max和min的变化，需要重新定义。</p>
-<p>在不涉及距离度量、协方差计算、数据不符合正太分布的时候，可以使用第一种方法或其他归一化方法。比如图像处理中，将RGB图像转换为灰度图像后将其值限定在[0 255]的范围。</p>
-<h2 id="Z-score标准化方法"><a href="#Z-score标准化方法" class="headerlink" title="Z-score标准化方法"></a>Z-score标准化方法</h2><p>这种方法给予原始数据的均值（mean）和标准差（standard deviation）进行数据的标准化。经过处理的数据符合标准正态分布，即均值为0，标准差为1，转化函数为：</p>
-<p>x` = (x- μ) / σ</p>
-<p>其中, μ为所有样本数据的均值，σ 为所有样本数据的标准差。 在分类、聚类算法中，需要使用距离来度量相似性的时候、或者使用PCA技术进行降维的时候，第二种方法(Z-score standardization)表现更好。</p>
-<h2 id="非线性归一化"><a href="#非线性归一化" class="headerlink" title="非线性归一化"></a>非线性归一化</h2><p>经常用在数据分化比较大的场景，有些数值很大，有些很小。通过一些数学函数，将原始值进行映射。该方法包括 log、指数，正切等。需要根据数据分布的情况，决定非线性函数的曲线，比如log(V, 2)还是log(V, 10)等。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1908,7 +1934,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-count">100</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1930,7 +1956,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

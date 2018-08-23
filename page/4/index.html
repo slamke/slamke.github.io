@@ -249,6 +249,390 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/05/04/谈谈Spark的计算本地性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/04/谈谈Spark的计算本地性/" itemprop="url">谈谈Spark的计算本地性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T10:51:46+08:00">
+                2017-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/04/谈谈Spark的计算本地性/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/04/谈谈Spark的计算本地性/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转载：<a href="http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7" target="_blank" rel="noopener">http://coolplayer.net/2017/05/02/%E8%B0%88%E8%B0%88spark-%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%AC%E5%9C%B0%E6%80%A7</a></p>
+<p>Spark 是计算追着数据走， Storm 是数据追着计算走， 所以如果数据量比较小，要求延迟比较小， 就适合storm， 但是如果数据量比较大， 这个时候如果传输数据， 就会碰到很大的带宽占用和性能下降， 这个时候就比较适合让计算去找数据.</p>
+<p>但是在计算找数据的过程中， 是怎么让计算找到数据呢， 这个就是这篇文章谈的， spark 的计算本地性</p>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local1.jpg" alt=""></p>
+<h2 id="不同的-Locality-Level"><a href="#不同的-Locality-Level" class="headerlink" title="不同的 Locality Level"></a>不同的 Locality Level</h2><ul>
+<li>PROCESS_LOCAL: 数据和 task 在同一个executor jvm 中，最好的就是这种 locality。</li>
+<li>NODE_LOCAL: 数据在同一个节点上。比如数据在同一个节点的另一个 executor上；或在 HDFS 上，恰好有 block 在同一个节点上。速度比 PROCESS_LOCAL 稍慢，因为数据需要在不同进程之间传递或从文件中读取</li>
+<li>NO_PREF: 数据从哪里访问都一样快，不需要位置优先</li>
+<li>RACK_LOCAL: 数据在同一机架的不同节点上。需要通过网络传输数据及文件 IO，比 NODE_LOCAL 慢</li>
+<li>ANY: 数据在非同一机架的网络上，速度最慢</li>
+</ul>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local2.jpg" alt=""></p>
+<h2 id="Task-自己想在哪里执行"><a href="#Task-自己想在哪里执行" class="headerlink" title="Task 自己想在哪里执行"></a>Task 自己想在哪里执行</h2><p>我们来看下 task 自己想在哪里执行， 这要根据 task 处理的数据是否缓存， task 的数据所在的 host 和 rack来判断， 在 DAGScheduler 中， 每个分区每个 stage 会成为一个task， 每个 task 会根据自己分区的数据的情况，进行判断自己的 本地性Level，</p>
+<p>getPreferredLocs -&gt; getPreferredLocsInternal</p>
+<p>函数中， 会先判断是否rdd 本分区的数据是否已经缓存在 blockManager， 如果已经缓存， 获取到数据所在的 host 和 executorId， 然后设置本 task 的数据本地性 Level 为 PROCESS_LOCAL， 偏好某个 host 上的某个 executor 去执行，</p>
+<p>如果没有缓存， 那么就不能是PROCESS_LOCAL ， 最多也就是个 NODE_LOCAL，会根据不同的RDD类型，来调用具体的 getPreferredLocations 来判断数据本地性 Level， 和数据本地性偏好</p>
+<p>假如这里是HadoopRDD， 那么每个 task 处理的数据就是一个 HadoopPartition， 其实代表 hdfs 中的一份数据 InputSplit， 它定义了分割的长度及位置。分割长度 是指分割数据的大小（以字节为单位），而分割位置 是分割所在的机器结点名称组成的列表， 分割位置中就能获取到 数据所在的 host 和 rack，</p>
+<p>如果数据源头是 kafka， 那么每个 task 处理的数据就是 KafkaRDDPartition， 其实对应每一个topic的每一个partition， preferredHosts 中记录着每个 topic 中每个 partition 所在的 host， 就直接可以当做 偏好的 host， 如果kafka中broker和Spark在同一个集群中，此时getPreferredLocations获取本地性就可以极大提高效率，因为没有了数据网络传输的成本。</p>
+<p>以上两种都偏好某个 host 去执行</p>
+<p>这里需要注意的是，这里找的数据源头是 rdd的顺着窄依赖， 往上找父依赖， 直到找到第一个窄依赖， 也就找到了数据读取源头， 来决定数据本地性</p>
+<p>如果读取的是 shuffle 的数据， 就不用考虑那么多了， 因为shuffle中的read task 是需要去所有的write task的disk上拉取数据的。</p>
+<h2 id="怎么能最大程度的满足-task-的本地性"><a href="#怎么能最大程度的满足-task-的本地性" class="headerlink" title="怎么能最大程度的满足 task 的本地性"></a>怎么能最大程度的满足 task 的本地性</h2><p>我们都知道， 数据传输对内网带宽和性能有极大的损耗，所以要千方百计的最大程度的满足 更高级别的本地性，从优到差排， PROCESS_LOCAL &gt; NODE_LOCAL &gt; NO_PREF &gt; RACK_LOCAL</p>
+<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task， 如果对应需要是用到的 executor 正在使用中（跑别的task），满足不了， 就等一会（等待时间是有spark.locality.wait.process或spark.locality.wait.node或spark.locality.wait.rack来控制的）， 看看过一会这个忙线的host 或者 executor是不是解脱了， 如果已经空闲了，我就可以把 task 放在它最期望的 host 或者 executor 上去运行了， 这里赌的就是一般来说，task 执行耗时相对于网络传输/文件IO 要小得多，调度器多等待1 2秒可能就可以以更好的本地性执行 task，避免了更耗时的网络传输或文件IO， 也是极棒的。</p>
+<h2 id="Spark的延迟调度"><a href="#Spark的延迟调度" class="headerlink" title="Spark的延迟调度"></a>Spark的延迟调度</h2><p>我们来看下 spark 的延迟调度的策略，</p>
+<p>有时候 task 自己偏好某个 executor 中，</p>
+<p>可以看下面的图直观理解一下</p>
+<p><img src="http://7xim8y.com1.z0.glb.clouddn.com/local3.jpg" alt=""></p>
+<p>所以spark 调度的总体原则就是总是尝试以最高的 locality level 去启动task，<br>我举个例子， 假如 一个 task 要处理的数据，在上一个 stage 中缓存下来了， 这个 task 期望的 就是以 PROCESS_LOCAL 来运行， 这个时候缓存数据的executor 不巧正在执行 其他的task， 那么我就等一会， 等多长时间呢， spark.locality.wait.process这么长时间， 如果时间超了， executor 还是没有空闲下来， 那么我没有办法， 我就以NODE_LOCAL 来运行 task， 这个时候我想到 同一台机器上其他 executor 上跨jvm 去拉取数据， 如果同一台机器上有其他空闲的 executor 可以满足， 就这么干， 如果没有， 等待 spark.locality.wait.node 时间， 还没有就以更低的 Locality Level 去执行这个 task。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/04/13/如何重构箭头型代码/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/04/13/如何重构箭头型代码/" itemprop="url">如何重构箭头型代码</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-13T10:37:03+08:00">
+                2017-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/重构/" itemprop="url" rel="index">
+                    <span itemprop="name">重构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/04/13/如何重构箭头型代码/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/04/13/如何重构箭头型代码/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转载自： <a href="http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io" target="_blank" rel="noopener">http://coolshell.cn/articles/17757.html?hmsr=toutiao.io&amp;utm_medium=toutiao.io&amp;utm_source=toutiao.io</a></p>
+<p>本文主要起因是，一次在微博上和朋友关于嵌套好几层的if-else语句的代码重构的讨论，在微博上大家有各式各样的问题和想法。按道理来说这些都是编程的基本功，似乎不太值得写一篇文章，不过我觉得很多东西可以从一个简单的东西出发，到达本质，所以，我觉得有必要在这里写一篇的文章。不一定全对，只希望得到更多的讨论，因为有了更深入的讨论才能进步。</p>
+<p>文章有点长，我在文章最后会给出相关的思考和总结陈词，你可以跳到结尾。</p>
+<p>所谓箭头型代码，基本上来说就是下面这个图片所示的情况。</p>
+<p><img src="http://coolshell.cn//wp-content/uploads/2017/04/IMG_7411.jpg" alt=""></p>
+<p>那么，这样“箭头型”的代码有什么问题呢？看上去也挺好看的，有对称美。但是……</p>
+<p>关于箭头型代码的问题有如下几个：</p>
+<p>1）我的显示器不够宽，箭头型代码缩进太狠了，需要我来回拉水平滚动条，这让我在读代码的时候，相当的不舒服。</p>
+<p>2）除了宽度外还有长度，有的代码的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">总而言之，**“箭头型代码”如果嵌套太多，代码太长的话，会相当容易让维护代码的人（包括自己）迷失在代码中，因为看到最内层的代码时，你已经不知道前面的那一层一层的条件判断是什么样的，代码是怎么运行到这里的，所以，箭头型代码是非常难以维护和Debug的**。</span><br><span class="line"></span><br><span class="line">## 微博上的案例 与 Guard Clauses</span><br><span class="line">OK，我们先来看一下微博上的那个示例，代码量如果再大一点，嵌套再多一点，你很容易会在条件中迷失掉（下面这个示例只是那个“大箭头”下的一个小箭头）</span><br><span class="line">``` java</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    int index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    if (index != -1) &#123;</span><br><span class="line">        auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">        if (! types.Contains(type.Obj())) &#123;</span><br><span class="line">            types.Add(type.Obj());</span><br><span class="line">            if (auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L&quot;CastResult&quot;, true)) &#123;</span><br><span class="line">                int count = group-&gt;GetMethodCount();</span><br><span class="line">                for (int i = 0; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">                    if (method-&gt;IsStatic()) &#123;</span><br><span class="line">                        if (method-&gt;GetParameterCount() == 1 &amp;&amp;</span><br><span class="line">                            method-&gt;GetParameter(0)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">                            method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;void&gt;() ) &#123;</span><br><span class="line">                            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码，可以把条件反过来写，然后就可以把箭头型的代码解掉了，重构的代码如下所示：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>)  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj()))  <span class="keyword">continue</span>;</span><br><span class="line">     </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line"> </span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> (! method-&gt;IsStatic()) <span class="keyword">continue</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">               method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">               method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">            symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种代码的重构方式叫 Guard Clauses</p>
+<p>Martin Fowler 的 Refactoring 的网站上有相应的说明《Replace Nested Conditional with Guard Clauses》。<br>Coding Horror 上也有一篇文章讲了这种重构的方式 —— 《Flattening Arrow Code》<br>StackOverflow 上也有相关的问题说了这种方式 —— 《Refactor nested IF statement for clarity》<br>这里的思路其实就是，<strong>让出错的代码先返回，前面把所有的错误判断全判断掉，然后就剩下的就是正常的代码了</strong>。</p>
+<h2 id="抽取成函数"><a href="#抽取成函数" class="headerlink" title="抽取成函数"></a>抽取成函数</h2><p>微博上有些人说，continue 语句破坏了阅读代码的通畅，我觉得他们一定没有好好读这里面的代码，其实，我们可以看到，所有的 if 语句都是在判断是否出错的情况，所以，在维护代码的时候，你可以完全不理会这些 if 语句，因为都是出错处理的，而剩下的代码都是正常的功能代码，反而更容易阅读了。当然，一定有不是上面代码里的这种情况，那么，不用continue ，我们还能不能重构呢？</p>
+<p>当然可以，抽成函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">CopyMethodTypeInfo</span><span class="params">(auto &amp;method, auto &amp;group, auto &amp;symbol)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! method-&gt;IsStatic()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( method-&gt;GetParameterCount() == <span class="number">1</span> &amp;&amp;</span><br><span class="line">           method-&gt;GetParameter(<span class="number">0</span>)-&gt;GetType()-&gt;GetTypeDescriptor() == description::GetTypeDescriptor&lt;DescriptableObject&gt;() &amp;&amp;</span><br><span class="line">           method-&gt;GetReturn()-&gt;GetTypeDescriptor() != description::GetTypeDescriptor&lt;<span class="keyword">void</span>&gt;() ) &#123;</span><br><span class="line">        symbol-&gt;typeInfo = CopyTypeInfo(method-&gt;GetReturn());</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ExpressionResolvings</span><span class="params">(auto &amp;manager, auto &amp;argument, auto &amp;symbol)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> index = manager-&gt;expressionResolvings.Keys().IndexOf(argument.Obj());</span><br><span class="line">    <span class="keyword">if</span> (index == -<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">     </span><br><span class="line">    auto type = manager-&gt;expressionResolvings.Values()[index].type;</span><br><span class="line">    <span class="keyword">if</span> ( types.Contains(type.Obj())) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    types.Add(type.Obj());</span><br><span class="line">    auto group = type-&gt;GetTypeDescriptor()-&gt;GetMethodGroupByName(L<span class="string">"CastResult"</span>, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">if</span>  ( ! group ) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> count = group-&gt;GetMethodCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123; auto method = group-&gt;GetMethod(i);</span><br><span class="line">        <span class="keyword">if</span> ( ! CopyMethodTypeInfo(method, group, symbol) ) <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">FOREACH(Ptr&lt;WfExpression&gt;, argument, node-&gt;arguments) &#123;</span><br><span class="line">    ExpressionResolvings(manager, arguments, symbol)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>你发出现，抽成函数后，代码比之前变得更容易读和更容易维护了。不是吗？</p>
+<p>有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护。这才是函数的作用。</p>
+<h2 id="嵌套的-if-外的代码"><a href="#嵌套的-if-外的代码" class="headerlink" title="嵌套的 if 外的代码"></a>嵌套的 if 外的代码</h2><p>微博上还有人问，原来的代码如果在各个 if 语句后还有要执行的代码，那么应该如何重构。比如下面这样的代码。</p>
+<p>原版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1()</span><br><span class="line">    <span class="keyword">if</span> (cond1) &#123;</span><br><span class="line">        do_before_cond2();</span><br><span class="line">        <span class="keyword">if</span> (cond2) &#123;</span><br><span class="line">            do_before_cond3();</span><br><span class="line">            <span class="keyword">if</span> (cond3) &#123;</span><br><span class="line">                do_something();</span><br><span class="line">            &#125;</span><br><span class="line">            do_after_cond3();</span><br><span class="line">        &#125;</span><br><span class="line">        do_after_cond2();</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond1();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码中的那些 <strong>do_after_condX()</strong> 是无论条件成功与否都要执行的。所以，我们拉平后的代码如下所示：</p>
+<p>重构第一版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) &#123;</span><br><span class="line">        do_after_cond1();</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    &#125; </span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) &#123; </span><br><span class="line">        do_after_cond2();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) &#123;</span><br><span class="line">        do_after_cond3();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>你会发现，上面的 do_after_condX 出现了两份。<strong>如果 if 语句块中的代码改变了某些do_after_condX依赖的状态，那么这是最终版本</strong>。</p>
+<p>但是，如果它们之前没有依赖关系的话，根据 DRY 原则，我们就可以只保留一份，那么直接掉到 if 条件前就好了，如下所示：</p>
+<p>重构第二版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;</span><br><span class="line">  </span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">    do_something();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时，你会说，我靠，居然，改变了执行的顺序，把条件放到 do_after_condX() 后面去了。这会不会有问题啊？</p>
+<p>其实，你再分析一下之前的代码，你会发现，本来，cond1 是判断 do_before_cond1() 是否出错的，如果有成功了，才会往下执行。而 do_after_cond1() 是无论如何都要执行的。从逻辑上来说，do_after_cond1()其实和do_before_cond1()的执行结果无关，而 cond1 却和是否去执行 do_before_cond2() 相关了。如果我把断行变成下面这样，反而代码逻辑更清楚了。</p>
+<p>重构第三版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(....) &#123;</span><br><span class="line"> </span><br><span class="line">    do_before_cond1();</span><br><span class="line">    do_after_cond1();</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond1 ) <span class="keyword">continue</span>;  <span class="comment">// &lt;-- cond1 成了是否做第二个语句块的条件</span></span><br><span class="line">    do_before_cond2();</span><br><span class="line">    do_after_cond2();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond2 ) <span class="keyword">continue</span>; <span class="comment">// &lt;-- cond2 成了是否做第三个语句块的条件</span></span><br><span class="line">    do_before_cond3();</span><br><span class="line">    do_after_cond3();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( !cond3 ) <span class="keyword">continue</span>; <span class="comment">//&lt;-- cond3 成了是否做第四个语句块的条件</span></span><br><span class="line">    do_something(); </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>于是乎，在未来维护代码的时候，维护人一眼看上去就明白，代码在什么时候会执行到哪里。 这个时候，你会发现，把这些语句块抽成函数，代码会干净的更多，再重构一版：</p>
+<p>重构第四版<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">bool <span class="title">do_func3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond3;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond2();</span><br><span class="line">   do_after_cond2();</span><br><span class="line">   <span class="keyword">return</span> cond2;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function">bool <span class="title">do_func1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   do_before_cond1();</span><br><span class="line">   do_after_cond1();</span><br><span class="line">   <span class="keyword">return</span> cond1;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 你可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    bool cond = do_func1();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func2();</span><br><span class="line">    <span class="keyword">if</span> (cond) cond = do_func3();</span><br><span class="line">    <span class="keyword">if</span> (cond) do_something();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// for-loop 也可以重构成这样</span></span><br><span class="line"><span class="keyword">for</span> (...) &#123;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func1() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func2() ) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> ( ! do_func3() ) <span class="keyword">continue</span>;</span><br><span class="line"> </span><br><span class="line">   do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面，我给出了两个版本的for-loop，你喜欢哪个？我喜欢第二个。这个时候，因为for-loop里的代码非常简单，就算你不喜欢 continue ，这样的代码阅读成本已经很低了。</p>
+<h2 id="状态检查嵌套"><a href="#状态检查嵌套" class="headerlink" title="状态检查嵌套"></a>状态检查嵌套</h2><p>接下来，我们再来看另一个示例。下面的代码的伪造了一个场景——把两个人拉到一个一对一的聊天室中，因为要检查双方的状态，所以，代码可能会写成了“箭头型”。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare(pB);</span><br><span class="line">            <span class="keyword">if</span> ( manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">                pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">                <span class="keyword">return</span> S_OK;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> S_ERROR;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            pA-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">            manager-&gt;Prepare();</span><br><span class="line">            pB-&gt;Write(<span class="string">"Peer is not Ready, waiting..."</span>);</span><br><span class="line">            <span class="keyword">return</span> S_RETRY;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            pA-&gt;Close();</span><br><span class="line">            pB-&gt;Close();</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Shouldn't be here!</span></span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重构上面的代码，我们可以先分析一下上面的代码，说明了，上面的代码就是对 PeerA 和 PeerB 的两个状态 “连上”， “未连上” 做组合 “状态” （注：实际中的状态应该比这个还要复杂，可能还会有“断开”、“错误”……等等状态）， 于是，我们可以把代码写成下面这样，合并上面的嵌套条件，对于每一种组合都做出判断。这样一来，逻辑就会非常的干净和清楚。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ConnectPeer2Peer</span><span class="params">(Conn *pA, Conn* pB, Manager *manager)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( pA-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pA);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ( pB-&gt;isConnected() ) &#123;</span><br><span class="line">        manager-&gt;Prepare(pB);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = NO</span></span><br><span class="line">    <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; ! pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        pA-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = NO &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> ( !pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected() ) &#123;</span><br><span class="line">        pB-&gt;Write(<span class="string">"Peer is not Ready, waiting"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_RETRY;</span><br><span class="line">    <span class="comment">// pA = YES &amp;&amp; pB = YES</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> (pA-&gt;isConnected() &amp;&amp; pB-&gt;isConnected()  ) &#123;</span><br><span class="line">        <span class="keyword">if</span> ( ! manager-&gt;ConnectTogther(pA, pB) ) &#123;</span><br><span class="line">            <span class="keyword">return</span> S_ERROR;</span><br><span class="line">        &#125;</span><br><span class="line">        pA-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        pB-&gt;Write(<span class="string">"connected"</span>);</span><br><span class="line">        <span class="keyword">return</span> S_OK;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// pA = NO, pB = NO</span></span><br><span class="line">    pA-&gt;Close();</span><br><span class="line">    pB-&gt;Close();</span><br><span class="line">    <span class="keyword">return</span> S_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="延伸思考"><a href="#延伸思考" class="headerlink" title="延伸思考"></a>延伸思考</h2><p>对于<strong> if-else</strong> 语句来说，一般来说，就是检查两件事：<strong>错误</strong> 和 <strong>状态</strong>。</p>
+<p>检查错误</p>
+<p>对于检查错误来说，使用 Guard Clauses 会是一种标准解，但我们还需要注意下面几件事：</p>
+<p>1）当然，出现错误的时候，还会出现需要释放资源的情况。你可以使用 <code>goto fail</code>; 这样的方式，但是最优雅的方式应该是C++面向对象式的 RAII 方式。</p>
+<p>2）以错误码返回是一种比较简单的方式，这种方式有很一些问题，比如，如果错误码太多，判断出错的代码会非常复杂，另外，正常的代码和错误的代码会混在一起，影响可读性。所以，在更为高组的语言中，使用<code>try-catch</code>异常捕捉的方式，会让代码更为易读一些。</p>
+<p><strong>检查状态</strong></p>
+<p>对于检查状态来说，实际中一定有更为复杂的情况，比如下面几种情况：</p>
+<p>1）像TCP协议中的两端的状态变化。</p>
+<p>2）像shell各个命令的命令选项的各种组合。</p>
+<p>3）像游戏中的状态变化（一棵非常复杂的状态树）。</p>
+<p>4）像语法分析那样的状态变化。</p>
+<p>对于这些复杂的状态变化，其本上来说，你需要先定义一个状态机，或是一个子状态的组合状态的查询表，或是一个状态查询分析树。</p>
+<p><strong>写代码时，代码的运行中的控制状态或业务状态是会让你的代码流程变得混乱的一个重要原因，重构“箭头型”代码的一个很重要的工作就是重新梳理和描述这些状态的变迁关系。</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>好了，下面总结一下，把“箭头型”代码重构掉的几个手段如下：</p>
+<p>1）<strong>使用 Guard Clauses</strong> 。 尽可能的让出错的先返回， 这样后面就会得到干净的代码。</p>
+<p>2）<strong>把条件中的语句块抽取成函数</strong>。 有人说：“如果代码不共享，就不要抽取成函数！”，持有这个观点的人太死读书了。函数是代码的封装或是抽象，并不一定用来作代码共享使用，函数用于屏蔽细节，让其它代码耦合于接口而不是细节实现，这会让我们的代码更为简单，简单的东西都能让人易读也易维护，<strong>写出让人易读易维护的代码才是重构代码的初衷</strong>！</p>
+<p>3）<strong>对于出错处理，使用try-catch异常处理和RAII机制</strong>。返回码的出错处理有很多问题，比如：A) 返回码可以被忽略，B) 出错处理的代码和正常处理的代码混在一起，C) 造成函数接口污染，比如像atoi()这种错误码和返回值共用的糟糕的函数。</p>
+<p>4）对于多个状态的判断和组合，如果复杂了，可以使用“组合状态表”，或是状态机加Observer的状态订阅的设计模式。这样的代码即解了耦，也干净简单，同样有很强的扩展性。</p>
+<p>5） 重构“箭头型”代码其实是在帮你重新梳理所有的代码和逻辑，这个过程非常值得为之付出。重新整思路去想尽一切办法简化代码的过程本身就可以让人成长。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/04/10/流式计算概述和Spark-Streaming-tips/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1685,347 +2069,6 @@ Beeline version 1.2.1.spark2 by Apache Hive
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/15/Spark的UDF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/15/Spark的UDF/" itemprop="url">Spark的UDF</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-15T10:52:24+08:00">
-                2017-03-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/15/Spark的UDF/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/15/Spark的UDF/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>参考:<br><a href="http://zhangyi.farbox.com/post/framework/udf-and-udaf-in-spark" target="_blank" rel="noopener">http://zhangyi.farbox.com/post/framework/udf-and-udaf-in-spark</a><br><a href="https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$</a></p>
-<p>UDF的引入极大地丰富了Spark SQL的表现力。一方面，它让我们享受了利用Scala（当然，也包括Java或Python）更为自然地编写代码实现函数的福利，另一方面，又能精简SQL（或者DataFrame的API），更加写意自如地完成复杂的数据分析。尤其采用SQL语句去执行数据分析时，UDF帮助我们在SQL函数与Scala函数之间左右逢源，还可以在一定程度上化解不同数据源具有歧异函数的尴尬。想想不同关系数据库处理日期或时间的函数名称吧！</p>
-<h2 id="UDF"><a href="#UDF" class="headerlink" title="UDF"></a>UDF</h2><h3 id="注册制"><a href="#注册制" class="headerlink" title="注册制"></a>注册制</h3><p>用Scala编写的UDF与普通的Scala函数没有任何区别，唯一需要多执行的一个步骤是要让SQLContext注册它。例如：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">len</span></span>(bookTitle: <span class="type">String</span>):<span class="type">Int</span> = bookTitle.length</span><br><span class="line"></span><br><span class="line">sqlContext.udf.register(<span class="string">"len"</span>, len _)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> booksWithLongTitle = sqlContext.sql(<span class="string">"select title, author from books where len(title) &gt; 10"</span>)</span><br></pre></td></tr></table></figure>
-<p>编写的UDF可以放到SQL语句的fields部分，也可以作为where、groupBy或者having子句的一部分。</p>
-<p>若使用DataFrame的API，则可以以字符串的形式将UDF传入：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(<span class="string">"longLength(title, 10)"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="非注册制"><a href="#非注册制" class="headerlink" title="非注册制"></a>非注册制</h3><p>DataFrame的API也可以接收Column对象，可以用$符号来包裹一个字符串表示一个Column。$是定义在SQLContext对象implicits中的一个隐式转换。此时，UDF的定义也不相同，不能直接定义Scala函数，而是要用定义在org.apache.spark.sql.functions中的udf方法来接收一个函数。这种方式无需register：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> longLength = udf((bookTitle: <span class="type">String</span>, length: <span class="type">Int</span>) =&gt; bookTitle.length &gt; length)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(longLength($<span class="string">"title"</span>, $<span class="string">"10"</span>))</span><br></pre></td></tr></table></figure></p>
-<p>不幸，运行这段代码会抛出异常：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cannot resolve <span class="symbol">'1</span>0' given input columns id, title, author, price, publishedDate;</span><br></pre></td></tr></table></figure>
-<p>因为采用$来包裹一个常量，会让Spark错以为这是一个Column。这时，需要定义在org.apache.spark.sql.functions中的lit函数来帮助：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(longLength($<span class="string">"title"</span>, lit(<span class="number">10</span>)))</span><br></pre></td></tr></table></figure></p>
-<h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><p>参考 <a href="https://databricks.com/blog/2015/09/16/apache-spark-1-5-dataframe-api-highlights.html" target="_blank" rel="noopener">https://databricks.com/blog/2015/09/16/apache-spark-1-5-dataframe-api-highlights.html</a><br>普通的UDF却也存在一个缺陷，就是无法在函数内部支持对表数据的聚合运算。例如，当我要对销量执行年度同比计算，就需要对当年和上一年的销量分别求和，然后再利用同比公式进行计算。此时，UDF就无能为力了。该UDAF（User Defined Aggregate Function）粉墨登场的时候了。</p>
-<p>Spark为所有的UDAF定义了一个父类UserDefinedAggregateFunction。要继承这个类，需要实现父类的几个抽象方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inputSchema</span></span>: <span class="type">StructType</span>  输入参数类型，映射为每一个<span class="type">Field</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bufferSchema</span></span>: <span class="type">StructType</span>   中间结果类型</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dataType</span></span>: <span class="type">DataType</span>   返回结果</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">deterministic</span></span>: <span class="type">Boolean</span>  对于一组输入是否输出相同的结果</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>): <span class="type">Unit</span>  初始化buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>, input: <span class="type">Row</span>): <span class="type">Unit</span>  更新row和buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span></span>(buffer1: <span class="type">MutableAggregationBuffer</span>, buffer2: <span class="type">Row</span>): <span class="type">Unit</span>  merge两个buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluate</span></span>(buffer: <span class="type">Row</span>): <span class="type">Any</span> 计算最终结果</span><br></pre></td></tr></table></figure></p>
-<p>可以将inputSchema理解为UDAF与DataFrame列有关的输入样式。例如年同比函数需要对某个可以运算的指标与时间维度进行处理，就需要在inputSchema中定义它们。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inputSchema</span></span>: <span class="type">StructType</span> = &#123;</span><br><span class="line">  <span class="type">StructType</span>(<span class="type">StructField</span>(<span class="string">"metric"</span>, <span class="type">DoubleType</span>) :: <span class="type">StructField</span>(<span class="string">"timeCategory"</span>, <span class="type">DateType</span>) :: <span class="type">Nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>代码创建了拥有两个StructField的StructType。StructField的名字并没有特别要求，完全可以认为是两个内部结构的列名占位符。至于UDAF具体要操作DataFrame的哪个列，取决于调用者，但前提是数据类型必须符合事先的设置，如这里的DoubleType与DateType类型。这两个类型被定义在org.apache.spark.sql.types中。</p>
-<p>bufferSchema用于定义存储聚合运算时产生的中间数据结果的Schema，例如我们需要存储当年与上一年的销量总和，就需要定义两个StructField：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bufferSchema</span></span>: <span class="type">StructType</span> = &#123;</span><br><span class="line">  <span class="type">StructType</span>(<span class="type">StructField</span>(<span class="string">"sumOfCurrent"</span>, <span class="type">DoubleType</span>) :: <span class="type">StructField</span>(<span class="string">"sumOfPrevious"</span>, <span class="type">DoubleType</span>) :: <span class="type">Nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>dataType标明了UDAF函数的返回值类型，deterministic是一个布尔值，用以标记针对给定的一组输入，UDAF是否总是生成相同的结果。</p>
-<p>顾名思义，initialize就是对聚合运算中间结果的初始化，在我们这个例子中，两个求和的中间值都被初始化为0d：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">  buffer.update(<span class="number">0</span>, <span class="number">0.0</span>)</span><br><span class="line">  buffer.update(<span class="number">1</span>, <span class="number">0.0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>update函数的第一个参数为bufferSchema中两个Field的索引，默认以0开始，所以第一行就是针对“sumOfCurrent”的求和值进行初始化。</p>
-<p>UDAF的核心计算都发生在update函数中。在我们这个例子中，需要用户设置计算同比的时间周期。这个时间周期值属于外部输入，但却并非inputSchema的一部分，所以应该从UDAF对应类的构造函数中传入。我为时间周期定义了一个样例类，且对于同比函数，我们只要求输入当年的时间周期，上一年的时间周期可以通过对年份减1来完成：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">DateRange</span>(<span class="params">startDate: <span class="type">Timestamp</span>, endDate: <span class="type">Timestamp</span></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">in</span></span>(targetDate: <span class="type">Date</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">    targetDate.before(endDate) &amp;&amp; targetDate.after(startDate)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YearOnYearBasis</span>(<span class="params">current: <span class="type">DateRange</span></span>) <span class="keyword">extends</span> <span class="title">UserDefinedAggregateFunction</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">update</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>, input: <span class="type">Row</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (current.in(input.getAs[<span class="type">Date</span>](<span class="number">1</span>))) &#123;</span><br><span class="line">      buffer(<span class="number">0</span>) = buffer.getAs[<span class="type">Double</span>](<span class="number">0</span>) + input.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> previous = <span class="type">DateRange</span>(subtractOneYear(current.startDate), subtractOneYear(current.endDate))</span><br><span class="line">    <span class="keyword">if</span> (previous.in(input.getAs[<span class="type">Date</span>](<span class="number">1</span>))) &#123;</span><br><span class="line">      buffer(<span class="number">1</span>) = buffer.getAs[<span class="type">Double</span>](<span class="number">0</span>) + input.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>update函数的第二个参数input: Row对应的并非DataFrame的行，而是被inputSchema投影了的行。以本例而言，每一个input就应该只有两个Field的值。倘若我们在调用这个UDAF函数时，分别传入了销量和销售日期两个列的话，则input(0)代表的就是销量，input(1)代表的就是销售日期。</p>
-<p>merge函数负责合并两个聚合运算的buffer，再将其存储到MutableAggregationBuffer中：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span></span>(buffer1: <span class="type">MutableAggregationBuffer</span>, buffer2: <span class="type">Row</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">  buffer1(<span class="number">0</span>) = buffer1.getAs[<span class="type">Double</span>](<span class="number">0</span>) + buffer2.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">  buffer1(<span class="number">1</span>) = buffer1.getAs[<span class="type">Double</span>](<span class="number">1</span>) + buffer2.getAs[<span class="type">Double</span>](<span class="number">1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后，由evaluate函数完成对聚合Buffer值的运算，得到最后的结果：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluate</span></span>(buffer: <span class="type">Row</span>): <span class="type">Any</span> = &#123;</span><br><span class="line">  <span class="keyword">if</span> (buffer.getDouble(<span class="number">1</span>) == <span class="number">0.0</span>)</span><br><span class="line">    <span class="number">0.0</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    (buffer.getDouble(<span class="number">0</span>) - buffer.getDouble(<span class="number">1</span>)) / buffer.getDouble(<span class="number">1</span>) * <span class="number">100</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>假设我们创建了这样一个简单的DataFrame：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"TestUDF"</span>).setMaster(<span class="string">"local[*]"</span>)</span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> sales = <span class="type">Seq</span>(</span><br><span class="line">  (<span class="number">1</span>, <span class="string">"Widget Co"</span>, <span class="number">1000.00</span>, <span class="number">0.00</span>, <span class="string">"AZ"</span>, <span class="string">"2014-01-01"</span>),</span><br><span class="line">  (<span class="number">2</span>, <span class="string">"Acme Widgets"</span>, <span class="number">2000.00</span>, <span class="number">500.00</span>, <span class="string">"CA"</span>, <span class="string">"2014-02-01"</span>),</span><br><span class="line">  (<span class="number">3</span>, <span class="string">"Widgetry"</span>, <span class="number">1000.00</span>, <span class="number">200.00</span>, <span class="string">"CA"</span>, <span class="string">"2015-01-11"</span>),</span><br><span class="line">  (<span class="number">4</span>, <span class="string">"Widgets R Us"</span>, <span class="number">2000.00</span>, <span class="number">0.0</span>, <span class="string">"CA"</span>, <span class="string">"2015-02-19"</span>),</span><br><span class="line">  (<span class="number">5</span>, <span class="string">"Ye Olde Widgete"</span>, <span class="number">3000.00</span>, <span class="number">0.0</span>, <span class="string">"MA"</span>, <span class="string">"2015-02-28"</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> salesRows = sc.parallelize(sales, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">val</span> salesDF = salesRows.toDF(<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"sales"</span>, <span class="string">"discount"</span>, <span class="string">"state"</span>, <span class="string">"saleDate"</span>)</span><br><span class="line">salesDF.registerTempTable(<span class="string">"sales"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>那么，要使用之前定义的UDAF，则需要实例化该UDAF类，然后再通过udf进行注册：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> current = <span class="type">DateRange</span>(<span class="type">Timestamp</span>.valueOf(<span class="string">"2015-01-01 00:00:00"</span>), <span class="type">Timestamp</span>.valueOf(<span class="string">"2015-12-31 00:00:00"</span>))</span><br><span class="line"><span class="keyword">val</span> yearOnYear = <span class="keyword">new</span> <span class="type">YearOnYearBasis</span>(current)</span><br><span class="line"></span><br><span class="line">sqlContext.udf.register(<span class="string">"yearOnYear"</span>, yearOnYear)</span><br><span class="line"><span class="keyword">val</span> dataFrame = sqlContext.sql(<span class="string">"select yearOnYear(sales, saleDate) as yearOnYear from sales"</span>)</span><br><span class="line">dataFrame.show()</span><br></pre></td></tr></table></figure></p>
-<p>在使用上，除了需要对UDAF进行实例化之外，与普通的UDF使用没有任何区别。但显然，UDAF更加地强大和灵活。如果Spark自身没有提供符合你需求的函数，且需要进行较为复杂的聚合运算，UDAF是一个不错的选择。</p>
-<p>通过Spark提供的UDF与UDAF，你可以慢慢实现属于自己行业的函数库，让Spark SQL变得越来越强大，对于使用者而言，却能变得越来越简单。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" itemprop="url">如何优雅地终止正在运行的Spark Streaming程序</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-02T14:14:30+08:00">
-                2017-03-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>转自: <a href="https://www.iteblog.com/archives/1890.html" target="_blank" rel="noopener">https://www.iteblog.com/archives/1890.html</a></p>
-<p>一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们咋办？这里有两种方法。</p>
-<h2 id="等作业运行完再关闭"><a href="#等作业运行完再关闭" class="headerlink" title="等作业运行完再关闭"></a>等作业运行完再关闭</h2><p>我们都知道，Spark Streaming每隔batchDuration的时间会把源源不断的流数据分割成一批有限数据集，然后计算这些数据，我们可以从Spark提供的监控页面看到当前batch是否执行完成，当作业执行完，我们就可以手动执行kill命令来强制关闭这个Streaming作业。这种方式的缺点就是得盯着监控页面，然后决定关不关闭，很不灵活。</p>
-<h2 id="通过Spark内置机制关闭"><a href="#通过Spark内置机制关闭" class="headerlink" title="通过Spark内置机制关闭"></a>通过Spark内置机制关闭</h2><p>其实Spark内置就为我们提供了一种优雅的方法来关闭长期运行的Streaming作业，我们来看看 StreamingContext类中定义的一个 stop 方法：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop</span></span>(stopSparkContext: <span class="type">Boolean</span>, stopGracefully: <span class="type">Boolean</span>)</span><br></pre></td></tr></table></figure>
-<p>官方文档对其解释是：Stop the execution of the streams, with option of ensuring all received data has been processed. 控制所有接收的数据是否被处理的参数就是 stopGracefully，如果我们将它设置为true，Spark则会等待所有接收的数据被处理完成，然后再关闭计算引擎，这样就可以避免数据的丢失。现在的问题是我们在哪里调用这个stop方法？</p>
-<p>Spark 1.4版本之前<br>在Spark 1.4版本之前，我们需要手动调用这个 stop 方法，一种比较合适的方式是通过 Runtime.getRuntime().addShutdownHook 来添加一个钩子，其会在JVM关闭的之前执行传递给他的函数，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Runtime</span>.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="type">Thread</span>() &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">run</span></span>() &#123;</span><br><span class="line">    log(<span class="string">"Gracefully stop Spark Streaming"</span>)</span><br><span class="line">    streamingContext.stop(<span class="literal">true</span>, <span class="literal">true</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
-<p>如果你使用的是Scala，我们还可以通过以下的方法实现类似的功能：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scala.sys.addShutdownHook(&#123;</span><br><span class="line">  streamingContext.stop(<span class="literal">true</span>,<span class="literal">true</span>)</span><br><span class="line">)&#125;)</span><br></pre></td></tr></table></figure></p>
-<p>通过上面的办法，我们客户确保程序退出之前会执行上面的函数，从而保证Streaming程序关闭的时候不丢失数据。</p>
-<p>Spark 1.4版本之后<br>上面方式可以达到我们的需求，但是在每个程序里面都添加这样的重复代码也未免太过麻烦了！值得高兴的是，从Apache Spark 1.4版本开始，Spark内置提供了spark.streaming.stopGracefullyOnShutdown参数来决定是否需要以Gracefully方式来关闭Streaming程序（详情请参见SPARK-7776）。Spark会在启动 StreamingContext 的时候注册这个钩子，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">shutdownHookRef = <span class="type">ShutdownHookManager</span>.addShutdownHook(</span><br><span class="line">          <span class="type">StreamingContext</span>.<span class="type">SHUTDOWN_HOOK_PRIORITY</span>)(stopOnShutdown)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">stopOnShutdown</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> stopGracefully = conf.getBoolean(<span class="string">"spark.streaming.stopGracefullyOnShutdown"</span>, <span class="literal">false</span>)</span><br><span class="line">    logInfo(<span class="string">s"Invoking stop(stopGracefully=<span class="subst">$stopGracefully</span>) from shutdown hook"</span>)</span><br><span class="line">    <span class="comment">// Do not stop SparkContext, let its own shutdown hook stop it</span></span><br><span class="line">    stop(stopSparkContext = <span class="literal">false</span>, stopGracefully = stopGracefully)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>从上面的代码可以看出，我们可以根据自己的需求来设置 spark.streaming.stopGracefullyOnShutdown 的值，而不需要在每个Streaming程序里面手动调用StreamingContext的stop方法，确实方便多了。不过虽然这个参数在Spark 1.4开始引入，但是却是在Spark 1.6才开始才有文档正式介绍（可以参见<a href="https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）" target="_blank" rel="noopener">https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2076,7 +2119,7 @@ Beeline version 1.2.1.spark2 by Apache Hive
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-count">100</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2098,7 +2141,7 @@ Beeline version 1.2.1.spark2 by Apache Hive
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

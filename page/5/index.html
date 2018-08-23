@@ -249,6 +249,347 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/15/Spark的UDF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/15/Spark的UDF/" itemprop="url">Spark的UDF</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-15T10:52:24+08:00">
+                2017-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/15/Spark的UDF/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/15/Spark的UDF/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>参考:<br><a href="http://zhangyi.farbox.com/post/framework/udf-and-udaf-in-spark" target="_blank" rel="noopener">http://zhangyi.farbox.com/post/framework/udf-and-udaf-in-spark</a><br><a href="https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$</a></p>
+<p>UDF的引入极大地丰富了Spark SQL的表现力。一方面，它让我们享受了利用Scala（当然，也包括Java或Python）更为自然地编写代码实现函数的福利，另一方面，又能精简SQL（或者DataFrame的API），更加写意自如地完成复杂的数据分析。尤其采用SQL语句去执行数据分析时，UDF帮助我们在SQL函数与Scala函数之间左右逢源，还可以在一定程度上化解不同数据源具有歧异函数的尴尬。想想不同关系数据库处理日期或时间的函数名称吧！</p>
+<h2 id="UDF"><a href="#UDF" class="headerlink" title="UDF"></a>UDF</h2><h3 id="注册制"><a href="#注册制" class="headerlink" title="注册制"></a>注册制</h3><p>用Scala编写的UDF与普通的Scala函数没有任何区别，唯一需要多执行的一个步骤是要让SQLContext注册它。例如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">len</span></span>(bookTitle: <span class="type">String</span>):<span class="type">Int</span> = bookTitle.length</span><br><span class="line"></span><br><span class="line">sqlContext.udf.register(<span class="string">"len"</span>, len _)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> booksWithLongTitle = sqlContext.sql(<span class="string">"select title, author from books where len(title) &gt; 10"</span>)</span><br></pre></td></tr></table></figure>
+<p>编写的UDF可以放到SQL语句的fields部分，也可以作为where、groupBy或者having子句的一部分。</p>
+<p>若使用DataFrame的API，则可以以字符串的形式将UDF传入：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(<span class="string">"longLength(title, 10)"</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="非注册制"><a href="#非注册制" class="headerlink" title="非注册制"></a>非注册制</h3><p>DataFrame的API也可以接收Column对象，可以用$符号来包裹一个字符串表示一个Column。$是定义在SQLContext对象implicits中的一个隐式转换。此时，UDF的定义也不相同，不能直接定义Scala函数，而是要用定义在org.apache.spark.sql.functions中的udf方法来接收一个函数。这种方式无需register：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> longLength = udf((bookTitle: <span class="type">String</span>, length: <span class="type">Int</span>) =&gt; bookTitle.length &gt; length)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(longLength($<span class="string">"title"</span>, $<span class="string">"10"</span>))</span><br></pre></td></tr></table></figure></p>
+<p>不幸，运行这段代码会抛出异常：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cannot resolve <span class="symbol">'1</span>0' given input columns id, title, author, price, publishedDate;</span><br></pre></td></tr></table></figure>
+<p>因为采用$来包裹一个常量，会让Spark错以为这是一个Column。这时，需要定义在org.apache.spark.sql.functions中的lit函数来帮助：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> booksWithLongTitle = dataFrame.filter(longLength($<span class="string">"title"</span>, lit(<span class="number">10</span>)))</span><br></pre></td></tr></table></figure></p>
+<h2 id="UDAF"><a href="#UDAF" class="headerlink" title="UDAF"></a>UDAF</h2><p>参考 <a href="https://databricks.com/blog/2015/09/16/apache-spark-1-5-dataframe-api-highlights.html" target="_blank" rel="noopener">https://databricks.com/blog/2015/09/16/apache-spark-1-5-dataframe-api-highlights.html</a><br>普通的UDF却也存在一个缺陷，就是无法在函数内部支持对表数据的聚合运算。例如，当我要对销量执行年度同比计算，就需要对当年和上一年的销量分别求和，然后再利用同比公式进行计算。此时，UDF就无能为力了。该UDAF（User Defined Aggregate Function）粉墨登场的时候了。</p>
+<p>Spark为所有的UDAF定义了一个父类UserDefinedAggregateFunction。要继承这个类，需要实现父类的几个抽象方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inputSchema</span></span>: <span class="type">StructType</span>  输入参数类型，映射为每一个<span class="type">Field</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bufferSchema</span></span>: <span class="type">StructType</span>   中间结果类型</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dataType</span></span>: <span class="type">DataType</span>   返回结果</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">deterministic</span></span>: <span class="type">Boolean</span>  对于一组输入是否输出相同的结果</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>): <span class="type">Unit</span>  初始化buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>, input: <span class="type">Row</span>): <span class="type">Unit</span>  更新row和buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span></span>(buffer1: <span class="type">MutableAggregationBuffer</span>, buffer2: <span class="type">Row</span>): <span class="type">Unit</span>  merge两个buffer</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluate</span></span>(buffer: <span class="type">Row</span>): <span class="type">Any</span> 计算最终结果</span><br></pre></td></tr></table></figure></p>
+<p>可以将inputSchema理解为UDAF与DataFrame列有关的输入样式。例如年同比函数需要对某个可以运算的指标与时间维度进行处理，就需要在inputSchema中定义它们。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inputSchema</span></span>: <span class="type">StructType</span> = &#123;</span><br><span class="line">  <span class="type">StructType</span>(<span class="type">StructField</span>(<span class="string">"metric"</span>, <span class="type">DoubleType</span>) :: <span class="type">StructField</span>(<span class="string">"timeCategory"</span>, <span class="type">DateType</span>) :: <span class="type">Nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码创建了拥有两个StructField的StructType。StructField的名字并没有特别要求，完全可以认为是两个内部结构的列名占位符。至于UDAF具体要操作DataFrame的哪个列，取决于调用者，但前提是数据类型必须符合事先的设置，如这里的DoubleType与DateType类型。这两个类型被定义在org.apache.spark.sql.types中。</p>
+<p>bufferSchema用于定义存储聚合运算时产生的中间数据结果的Schema，例如我们需要存储当年与上一年的销量总和，就需要定义两个StructField：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bufferSchema</span></span>: <span class="type">StructType</span> = &#123;</span><br><span class="line">  <span class="type">StructType</span>(<span class="type">StructField</span>(<span class="string">"sumOfCurrent"</span>, <span class="type">DoubleType</span>) :: <span class="type">StructField</span>(<span class="string">"sumOfPrevious"</span>, <span class="type">DoubleType</span>) :: <span class="type">Nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>dataType标明了UDAF函数的返回值类型，deterministic是一个布尔值，用以标记针对给定的一组输入，UDAF是否总是生成相同的结果。</p>
+<p>顾名思义，initialize就是对聚合运算中间结果的初始化，在我们这个例子中，两个求和的中间值都被初始化为0d：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">  buffer.update(<span class="number">0</span>, <span class="number">0.0</span>)</span><br><span class="line">  buffer.update(<span class="number">1</span>, <span class="number">0.0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>update函数的第一个参数为bufferSchema中两个Field的索引，默认以0开始，所以第一行就是针对“sumOfCurrent”的求和值进行初始化。</p>
+<p>UDAF的核心计算都发生在update函数中。在我们这个例子中，需要用户设置计算同比的时间周期。这个时间周期值属于外部输入，但却并非inputSchema的一部分，所以应该从UDAF对应类的构造函数中传入。我为时间周期定义了一个样例类，且对于同比函数，我们只要求输入当年的时间周期，上一年的时间周期可以通过对年份减1来完成：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">DateRange</span>(<span class="params">startDate: <span class="type">Timestamp</span>, endDate: <span class="type">Timestamp</span></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">in</span></span>(targetDate: <span class="type">Date</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">    targetDate.before(endDate) &amp;&amp; targetDate.after(startDate)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YearOnYearBasis</span>(<span class="params">current: <span class="type">DateRange</span></span>) <span class="keyword">extends</span> <span class="title">UserDefinedAggregateFunction</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">update</span></span>(buffer: <span class="type">MutableAggregationBuffer</span>, input: <span class="type">Row</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (current.in(input.getAs[<span class="type">Date</span>](<span class="number">1</span>))) &#123;</span><br><span class="line">      buffer(<span class="number">0</span>) = buffer.getAs[<span class="type">Double</span>](<span class="number">0</span>) + input.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> previous = <span class="type">DateRange</span>(subtractOneYear(current.startDate), subtractOneYear(current.endDate))</span><br><span class="line">    <span class="keyword">if</span> (previous.in(input.getAs[<span class="type">Date</span>](<span class="number">1</span>))) &#123;</span><br><span class="line">      buffer(<span class="number">1</span>) = buffer.getAs[<span class="type">Double</span>](<span class="number">0</span>) + input.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>update函数的第二个参数input: Row对应的并非DataFrame的行，而是被inputSchema投影了的行。以本例而言，每一个input就应该只有两个Field的值。倘若我们在调用这个UDAF函数时，分别传入了销量和销售日期两个列的话，则input(0)代表的就是销量，input(1)代表的就是销售日期。</p>
+<p>merge函数负责合并两个聚合运算的buffer，再将其存储到MutableAggregationBuffer中：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span></span>(buffer1: <span class="type">MutableAggregationBuffer</span>, buffer2: <span class="type">Row</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">  buffer1(<span class="number">0</span>) = buffer1.getAs[<span class="type">Double</span>](<span class="number">0</span>) + buffer2.getAs[<span class="type">Double</span>](<span class="number">0</span>)</span><br><span class="line">  buffer1(<span class="number">1</span>) = buffer1.getAs[<span class="type">Double</span>](<span class="number">1</span>) + buffer2.getAs[<span class="type">Double</span>](<span class="number">1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后，由evaluate函数完成对聚合Buffer值的运算，得到最后的结果：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluate</span></span>(buffer: <span class="type">Row</span>): <span class="type">Any</span> = &#123;</span><br><span class="line">  <span class="keyword">if</span> (buffer.getDouble(<span class="number">1</span>) == <span class="number">0.0</span>)</span><br><span class="line">    <span class="number">0.0</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    (buffer.getDouble(<span class="number">0</span>) - buffer.getDouble(<span class="number">1</span>)) / buffer.getDouble(<span class="number">1</span>) * <span class="number">100</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>假设我们创建了这样一个简单的DataFrame：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"TestUDF"</span>).setMaster(<span class="string">"local[*]"</span>)</span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sqlContext.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> sales = <span class="type">Seq</span>(</span><br><span class="line">  (<span class="number">1</span>, <span class="string">"Widget Co"</span>, <span class="number">1000.00</span>, <span class="number">0.00</span>, <span class="string">"AZ"</span>, <span class="string">"2014-01-01"</span>),</span><br><span class="line">  (<span class="number">2</span>, <span class="string">"Acme Widgets"</span>, <span class="number">2000.00</span>, <span class="number">500.00</span>, <span class="string">"CA"</span>, <span class="string">"2014-02-01"</span>),</span><br><span class="line">  (<span class="number">3</span>, <span class="string">"Widgetry"</span>, <span class="number">1000.00</span>, <span class="number">200.00</span>, <span class="string">"CA"</span>, <span class="string">"2015-01-11"</span>),</span><br><span class="line">  (<span class="number">4</span>, <span class="string">"Widgets R Us"</span>, <span class="number">2000.00</span>, <span class="number">0.0</span>, <span class="string">"CA"</span>, <span class="string">"2015-02-19"</span>),</span><br><span class="line">  (<span class="number">5</span>, <span class="string">"Ye Olde Widgete"</span>, <span class="number">3000.00</span>, <span class="number">0.0</span>, <span class="string">"MA"</span>, <span class="string">"2015-02-28"</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> salesRows = sc.parallelize(sales, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">val</span> salesDF = salesRows.toDF(<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"sales"</span>, <span class="string">"discount"</span>, <span class="string">"state"</span>, <span class="string">"saleDate"</span>)</span><br><span class="line">salesDF.registerTempTable(<span class="string">"sales"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>那么，要使用之前定义的UDAF，则需要实例化该UDAF类，然后再通过udf进行注册：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> current = <span class="type">DateRange</span>(<span class="type">Timestamp</span>.valueOf(<span class="string">"2015-01-01 00:00:00"</span>), <span class="type">Timestamp</span>.valueOf(<span class="string">"2015-12-31 00:00:00"</span>))</span><br><span class="line"><span class="keyword">val</span> yearOnYear = <span class="keyword">new</span> <span class="type">YearOnYearBasis</span>(current)</span><br><span class="line"></span><br><span class="line">sqlContext.udf.register(<span class="string">"yearOnYear"</span>, yearOnYear)</span><br><span class="line"><span class="keyword">val</span> dataFrame = sqlContext.sql(<span class="string">"select yearOnYear(sales, saleDate) as yearOnYear from sales"</span>)</span><br><span class="line">dataFrame.show()</span><br></pre></td></tr></table></figure></p>
+<p>在使用上，除了需要对UDAF进行实例化之外，与普通的UDF使用没有任何区别。但显然，UDAF更加地强大和灵活。如果Spark自身没有提供符合你需求的函数，且需要进行较为复杂的聚合运算，UDAF是一个不错的选择。</p>
+<p>通过Spark提供的UDF与UDAF，你可以慢慢实现属于自己行业的函数库，让Spark SQL变得越来越强大，对于使用者而言，却能变得越来越简单。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" itemprop="url">如何优雅地终止正在运行的Spark Streaming程序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-02T14:14:30+08:00">
+                2017-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/02/如何优雅地终止正在运行的Spark-Streaming程序/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转自: <a href="https://www.iteblog.com/archives/1890.html" target="_blank" rel="noopener">https://www.iteblog.com/archives/1890.html</a></p>
+<p>一直运行的Spark Streaming程序如何关闭呢？是直接使用kill命令强制关闭吗？这种手段是可以达到关闭的目的，但是带来的后果就是可能会导致数据的丢失，因为这时候如果程序正在处理接收到的数据，但是由于接收到kill命令，那它只能停止整个程序，而那些正在处理或者还没有处理的数据可能就会被丢失。那我们咋办？这里有两种方法。</p>
+<h2 id="等作业运行完再关闭"><a href="#等作业运行完再关闭" class="headerlink" title="等作业运行完再关闭"></a>等作业运行完再关闭</h2><p>我们都知道，Spark Streaming每隔batchDuration的时间会把源源不断的流数据分割成一批有限数据集，然后计算这些数据，我们可以从Spark提供的监控页面看到当前batch是否执行完成，当作业执行完，我们就可以手动执行kill命令来强制关闭这个Streaming作业。这种方式的缺点就是得盯着监控页面，然后决定关不关闭，很不灵活。</p>
+<h2 id="通过Spark内置机制关闭"><a href="#通过Spark内置机制关闭" class="headerlink" title="通过Spark内置机制关闭"></a>通过Spark内置机制关闭</h2><p>其实Spark内置就为我们提供了一种优雅的方法来关闭长期运行的Streaming作业，我们来看看 StreamingContext类中定义的一个 stop 方法：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop</span></span>(stopSparkContext: <span class="type">Boolean</span>, stopGracefully: <span class="type">Boolean</span>)</span><br></pre></td></tr></table></figure>
+<p>官方文档对其解释是：Stop the execution of the streams, with option of ensuring all received data has been processed. 控制所有接收的数据是否被处理的参数就是 stopGracefully，如果我们将它设置为true，Spark则会等待所有接收的数据被处理完成，然后再关闭计算引擎，这样就可以避免数据的丢失。现在的问题是我们在哪里调用这个stop方法？</p>
+<p>Spark 1.4版本之前<br>在Spark 1.4版本之前，我们需要手动调用这个 stop 方法，一种比较合适的方式是通过 Runtime.getRuntime().addShutdownHook 来添加一个钩子，其会在JVM关闭的之前执行传递给他的函数，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Runtime</span>.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="type">Thread</span>() &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">run</span></span>() &#123;</span><br><span class="line">    log(<span class="string">"Gracefully stop Spark Streaming"</span>)</span><br><span class="line">    streamingContext.stop(<span class="literal">true</span>, <span class="literal">true</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>如果你使用的是Scala，我们还可以通过以下的方法实现类似的功能：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scala.sys.addShutdownHook(&#123;</span><br><span class="line">  streamingContext.stop(<span class="literal">true</span>,<span class="literal">true</span>)</span><br><span class="line">)&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>通过上面的办法，我们客户确保程序退出之前会执行上面的函数，从而保证Streaming程序关闭的时候不丢失数据。</p>
+<p>Spark 1.4版本之后<br>上面方式可以达到我们的需求，但是在每个程序里面都添加这样的重复代码也未免太过麻烦了！值得高兴的是，从Apache Spark 1.4版本开始，Spark内置提供了spark.streaming.stopGracefullyOnShutdown参数来决定是否需要以Gracefully方式来关闭Streaming程序（详情请参见SPARK-7776）。Spark会在启动 StreamingContext 的时候注册这个钩子，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">shutdownHookRef = <span class="type">ShutdownHookManager</span>.addShutdownHook(</span><br><span class="line">          <span class="type">StreamingContext</span>.<span class="type">SHUTDOWN_HOOK_PRIORITY</span>)(stopOnShutdown)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">stopOnShutdown</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> stopGracefully = conf.getBoolean(<span class="string">"spark.streaming.stopGracefullyOnShutdown"</span>, <span class="literal">false</span>)</span><br><span class="line">    logInfo(<span class="string">s"Invoking stop(stopGracefully=<span class="subst">$stopGracefully</span>) from shutdown hook"</span>)</span><br><span class="line">    <span class="comment">// Do not stop SparkContext, let its own shutdown hook stop it</span></span><br><span class="line">    stop(stopSparkContext = <span class="literal">false</span>, stopGracefully = stopGracefully)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从上面的代码可以看出，我们可以根据自己的需求来设置 spark.streaming.stopGracefullyOnShutdown 的值，而不需要在每个Streaming程序里面手动调用StreamingContext的stop方法，确实方便多了。不过虽然这个参数在Spark 1.4开始引入，但是却是在Spark 1.6才开始才有文档正式介绍（可以参见<a href="https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）" target="_blank" rel="noopener">https://github.com/apache/spark/pull/8898和http://spark.apache.org/docs/1.6.0/configuration.html）</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/02/23/Spark有用的配置选项/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1559,412 +1900,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/11/29/Scala的类型和反射机制/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/11/29/Scala的类型和反射机制/" itemprop="url">Scala的类型和反射机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-29T16:43:45+08:00">
-                2016-11-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Scala/" itemprop="url" rel="index">
-                    <span itemprop="name">Scala</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/11/29/Scala的类型和反射机制/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/11/29/Scala的类型和反射机制/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Scala的反射机制"><a href="#Scala的反射机制" class="headerlink" title="Scala的反射机制"></a>Scala的反射机制</h1><ol>
-<li><p>Manifest &amp; ClassManifest<br>Manifest是在编译时捕捉的，编码了“捕捉时”所致的类型信息。然后就可以在运行时检查和使用类型信息，但是manifest只能捕捉当Manifest被查找时在隐式作用域里的类型。</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first</span></span>[<span class="type">A</span> : <span class="type">ClassManifest</span>](x:<span class="type">Array</span>[<span class="type">A</span>]) = <span class="type">Array</span>(x(<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>ClassTag &amp; TypeTag</p>
-</li>
-</ol>
-<ul>
-<li><p>ClassTag[T]保存了被泛型擦除后的原始类型T,提供给运行时的</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">mkArray</span></span>[<span class="type">T</span> : <span class="type">ClassTag</span>](elems: <span class="type">T</span>*) = <span class="type">Array</span>[<span class="type">T</span>](elems: _*)</span><br><span class="line">mkArray: [<span class="type">T</span>](elems: <span class="type">T</span>*)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: scala.reflect.<span class="type">ClassTag</span>[<span class="type">T</span>])<span class="type">Array</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>TypeTag则保存所有具体的类型</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramInfo</span></span>[<span class="type">T</span>](x: <span class="type">T</span>)(<span class="keyword">implicit</span> tag: <span class="type">TypeTag</span>[<span class="type">T</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> targs = tag.tpe <span class="keyword">match</span> &#123; <span class="keyword">case</span> <span class="type">TypeRef</span>(_, _, args) =&gt; args &#125;</span><br><span class="line">  println(<span class="string">s"type of <span class="subst">$x</span> has type arguments <span class="subst">$targs</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line">scala&gt; paramInfo(<span class="number">42</span>)</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">of</span> 42 <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">paramInfo</span>(<span class="params"><span class="type">List</span>(1, 2</span>))</span></span><br><span class="line"><span class="class"><span class="title">type</span> <span class="title">of</span> <span class="title">List</span>(<span class="params">1, 2</span>) <span class="title">has</span> <span class="title">type</span> <span class="title">arguments</span> <span class="title">List</span>(<span class="params"><span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>可以看到，获取到的类型是具体的类型，而不是被擦除后的类型List(Any)</p>
-<p>scala在2.10里却用TypeTag替代了Manifest，用ClassTag替代了ClassManifest，原因是在路径依赖类型中，Manifest存在问题：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span>&#123;<span class="class"><span class="keyword">class</span> <span class="title">Bar</span>&#125;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">def</span> <span class="title">m</span>(<span class="params">f: <span class="type">Foo</span></span>)(<span class="params">b: f.<span class="type">Bar</span></span>)(<span class="params">implicit ev: <span class="type">Manifest</span>[f.<span class="type">Bar</span>]</span>) </span>= ev</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> f1 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b1 = <span class="keyword">new</span> f1.<span class="type">Bar</span></span><br><span class="line">scala&gt; <span class="keyword">val</span> f2 = <span class="keyword">new</span> <span class="type">Foo</span>;<span class="keyword">val</span> b2 = <span class="keyword">new</span> f2.<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev1 = m(f1)(b1)</span><br><span class="line">ev1: <span class="type">Manifest</span>[f1.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">681e731</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> ev2 = m(f2)(b2)</span><br><span class="line">ev2: <span class="type">Manifest</span>[f2.<span class="type">Bar</span>] = <span class="type">Foo</span>@<span class="number">3e50039</span>c.<span class="keyword">type</span>#<span class="type">Foo</span>$<span class="type">Bar</span></span><br><span class="line"></span><br><span class="line">scala&gt; ev1 == ev2 <span class="comment">// they should be different, thus the result is wrong</span></span><br><span class="line">res28: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
-<p>ev1 不应该等于 ev2 的，因为其依赖路径（外部实例）是不一样的。<br>还有其他因素，所以在2.10版本里，使用 TypeTag 替代了 Manifest<br>TypeTag:由编辑器生成,只能通过隐式参数或者上下文绑定获取<br>可以有两种方式获取:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用typeTag</span></span><br><span class="line">scala&gt; <span class="function"><span class="keyword">def</span> <span class="title">getTypeTag</span></span>[<span class="type">T</span>:<span class="type">TypeTag</span>](a:<span class="type">T</span>) = typeTag[<span class="type">T</span>]</span><br><span class="line">getTypeTag: [<span class="type">T</span>](a: <span class="type">T</span>)(<span class="keyword">implicit</span> evidence$<span class="number">1</span>: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>])reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">T</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用implicitly 等价的 </span></span><br><span class="line"><span class="comment">//scala&gt;def getTypeTag[T:TypeTag](a:T) = implicitly[TypeTag[T]]</span></span><br><span class="line"></span><br><span class="line">scala&gt; getTypeTag(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line">res0: reflect.runtime.universe.<span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]] = <span class="type">TypeTag</span>[<span class="type">List</span>[<span class="type">Int</span>]]</span><br></pre></td></tr></table></figure></p>
-<p>通过TypeTag的tpe方法获得需要的Type(如果不是从对象换取Type 而是从class中获得 可以直接用 typeOf[类名])</p>
-<ol start="3">
-<li><p>反射获取TypeTag和ClassTag<br><a href="http://www.programcreek.com/java-api-examples/index.php?api=scala.reflect.ClassTag" target="_blank" rel="noopener">JavaCodeExample</a><br>String———-&gt;Calss————–&gt;Manifest——–&gt;TypeTag<br>Class.forName    ManifestFactory.classType scala.reflect.runtime.universe.manifestToTypeTag</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.reflect.runtime.universe</span><br><span class="line"><span class="keyword">import</span> scala.reflect.<span class="type">ManifestFactory</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> className = <span class="string">"java.lang.String"</span></span><br><span class="line"><span class="keyword">val</span> mirror = universe.runtimeMirror(getClass.getClassLoader)</span><br><span class="line"><span class="keyword">val</span> cls = <span class="type">Class</span>.forName(className)</span><br><span class="line"><span class="keyword">val</span> t = universe.manifestToTypeTag(mirror, <span class="type">ManifestFactory</span>.classType(cls))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>classOf与getClass方法的差异</p>
-</li>
-</ol>
-<p>getClass 方法得到的是 Class[A]的某个子类，而 classOf[A] 得到是正确的 Class[A]，但是去比较的话，这两个类型是equals为true的</p>
-<p>classOf获取运行时的类型。classOf[T] 相当于 java中的T.class; 而getClass:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listClass = classOf[<span class="type">List</span>[_]]</span><br><span class="line">   * <span class="comment">// listClass is java.lang.Class[List[_]] = class scala.collection.immutable.List</span></span><br><span class="line"><span class="keyword">val</span> mapIntString = classOf[<span class="type">Map</span>[<span class="type">Int</span>,<span class="type">String</span>]]</span><br><span class="line">   * <span class="comment">// mapIntString is java.lang.Class[Map[Int,String]] = interface scala.collection.immutable.Map</span></span><br><span class="line">   * &#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span>  <span class="title">A</span></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">val</span> <span class="title">a</span> </span>= <span class="keyword">new</span> <span class="type">A</span></span><br><span class="line"></span><br><span class="line">scala&gt; a.getClass</span><br><span class="line">res2: <span class="type">Class</span>[_ &lt;: <span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">classOf</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"><span class="title">res3</span></span>: <span class="type">Class</span>[<span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">a</span>.<span class="title">getClass</span>  <span class="title">==</span> <span class="title">classOf</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"><span class="title">res13</span></span>: <span class="type">Boolean</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
-<p>这种细微的差别，体现在类型赋值时，因为java里的 Class[T]是不支持协变的，所以无法把一个 Class[_ &lt; : A] 赋值给一个 Class[A]<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> c:<span class="type">Class</span>[<span class="type">A</span>] = a.getClass</span><br><span class="line">&lt;console&gt;:<span class="number">9</span>: error: <span class="class"><span class="keyword">type</span> <span class="title">mismatch</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p>类(class)与类型(type)是两个不一样的概念</p>
-<p>(在java里因为早期一直使用class表达type，并且现在也延续这样的习惯)；类型(type)比类(class)更”具体”，任何数据都有类型。类是面向对象系统里对同一类数据的抽象，在没有泛型之前，类型系统不存在高阶概念，直接与类一一映射，而泛型出现之后，就不在一一映射了。比如定义class List[T] {}, 可以有List[Int] 和 List[String]等具体类型，它们的类是同一个List，但类型则根据不同的构造参数类型而不同。</p>
-<p>类型一致的对象它们的类也是一致的，反过来，类一致的，其类型不一定一致。</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; classOf[<span class="type">List</span>[<span class="type">Int</span>]] == classOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res16: <span class="type">Boolean</span> = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">scala&gt; typeOf[<span class="type">List</span>[<span class="type">Int</span>]] == typeOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res17: <span class="type">Boolean</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/11/29/JVM源码分析系列/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/11/29/JVM源码分析系列/" itemprop="url">JVM源码分析系列</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-29T16:43:45+08:00">
-                2016-11-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/11/29/JVM源码分析系列/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/11/29/JVM源码分析系列/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>JVM源码分析系列</p>
-<ol>
-<li><p>不保证顺序的Class.getMethods<br><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=2650886863&amp;idx=1&amp;sn=1cc34f397e0c62d1126560ff43f30069&amp;chksm=f32f6670c458ef66d56f51187547c4aff7b62038ea941c8048b014e6a1e2d2e9252369397866&amp;scene=0#rd" target="_blank" rel="noopener">JVM源码分析之不保证顺序的Class.getMethods</a></p>
-</li>
-<li><p>Metaspace<br><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=2650886860&amp;idx=1&amp;sn=f8bc6ab03d7a07022c86bf726209b17c&amp;chksm=f32f6673c458ef657358068a8aea4664d3cbc8a488e6bfd6445c0743140f6fc8bcf9649298b7&amp;scene=0#wechat_redirect" target="_blank" rel="noopener">JVM源码分析之Metaspace解密</a></p>
-</li>
-</ol>
-<p>metaspace，顾名思义，元数据空间，专门用来存元数据的，它是jdk8里特有的数据结构用来替代perm</p>
-<ul>
-<li>为什么会有metaspace<br>如果perm设置太小了，系统运行过程中就容易出现内存溢出，设置大了又总感觉浪费，尽管不会实质分配这么大的物理内存。基于这么一个可能的原因，于是metaspace出现了，希望内存的管理不再受到限制，也不要怎么关注元数据这块的OOM问题</li>
-<li>metaspace的组成<ul>
-<li>Klass Metaspace Klass Metaspace就是用来存klass的，klass是我们熟知的class文件在jvm里的运行时数据结构，不过有点要提的是我们看到的类似A.class其实是存在heap里的，是java.lang.Class的一个对象实例。</li>
-<li>NoKlass Metaspace  NoKlass Metaspace专门来存klass相关的其他的内容，比如method，constantPool等，这块内存是由多块内存组合起来的，所以可以认为是不连续的内存块组成的。</li>
-</ul>
-</li>
-</ul>
-<p>Klass Metaspace和NoKlass Mestaspace都是所有classloader共享的，所以类加载器们要分配内存，但是每个类加载器都有一个SpaceManager，来管理属于这个类加载的内存小块。</p>
-<ol start="3">
-<li>JVM源码分析之String.intern()导致的YGC不断变长<br><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=2650886867&amp;idx=1&amp;sn=e4433f7068357b0f9ed283b607fa50e6&amp;chksm=f32f666cc458ef7a0132c6dfb74bc53626b47d884db7ae1b29a41bea3527e416c87c71c49fbc&amp;scene=0#rd" target="_blank" rel="noopener">JVM源码分析之String.intern()导致的YGC不断变长</a></li>
-</ol>
-<p>在JVM里存在一个叫做StringTable的数据结构，这个数据结构是一个Hashtable，在我们调用String.intern的时候其实就是先去这个StringTable里查找是否存在一个同名的项，如果存在就直接返回对应的对象，否则就往这个table里插入一项，指向这个String对象，那么再下次通过intern再来访问同名的String对象的时候，就会返回上次插入的这一项指向的String对象</p>
-<p>YGC的时间长短和扫描StringTable有关,如果StringTable非常庞大，那YGC过程扫描的时间也会变长</p>
-<p>YGC过程不会对StringTable做清理，这也就是我们demo里的情况会让Stringtable越来越大，因为到目前为止还只看到YGC过程，但是在Full GC或者CMS GC过程会对StringTable做清理</p>
-<ol start="4">
-<li><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=403257534&amp;idx=1&amp;sn=2015e011c50c0a9107a48aa60a4adb78&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">如何定位消耗CPU最多的线程</a></li>
-</ol>
-<p>步骤</p>
-<pre><code>- 使用top -Hp &lt;pid&gt; 查看进程所有线程的CPU消耗情况
-
-- 使用jstack &lt;pid&gt; 查看各个线程栈
-</code></pre><p> 5.<a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=403191974&amp;idx=1&amp;sn=def1d96a9abbfa22fd1aeedd254af5c7&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">JVM源码分析之Object.wait/notify(All)完全解读</a></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread()&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				lock.wait();</span><br><span class="line">			&#125; <span class="keyword">catch</span>(InterruptedException e) &#123;</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;.start();</span><br><span class="line"><span class="keyword">new</span> Thread()&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				lock.notify();</span><br><span class="line">			&#125; </span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;.start();</span><br></pre></td></tr></table></figure>
-<ul>
-<li>为何要加synchronized锁<br>从实现上来说，这个锁至关重要，正因为这把锁，才能让整个wait/notify玩转起来</li>
-<li>wait方法执行后未退出同步块，其他线程如何进入同步块<br>因为在wait处理过程中会临时释放同步锁，不过需要注意的是当某个线程调用notify唤起了这个线程的时候，在wait方法退出之前会重新获取这把锁，只有获取了这把锁才会继续执行</li>
-<li>为什么wait方法可能抛出InterruptedException异常<br>这个异常大家应该都知道，当我们调用了某个线程的interrupt方法时，对应的线程会抛出这个异常，wait方法也不希望破坏这种规则，因此就算当前线程因为wait一直在阻塞，当某个线程希望它起来继续执行的时候，它还是得从阻塞态恢复过来，因此wait方法被唤醒起来的时候会去检测这个状态，当有线程interrupt了它的时候，它就会抛出这个异常从阻塞状态恢复过来。</li>
-<li>被notify(All)的线程有规律吗<br>这里要分情况： <em> 如果是通过notify来唤起的线程，那先进入wait的线程会先被唤起来 </em> 如果是通过nootifyAll唤起的线程，默认情况是最后进入的会先被唤起来，即LIFO的策略</li>
-<li>notify执行之后立马唤醒线程吗<br>hotspot里真正的实现是退出同步块的时候才会去真正唤醒对应的线程，</li>
-<li>notifyAll是怎么实现全唤起的<br>以notifyAll的实现是调用notify的线程在退出其同步块的时候唤醒起最后一个进入wait状态的线程，然后这个线程退出同步块的时候继续唤醒其倒数第二个进入wait状态的线程，依次类推</li>
-<li>wait的线程是否会影响load<br>当线程进入到wait状态的时候其实是会放弃cpu的，也就是说这类线程是不会占用cpu资源</li>
-</ul>
-<ol start="6">
-<li><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjI1ODc2OA==&amp;mid=403241108&amp;idx=1&amp;sn=cd58280b00d0a8ef93b8eb78bfed4457&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">JVM源码分析之FinalReference完全解读</a></li>
-</ol>
-<p>override finalizer的类对象称为f对象。</p>
-<p>Finalizer的客观评价</p>
-<ul>
-<li>Finalizer其实是实现了析构函数的概念，我们在对象被回收前可以执行一些『收拾性』的逻辑，应该说是一个特殊场景的补充，但是这种概念的实现给我们的f对象生命周期以及gc等带来了一些影响： </li>
-<li>f对象因为Finalizer的引用而变成了一个临时的强引用，即使没有其他的强引用了，还是无法立即被回收<br>f对象至少经历两次GC才能被回收，因为只有在FinalizerThread执行完了f对象的finalize方法的情况下才有可能被下次gc回收，而有可能期间已经经历过多次gc了，但是一直还没执行f对象的finalize方法</li>
-<li>cpu资源比较稀缺的情况下FinalizerThread线程有可能因为优先级比较低而延迟执行f对象的finalize方法</li>
-<li>因为f对象的finalize方法迟迟没有执行，有可能会导致大部分f对象进入到old分代，此时容易引发old分代的gc，甚至fullgc，gc暂停时间明显变长</li>
-<li>f对象的finalize方法被调用了，但是这个对象其实还并没有被回收，虽然可能在不久的将来会被回收</li>
-</ul>
-<ol start="7">
-<li>不可逆的类初始化过程<br>定义一个类的时候，可能有静态变量，可能有静态代码块，这些逻辑编译之后会封装到一个叫做clinit的方法里。<br>clinit方法在我们第一次主动使用这个类的时候会触发执行，比如我们访问这个类的静态方法或者静态字段就会触发执行clinit，但是这个过程是不可逆的，也就是说当我们执行一遍之后再也不会执行了，如果在执行这个方法过程中出现了异常没有被捕获，那这个类将永远不可用。即使抛出异常，被catch住，也依然会被JVM标记为error标记。<br>如果clinit执行失败了，抛了一个未被捕获的异常，那将这个类的状态设置为initialization_error,并且无法再恢复，因为jvm会认为你这次初始化失败了，下次肯定也是失败的，为了防止不断抛这种异常，所以做了一个缓存处理，不是每次都再去执行clinit，因此大家要特别注意，类的初始化过程可千万不能出错，出错就可能只能重启了哦。</li>
-</ol>
-<p>8.JVM源码分析之jstat工具原理完全解读</p>
-<ul>
-<li>jstat如何获取到这些变量的值</li>
-</ul>
-<p>变量值显然是从目标进程里获取来的，但是是怎样来的？local socket还是memory share？其实是从一个共享文件里来的，这个文件叫PerfData，主要指的是/tmp/hsperfdata_<user>/<pid>这个文件</pid></user></p>
-<ul>
-<li>PerfData文件<ul>
-<li>文件创建<br>这个文件是否存在取决于两个参数，一个UsePerfData，另一个是PerfDisableSharedMem，如果设置了-XX:+PerfDisableSharedMem或者-XX:-UsePerfData，那这个文件是不会存在的，默认情况下PerfDisableSharedMem是关闭的，UsePerfData是打开的，所以默认情况下PerfData文件是存在的。</li>
-<li>文件删除<br>那这个文件什么时候删除？正常情况下当进程退出的时候会自动删除，但是某些极端情况下，比如kill -9，这种信号jvm是不能捕获的，所以导致进程直接退出了，而没有做一些收尾性的工作，这个时候你会发现进程虽然没了，但是这个文件其实还是存在的。在当前用户接下来的任何一个java进程(比如说我们执行jps)起来的时候会去做一个判断，遍历/tmp/hsperfdata_<user>下的进程文件，挨个看进程是不是还存在，如果不存在了就直接删除该文件，判断是否存在的具体操作其实就是发一个kill -0的信号看是否有异常。</user></li>
-<li>文件更新<br>由于这个文件是通过mmap的方式映射到了内存里，而jstat是直接通过DirectByteBuffer的方式从PerfData里读取的，所以只要内存里的值变了，那我们从jstat看到的值就会发生变化，内存里的值什么时候变，取决于-XX:PerfDataSamplingInterval这个参数，默认是50ms，也就是说50ms更新一次值，基本上可以认为是实时的了。</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2015,7 +1950,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-count">100</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2037,7 +1972,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
