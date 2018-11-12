@@ -249,6 +249,667 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/01/05/HFTP文件系统解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/01/05/HFTP文件系统解析/" itemprop="url">HFTP文件系统解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T15:57:58+08:00">
+                2017-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HDFS/" itemprop="url" rel="index">
+                    <span itemprop="name">HDFS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/05/HFTP文件系统解析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/01/05/HFTP文件系统解析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<p>spark-client关于filesystem实现的配置<figure class="highlight plain"><figcaption><span>```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">``` xml</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">    &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.DFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">   &lt;name&gt;fs.webhdfs.impl&lt;/name&gt;</span><br><span class="line">   &lt;value&gt;org.apache.hadoop.smw.hdfs.web.WebHdfsFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="HFTP介绍"><a href="#HFTP介绍" class="headerlink" title="HFTP介绍"></a>HFTP介绍</h2><p>HFTP 是hadoop文件系统用来让你从一个远程的hadoop HDFS集群中读取数据的组件。这个读取是通过HTTP，并且数据源是DataNodes。HFTP是一个只读的文件系统，当你试图用来写入数据或者修改文件系统状态时，会抛出异常。</p>
+<p>HFTP 主要的帮助在有多个HDFS集群，并存在多个版本时，将数据从一个集群迁移到另一个。HFTP 在不同版本的HDFS中是兼容写的。你可以操作例如：</p>
+<blockquote>
+<p>hadoop distcp -i h<a href="ftp://sourceFS:50070/src" target="_blank" rel="noopener">ftp://sourceFS:50070/src</a> hdfs://destFS:8020/dest</p>
+</blockquote>
+<p>注意HFTP是只读的，所以目标端必须是HDFS文件系统。（在这个例子中，distcp会使用新文件系统的配置运行。）</p>
+<p>另外，HSFTP，默认使用HTTPS。这意味着数据在传输的时候会被加密。<br><a href="https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html" target="_blank" rel="noopener">https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html</a></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>HFTP的代码在java 类<code>org.apache.hadoop.hdfs.HftpFileSystem</code> 中。同样的，HSFTP也在<code>org.apache.hadoop.hdfs.HsftpFileSystem</code>中实现.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/01/02/SparkListener机制详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/01/02/SparkListener机制详解/" itemprop="url">SparkListener机制详解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-02T18:35:49+08:00">
+                2017-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/02/SparkListener机制详解/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/01/02/SparkListener机制详解/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Spark源码注释中有下面一句话:</p>
+<blockquote>
+<p>Asynchronously passes SparkListenerEvents to registered SparkListeners</p>
+</blockquote>
+<p>即所有spark消息SparkListenerEvents 被异步的发送给已经注册过的SparkListeners.<br>在SparkContext中, 首先会创建LiveListenerBus实例,这个类主要功能如下:</p>
+<ul>
+<li>保存所有消息队列,负责消息的缓存</li>
+<li>保存所有注册过的listener,负责消息的分发<br><img src="http://img.blog.csdn.net/20150806141900394" alt=""></li>
+</ul>
+<p>listener链表保存在ListenerBus类中,为了保证并发访问的安全性,此处采用Java的CopyOnWriteArrayList类来存储listener. 当需要对listener链表进行更改时,CopyOnWriteArrayList的特性使得会先复制整个链表,然后在复制的链表上面进行修改.当一旦获得链表的迭代器,在迭代器的生命周期中,可以保证数据的一致性.</p>
+<p>消息队列实际上是保存在类AsynchronousListenerBus中的:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> <span class="type">EVENT_QUEUE_CAPACITY</span> = <span class="number">10000</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> eventQueue = <span class="keyword">new</span> <span class="type">LinkedBlockingQueue</span>[<span class="type">E</span>](<span class="type">EVENT_QUEUE_CAPACITY</span>)</span><br></pre></td></tr></table></figure>
+<p>事件队列的长度为10000,当缓存事件数量达到上限后,新来的事件会被丢弃,</p>
+<p>在SparkContext中,会</p>
+<ul>
+<li>创建LiveListenerBus类类型的成员变量listenerBus</li>
+<li>创建各种listener,并加入到listenerBus中</li>
+<li>post一些事件到listenerBus中</li>
+<li>调用listenerBus.start() 来启动事件处理程序</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20150806141223019" alt=""></p>
+<p>这里有一点需要注意的是, 在listenerBus.start() 调用之前, 可以向其中post消息, 这些消息会被缓存起来,等start函数调用之后, 消费者线程会分发这些缓存的消息.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/12/23/使用RCU技术实现读写线程无锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/12/23/使用RCU技术实现读写线程无锁/" itemprop="url">使用RCU技术实现读写线程无锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-23T14:56:16+08:00">
+                2016-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/23/使用RCU技术实现读写线程无锁/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/12/23/使用RCU技术实现读写线程无锁/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在一个系统中有一个写线程和若干个读线程，读写线程通过一个指针共用了一个数据结构，写线程改写这个结构，读线程读取该结构。在写线程改写这个数据结构的过程中，加锁情况下读线程由于等待锁耗时会增加。</p>
+<p>可以利用RCU (Read Copy Update What is rcu)的思想来去除这个锁。</p>
+<h2 id="RCU"><a href="#RCU" class="headerlink" title="RCU"></a>RCU</h2><p>RCU可以说是一种替代读写锁的方法。其基于一个事实：当写线程在改变一个指针时，读线程获取这个指针，要么获取到老的值，要么获取到新的值。RCU的基本思想其实很简单，参考<a href="http://www.rdrop.com/~paulmck/RCU/whatisRCU.html" target="_blank" rel="noopener">What is RCU</a>中Toy implementation可以很容易理解。一种简单的RCU流程可以描述为：</p>
+<p>写线程：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">old_ptr = _ptr</span><br><span class="line">tmp_ptr = copy(_ptr)     <span class="comment">// copy</span></span><br><span class="line">change(tmp_ptr)          <span class="comment">// change </span></span><br><span class="line">_ptr = tmp_ptr           <span class="comment">// update</span></span><br><span class="line">synchroize(tmp_ptr)</span><br></pre></td></tr></table></figure></p>
+<p>写线程要更新_ptr指向的内容时，先复制一份新的，基于新的进行改变，更新_ptr指针，最后同步释放老的内存。</p>
+<p>读线程：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tmp_ptr = _ptr</span><br><span class="line">use(tmp_ptr)</span><br><span class="line">dereference(tmp_ptr)</span><br></pre></td></tr></table></figure></p>
+<p>读线程直接使用_ptr，使用完后需要告诉写线程自己不再使用_ptr。读线程获取_ptr时，可能会获取到老的也可能获取到新的，无论哪种RCU都需要保证这块内存是有效的。重点在synchroize和dereference。synchroize会等待所有使用老的_ptr的线程dereference，对于新的_ptr使用者其不需要等待。这个问题说白了就是写线程如何知道old_ptr没有任何读线程在使用，可以安全地释放。</p>
+<p>这个问题实际上在wait-free的各种实现中有好些解法，<a href="http://stackoverflow.com/questions/22263874/how-when-to-release-memory-in-wait-free-algorithms" target="_blank" rel="noopener">how-when-to-release-memory-in-wait-free-algorithms</a>这里有人总结了几种方法，例如Hazard pointers、Quiescence period based reclamation。</p>
+<p>简单地使用引用计数智能指针是无法解决这个问题的，因为智能指针自己不是线程安全的，例如：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tmp_ptr = _ptr      <span class="comment">// 1</span></span><br><span class="line">tmp_ptr-&gt;addRef()   <span class="comment">// 2</span></span><br><span class="line">use</span><br><span class="line">tmp_ptr-&gt;release()</span><br></pre></td></tr></table></figure></p>
+<p>代码1/2行不是原子的，所以当取得tmp_ptr准备addRef时，tmp_ptr可能刚好被释放了。</p>
+<p>Quiescence period based reclamation方法指的是读线程需要声明自己处于Quiescence period，也就是不使用_ptr的时候，当其使用_ptr的时候实际是进入了一个逻辑上的临界区，当所有读线程都不再使用_ptr的时候，写线程就可以对内存进行安全地释放。</p>
+<p>本文正是描述了一种Quiescence period based reclamation实现。这个实现可以用于有一个写线程和多个读线程共用若干个数据的场景。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/12/23/大数据下的DistinctCount/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/12/23/大数据下的DistinctCount/" itemprop="url">大数据下的DistinctCount</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-23T11:53:53+08:00">
+                2016-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/23/大数据下的DistinctCount/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/12/23/大数据下的DistinctCount/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> course, <span class="keyword">count</span>(<span class="keyword">distinct</span> <span class="keyword">sid</span>)</span><br><span class="line"><span class="keyword">from</span> stu_table</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> course;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h2><p>在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> app, <span class="keyword">count</span>(<span class="keyword">distinct</span> uid) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span> log_table</span><br><span class="line"><span class="keyword">where</span> week_cal = <span class="string">'2016-03-27'</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> uv <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">20</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Pig"><a href="#Pig" class="headerlink" title="Pig"></a>Pig</h2><p>大部分情况下，Hive的执行效率偏低，我更为偏爱Pig：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- all users define DISTINCT_COUNT(A, a) returns dist &#123;</span></span><br><span class="line">    B = foreach $A generate $a;</span><br><span class="line">    unique_B = distinct B;</span><br><span class="line">    C = group unique_B all;</span><br><span class="line">    $dist = foreach C generate SIZE(unique_B);</span><br><span class="line">&#125;</span><br><span class="line">A = <span class="keyword">load</span> <span class="string">'/path/to/data'</span> <span class="keyword">using</span> PigStorage() <span class="keyword">as</span> (app, uid);</span><br><span class="line">B = DISTINCT_COUNT(A, uid);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- &lt;app, users&gt;</span></span><br><span class="line">A = <span class="keyword">load</span> <span class="string">'/path/to/data'</span> <span class="keyword">using</span> PigStorage() <span class="keyword">as</span> (app, uid);</span><br><span class="line">B = distinct A;</span><br><span class="line">C = group B by app;</span><br><span class="line">D = foreach C generate group as app, COUNT($1) as uv;</span><br><span class="line"><span class="comment">-- or</span></span><br><span class="line">D = foreach C generate group as app, SIZE($1) as uv;</span><br></pre></td></tr></table></figure></p>
+<p>DataFu 为pig提供基数估计的UDF <figure class="highlight plain"><figcaption><span>Count：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">```sql</span><br><span class="line">define HyperLogLogPlusPlus datafu.pig.stats.HyperLogLogPlusPlus();</span><br><span class="line">A = load &apos;/path/to/data&apos; using PigStorage() as (app, uid);</span><br><span class="line">B = group A by app;</span><br><span class="line">C = foreach B generate group as app, HyperLogLogPlusPlus($1) as uv;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h2><p>在Spark中，Load数据后通过RDD一系列的转换——map、distinct、reduceByKey进行Distinct Count：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map &#123; line =&gt; (line._1, <span class="number">1</span>) &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .mapValues&#123; _ =&gt; <span class="number">1</span> &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or </span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map(_._1)</span><br><span class="line">  .countByValue()</span><br></pre></td></tr></table></figure></p>
+<p>同时，Spark提供近似Distinct Count的API：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">    .countApproxDistinctByKey(<span class="number">0.001</span>)</span><br></pre></td></tr></table></figure></p>
+<p>实现是基于HyperLogLog算法：</p>
+<blockquote>
+<p>The algorithm used is based on streamlib’s implementation of “HyperLogLog in Practice: Algorithmic Engineering of a State of The Art Cardinality Estimation Algorithm”, available here.</p>
+</blockquote>
+<p>或者，将Schema化的RDD转成DataFrame后，registerTempTable然后执行sql命令亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> df = rdd.toDF()</span><br><span class="line">df.registerTempTable(<span class="string">"app_table"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> appUsers = sqlContext.sql(<span class="string">"select app, count(distinct uid) as uv from app_table group by app"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Bitmap"><a href="#Bitmap" class="headerlink" title="Bitmap"></a>Bitmap</h2><h3 id="Bitmap介绍"><a href="#Bitmap介绍" class="headerlink" title="Bitmap介绍"></a>Bitmap介绍</h3><p>《编程珠玑》上是这样介绍bitmap的：</p>
+<blockquote>
+<p>Bitmap是一个十分有用的数据结构。所谓的Bitmap就是用一个bit位来标记某个元素对应的Value，而Key即是该元素。由于采用了Bit为单位来存储数据，因此在内存占用方面，可以大大节省。</p>
+</blockquote>
+<p>简而言之——用一个bit（0或1）表示某元素是否出现过，其在bitmap的位置对应于其index。《编程珠玑》给出了一个用bitmap做排序的例子：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1999 Lucent Technologies */</span></span><br><span class="line"><span class="comment">/* From 'Programming Pearls' by Jon Bentley */</span></span><br><span class="line"><span class="comment">/* bitsort.c -- bitmap sort from Column 1 * Sort distinct integers in the range [0..N-1] */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BITSPERWORD 32</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SHIFT 5</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MASK 0x1F</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> N 10000000</span></span><br><span class="line"><span class="keyword">int</span> a[<span class="number">1</span> + N / BITSPERWORD];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] |= (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clr</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] &amp;= ~(<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; <span class="keyword">return</span> a[i &gt;&gt; SHIFT] &amp; (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        clr(i);</span><br><span class="line">    <span class="comment">/* Replace above 2 lines with below 3 for word-parallel init  int top = 1 + N/BITSPERWORD;  for (i = 0; i &lt; top; i++)  a[i] = 0;  */</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;i) != EOF)</span><br><span class="line">        <span class="built_in">set</span>(i);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        <span class="keyword">if</span> (test(i))</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, i);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，用int的数组存储bitmap，对于每一个待排序的int数，其对应的index为其int值。</p>
+<h3 id="Distinct-Count优化"><a href="#Distinct-Count优化" class="headerlink" title="Distinct Count优化"></a>Distinct Count优化</h3><ol>
+<li>index生成</li>
+</ol>
+<p>为了使用bitmap做Distinct Count，首先需得到每个用户（uid）对应（在bitmap中）的index。有两种办法可以得到从1开始编号index表（与uid一一对应）：</p>
+<ul>
+<li>hash，但是要找到无碰撞且hash值均匀分布[1, +∞)区间的hash函数是非常困难的；<br>维护一张uid与index之间的映射表，并增量更新</li>
+<li>比较两种方法，第二种方法更为简单可行。</li>
+</ul>
+<ol start="2">
+<li>UV计算</li>
+</ol>
+<p>在index生成完成后，RDD[(uid, V)]与RDD[(uid, index)]join得到index化的RDD。bitmap的开源实现有EWAH，采用RLE（Run Length Encoding）压缩，很好地解决了存储空间的浪费。Distinct Count计算转变成了求bitmap中1的个数：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// distinct count for rdd(not pair) and the rdd must be sorted in each partition</span></span><br><span class="line"><span class="comment">// 计算独立值的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">distinctCount</span></span>(rdd: <span class="type">RDD</span>[<span class="type">Int</span>]): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> bitmap = rdd.aggregate[<span class="type">EWAHCompressedBitmap</span>](<span class="keyword">new</span> <span class="type">EWAHCompressedBitmap</span>())(</span><br><span class="line">      (u: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        u.set(v)</span><br><span class="line">        u</span><br><span class="line">      &#125;,</span><br><span class="line">      (u1: <span class="type">EWAHCompressedBitmap</span>, u2: <span class="type">EWAHCompressedBitmap</span>) =&gt; u1.or(u2)</span><br><span class="line">    )</span><br><span class="line">    bitmap.cardinality()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// the tuple_2 is the index</span></span><br><span class="line"><span class="comment">// 计算每个值对应的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">groupCount</span></span>[<span class="type">K</span>: <span class="type">ClassTag</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    <span class="keyword">val</span> grouped: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">EWAHCompressedBitmap</span>)] = rdd.combineByKey[<span class="type">EWAHCompressedBitmap</span>](</span><br><span class="line">      (v: <span class="type">Int</span>) =&gt; <span class="type">EWAHCompressedBitmap</span>.bitmapOf(v),</span><br><span class="line">      (c: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        c.set(v)</span><br><span class="line">        c</span><br><span class="line">      &#125;,</span><br><span class="line">      (c1: <span class="type">EWAHCompressedBitmap</span>, c2: <span class="type">EWAHCompressedBitmap</span>) =&gt; c1.or(c2))</span><br><span class="line">    grouped.map(t =&gt; (t._1, t._2.cardinality()))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>但是，在上述计算中，由于EWAHCompressedBitmap的set方法要求int值是升序的，也就是说RDD的每一个partition的index应是升序排列：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sort pair RDD by value</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortPairRDD</span></span>[<span class="type">K</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    rdd.mapPartitions(iter =&gt; &#123;</span><br><span class="line">      iter.toArray.sortWith((x, y) =&gt; x._2.compare(y._2) &lt; <span class="number">0</span>).iterator</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>为了避免排序，可以为每一个uid生成一个bitmap，然后在Distinct Count时将bitmap进行or运算亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.reduceByKey(_ or _)</span><br><span class="line">    .mapValues(_._2.cardinality())</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/11/29/Scala的类型和反射机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1403,665 +2064,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/24/Spark-Job任务提交-取消/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/08/24/Spark-Job任务提交-取消/" itemprop="url">Spark Job任务提交,取消,查看进度</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-24T11:29:45+08:00">
-                2016-08-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/24/Spark-Job任务提交-取消/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/08/24/Spark-Job任务提交-取消/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>使用一个SparkContext时，可以针对不同Job进行分组提交和取消：</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 提交任务</span></span><br><span class="line"><span class="keyword">private</span> <span class="type">SparkContext</span> sc;</span><br><span class="line"><span class="keyword">private</span> <span class="type">SQLContext</span> sqlc;</span><br><span class="line">sc.setJobGroup(jobGroup, description, <span class="literal">true</span>);</span><br><span class="line">sqlc.sql(st);</span><br><span class="line">sc.clearJobGroup();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消任务</span></span><br><span class="line">sc.cancelJobGroup(jobGroup）</span><br></pre></td></tr></table></figure>
-<p>获取任务执行进度信息：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> jobGroup = getJobGroup(context);</span><br><span class="line"><span class="type">SQLContext</span> sqlc = getSparkInterpreter().getSQLContext();</span><br><span class="line"><span class="type">SparkContext</span> sc = sqlc.sparkContext();</span><br><span class="line">int completedTasks = <span class="number">0</span>;</span><br><span class="line">int totalTasks = <span class="number">0</span>;</span><br><span class="line"><span class="type">JobProgressListener</span> sparkListener = <span class="keyword">new</span> <span class="type">JobProgressListener</span>(context.getConf());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">DAGScheduler</span> scheduler = sc.dagScheduler();</span><br><span class="line"><span class="type">HashSet</span>&lt;<span class="type">ActiveJob</span>&gt; jobs = scheduler.activeJobs();</span><br><span class="line"><span class="type">Iterator</span>&lt;<span class="type">ActiveJob</span>&gt; it = jobs.iterator();</span><br><span class="line"><span class="keyword">while</span> (it.hasNext()) &#123;</span><br><span class="line">      <span class="type">ActiveJob</span> job = it.next();</span><br><span class="line">      <span class="type">String</span> g = (<span class="type">String</span>) job.properties().get(<span class="string">"spark.jobGroup.id"</span>);</span><br><span class="line">      <span class="keyword">if</span> (jobGroup.equals(g)) &#123;</span><br><span class="line">      int[] progressInfo = <span class="literal">null</span>;</span><br><span class="line">        </span><br><span class="line">      progressInfo = getProgressFromStage_1_1x(sparkListener, job.finalStage());</span><br><span class="line">        </span><br><span class="line">      totalTasks += progressInfo[<span class="number">0</span>];</span><br><span class="line">      completedTasks += progressInfo[<span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (totalTasks == <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> completedTasks * <span class="number">100</span> / totalTasks;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> int[] getProgressFromStage_1_1x(<span class="type">JobProgressListener</span> sparkListener, <span class="type">Stage</span> stage) &#123;</span><br><span class="line">    int numTasks = stage.numTasks();</span><br><span class="line">    int completedTasks = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="type">Method</span> stageIdToData = sparkListener.getClass().getMethod(<span class="string">"stageIdToData"</span>);</span><br><span class="line">      <span class="type">HashMap</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;, <span class="type">Object</span>&gt; stageIdData =</span><br><span class="line">          (<span class="type">HashMap</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;, <span class="type">Object</span>&gt;) stageIdToData.invoke(sparkListener);</span><br><span class="line">      <span class="type">Class</span>&lt;?&gt; stageUIDataClass =</span><br><span class="line">          <span class="keyword">this</span>.getClass().forName(<span class="string">"org.apache.spark.ui.jobs.UIData$StageUIData"</span>);</span><br><span class="line"></span><br><span class="line">      <span class="type">Method</span> numCompletedTasks = stageUIDataClass.getMethod(<span class="string">"numCompleteTasks"</span>);</span><br><span class="line"></span><br><span class="line">      <span class="type">Set</span>&lt;<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt;&gt; keys =</span><br><span class="line">          <span class="type">JavaConverters</span>.asJavaSetConverter(stageIdData.keySet()).asJava();</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">Tuple2</span>&lt;<span class="type">Object</span>, <span class="type">Object</span>&gt; k : keys) &#123;</span><br><span class="line">        <span class="keyword">if</span> (stage.id() == (int) k._1()) &#123;</span><br><span class="line">          <span class="type">Object</span> uiData = stageIdData.get(k).get();</span><br><span class="line">          completedTasks += (int) numCompletedTasks.invoke(uiData);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="type">Exception</span> e) &#123;</span><br><span class="line">      logger.error(<span class="string">"Error on getting progress information"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">List</span>&lt;<span class="type">Stage</span>&gt; parents = <span class="type">JavaConversions</span>.asJavaList(stage.parents());</span><br><span class="line">    <span class="keyword">if</span> (parents != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">Stage</span> s : parents) &#123;</span><br><span class="line">        int[] p = getProgressFromStage_1_1x(sparkListener, s);</span><br><span class="line">        numTasks += p[<span class="number">0</span>];</span><br><span class="line">        completedTasks += p[<span class="number">1</span>];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> int[] &#123;numTasks, completedTasks&#125;;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/23/Hive-on-Spark-如何进行小文件merge/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/08/23/Hive-on-Spark-如何进行小文件merge/" itemprop="url">Hive on Spark 如何进行小文件merge</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-23T09:32:07+08:00">
-                2016-08-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hive/" itemprop="url" rel="index">
-                    <span itemprop="name">Hive</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/23/Hive-on-Spark-如何进行小文件merge/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/08/23/Hive-on-Spark-如何进行小文件merge/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Hive中有相关的属性property可以进行设置，对执行结果进行小文件merge；当使用Spark作为Hive的执行引擎时，遇到小文件合并需求时，也可以进行处理：</p>
-<ol>
-<li><p>配置属性 hive.merge.sparkfiles=true<br><a href="https://issues.apache.org/jira/browse/HIVE-8043" target="_blank" rel="noopener">https://issues.apache.org/jira/browse/HIVE-8043</a><br><a href="https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark%3A+Getting+Started" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark%3A+Getting+Started</a><br>ps： 奈何公司的Spark版本不支持，命令行设置&amp;hive-site.xml设置均无效</p>
-</li>
-<li><p>使用distribute by命令进行数据重分布<br>使用时间戳取模进行数据分布<br><a href="http://stackoverflow.com/questions/31009834/merge-multiple-small-files-in-to-few-larger-files-in-spark" target="_blank" rel="noopener">http://stackoverflow.com/questions/31009834/merge-multiple-small-files-in-to-few-larger-files-in-spark</a><br>Demo:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> table1 <span class="keyword">where</span> yymmdd=<span class="string">'20160816'</span> <span class="keyword">distribute</span> <span class="keyword">by</span> (<span class="keyword">column</span> % <span class="number">64</span>)</span><br></pre></td></tr></table></figure></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/23/Hive中order-by-sort-by-distribute-by-cluster-by的区别/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/08/23/Hive中order-by-sort-by-distribute-by-cluster-by的区别/" itemprop="url">Hive中order by,sort by,distribute by,cluster by的区别</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-23T09:25:20+08:00">
-                2016-08-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hive/" itemprop="url" rel="index">
-                    <span itemprop="name">Hive</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/23/Hive中order-by-sort-by-distribute-by-cluster-by的区别/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/08/23/Hive中order-by-sort-by-distribute-by-cluster-by的区别/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>转自：<a href="http://blog.csdn.net/lzm1340458776/article/details/43306115" target="_blank" rel="noopener">http://blog.csdn.net/lzm1340458776/article/details/43306115</a></p>
-<h2 id="order-by"><a href="#order-by" class="headerlink" title="order by"></a>order by</h2><p>order by会对输入做<strong>全局排序</strong>，因此<strong>只有一个Reducer</strong>(多个Reducer无法保证全局有序)，然而只有一个Reducer，会导致当输入规模较大时，消耗较长的计算时间。关于order by的详细介绍请参考这篇文章：Hive Order by操作。</p>
-<h2 id="sort-by"><a href="#sort-by" class="headerlink" title="sort by"></a>sort by</h2><p>sort by不是全局排序，其在数据进入reducer前完成排序，因此，如果用sort by进行排序，并且<strong>设置mapred.reduce.tasks&gt;1，则sort by只会保证每个reducer的输出有序</strong>，并不保证全局有序。sort by不同于order by，它不受hive.mapred.mode属性的影响，sort by的数据只能保证在同一个reduce中的数据可以按指定字段排序。使用sort by你可以指定执行的reduce个数(通过set mapred.reduce.tasks=n来指定)，对输出的数据再执行归并排序，即可得到全部结果。</p>
-<h2 id="distribute-by"><a href="#distribute-by" class="headerlink" title="distribute by"></a>distribute by</h2><p><strong>distribute by是控制在map端如何拆分数据给reduce端的</strong>。hive会根据distribute by后面列，对应reduce的个数进行分发，默认是采用hash算法。sort by为每个reduce产生一个排序文件。在有些情况下，你需要控制某个特定行应该到哪个reducer，这通常是为了进行后续的聚集操作。distribute by刚好可以做这件事。因此，distribute by经常和sort by配合使用。</p>
-<p>注：Distribute by和sort by的使用场景</p>
-<ol>
-<li><p>Map输出的文件大小不均。</p>
-</li>
-<li><p>Reduce输出文件大小不均。</p>
-</li>
-<li><p>小文件过多。</p>
-</li>
-<li><p>文件超大。</p>
-</li>
-</ol>
-<h2 id="cluster-by"><a href="#cluster-by" class="headerlink" title="cluster by"></a>cluster by</h2><p>cluster by除了具有distribute by的功能外还兼具sort by的功能。但是排序只能是倒叙排序，不能指定排序规则为ASC或者DESC。</p>
-<p>Demo：<br>根据年份和气温对气象数据进行排序，以确保所具有相同年份的行最终都在一个reduce分区中。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">hive (hive)&gt; select * from temperature distribute by year sort by year asc,tempra desc;  </span><br><span class="line">//MapReduce...  </span><br><span class="line">Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 2  </span><br><span class="line">//MapReduce...  </span><br><span class="line">OK  </span><br><span class="line">year    tempra  </span><br><span class="line">2008    35`C  </span><br><span class="line">2008    32.5`C  </span><br><span class="line">2008    31`C  </span><br><span class="line">2008    31.5`C  </span><br><span class="line">2008    30`C  </span><br><span class="line">2015    41`C  </span><br><span class="line">2015    39`C  </span><br><span class="line">2015    37`C  </span><br><span class="line">2015    36`C  </span><br><span class="line">2015    35`C  </span><br><span class="line">2015    33`C  </span><br><span class="line">Time taken: 17.358 seconds</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/" itemprop="url">Dropwizard--非常棒的Java REST服务器栈</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-11T11:57:38+08:00">
-                2016-08-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/REST/" itemprop="url" rel="index">
-                    <span itemprop="name">REST</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="什么是Dropwizard？"><a href="#什么是Dropwizard？" class="headerlink" title="什么是Dropwizard？"></a>什么是Dropwizard？</h2><p>Dropwizard 是一个开源的Java框架，用于开发OPS友好、高性能的基于REST的后端。它是由Yammer开发的，来驱动基于JVM的后端。</p>
-<p>Dropwizard提供同类最佳的Java库到一个嵌入式应用程序包。它由以下部分组成：</p>
-<ol>
-<li>嵌入式Jetty：每一个应用程序被打包成一个jar（而不是war）文件，并开始自己的嵌入式Jetty容器。没有任何war文件和外部servlet容器。</li>
-<li>JAX-RS：Jersey（JAX-RS的参考实现）是用来写基于REST的Web服务的。</li>
-<li>JSON：REST服务用的是JSON，Jackson库用来做所有的JSON处理。</li>
-<li>日志：使用Logback和SLF4J完成。</li>
-<li>Hibernate验证：Dropwizard使用Hibernate验证API进行声明性验证。</li>
-<li>指标：Dropwizard支持监控使用标准库，它在监控代码方面有无与伦比的洞察力。</li>
-</ol>
-<p>除了上面提到的这几个，Dropwizard还使用了一些其他的库，你可以在这里找到<a href="http://dropwizard.codahale.com/getting-started/" target="_blank" rel="noopener">完整的列表</a>。</p>
-<h2 id="为什么是Dropwizard？"><a href="#为什么是Dropwizard？" class="headerlink" title="为什么是Dropwizard？"></a>为什么是Dropwizard？</h2><p>我决定学Dropwizard的原因有以下几点：</p>
-<ol>
-<li>快速的项目引导：如果你已经在使用Spring和Java EE，你就会明白开发人员在引导项目时的痛苦。使用Dropwizard，你只需要在你的 pom.xml 文件中添加一个依赖就完成了。</li>
-<li>应用指标：Dropwizard自带应用程序指标的支持。它提供了类似请求/响应时间这种非常有用的信息，只要把@ 定时注解来获取方法的执行时间。</li>
-<li>生产力：每个Dropwizard应用程序有一个启动Jetty容器的主程序。这意味着，完全可以把应用程序作为一个主程序在IDE中运行和调试。所以就没有重新编译或部署war文件。</li>
-</ol>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p><a href="https://segmentfault.com/a/1190000000359827" target="_blank" rel="noopener">Dropwizard —— 非常棒的Java REST服务器栈</a></p>
-<p><a href="https://github.com/shekhargulati/day13-dropwizard-mongodb-demo-app" target="_blank" rel="noopener">day13-dropwizard-mongodb-demo-app</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2107,7 +2114,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2118,7 +2125,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>

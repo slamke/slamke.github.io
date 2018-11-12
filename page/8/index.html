@@ -249,6 +249,748 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/23/Spark-on-yarn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/05/23/Spark-on-yarn/" itemprop="url">Spark on yarn</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-23T14:33:43+08:00">
+                2016-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/23/Spark-on-yarn/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/05/23/Spark-on-yarn/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="模式"><a href="#模式" class="headerlink" title="模式:"></a>模式:</h2><ul>
+<li>yarn-cluster：<br>Spark的driver运行YARN集群启动的一个application master进程中，client在初始化application后可以消失。<br><a href="http://www.iteblog.com/archives/1189" target="_blank" rel="noopener">Spark on YARN集群模式作业运行全过程分析</a></li>
+<li>yarn-client：<br>Spark的driver运行在client进程中，而application master只用来向YARN申请资源。<br><a href="http://www.iteblog.com/archives/1191" target="_blank" rel="noopener">Spark on YARN客户端模式作业运行全过程分析</a></li>
+</ul>
+<h3 id="Deployment-Mode-Summary"><a href="#Deployment-Mode-Summary" class="headerlink" title="Deployment Mode Summary"></a>Deployment Mode Summary</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>YARN Client Mode</th>
+<th>YARN Cluster Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Driver runs in</td>
+<td>Client</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Requests resources</td>
+<td>ApplicationMaster</td>
+<td>ApplicationMaster</td>
+</tr>
+<tr>
+<td>Starts executor processes</td>
+<td>YARN NodeManager</td>
+<td>YARN NodeManager</td>
+</tr>
+<tr>
+<td>Persistent services</td>
+<td>YARN ResourceManager and NodeManagers</td>
+<td>YARN ResourceManager and NodeManagers</td>
+</tr>
+<tr>
+<td>Supports Spark Shell</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>参考:<br><a href="http://www.iteblog.com/archives/1223" target="_blank" rel="noopener">Spark:Yarn-cluster和Yarn-client区别与联系</a><br><a href="http://www.cloudera.com/documentation/enterprise/5-5-x/topics/cdh_ig_running_spark_on_yarn.html" target="_blank" rel="noopener">Running Spark Applications on YARN</a></p>
+<h2 id="启动App"><a href="#启动App" class="headerlink" title="启动App"></a>启动App</h2><p>在yarn-cluster模式中启动一个application：<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit --class path.to.your.Class --master yarn-cluster [options] &lt;app jar&gt; [app options]</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line"></span><br><span class="line">SPARK_JAR=hdfs://hansight/libs/spark-assembly-<span class="number">1.0</span>.<span class="number">2</span>-hadoop2.<span class="number">4.0</span>.<span class="number">2.1</span>.<span class="number">4.0</span>-<span class="number">632</span>.jar \</span><br><span class="line">./bin/spark-submit --class org.apache.spark.examples.SparkPI \</span><br><span class="line">    --master yarn-cluster \</span><br><span class="line">    --num-executors <span class="number">3</span> \</span><br><span class="line">    --driver-memory <span class="number">4</span>g \</span><br><span class="line">    --executor-memory <span class="number">2</span>g \</span><br><span class="line">    --executor-cores <span class="number">1</span> \</span><br><span class="line">    lib/spark-examples*.jar \</span><br><span class="line">    <span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="yarn的资源调度"><a href="#yarn的资源调度" class="headerlink" title="yarn的资源调度"></a>yarn的资源调度</h2><p><a href="http://debugo.com/yarn-scheduler/" target="_blank" rel="noopener">YARN Capacity Scheduler 简介</a><br>YARN Independent RM 指标:  Weight, Virtual Cores, Min and Max Memory, Max Running Apps, and Scheduling Policy</p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><p><a href="http://wuchong.me/blog/2015/04/04/spark-on-yarn-cluster-deploy/" target="_blank" rel="noopener">Spark On YARN 集群安装部署</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/23/Spark和MySQL交互/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/05/23/Spark和MySQL交互/" itemprop="url"> Spark和MySQL交互</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-23T14:32:22+08:00">
+                2016-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/23/Spark和MySQL交互/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/05/23/Spark和MySQL交互/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Spark读取MySQL"><a href="#Spark读取MySQL" class="headerlink" title="Spark读取MySQL"></a>Spark读取MySQL</h2><p><a href="http://www.iteblog.com/archives/1560" target="_blank" rel="noopener">Spark读取数据库(Mysql)的四种方式讲解</a><br><a href="http://www.iteblog.com/archives/1113" target="_blank" rel="noopener">Spark与Mysql(JdbcRDD)整合开发</a><br><a href="http://blog.csdn.net/yery/article/details/43562483" target="_blank" rel="noopener">改写Spark JdbcRDD，支持自己定义分区查询条件</a><br><a href="http://lswyyy.github.io/2015/12/16/%E6%8F%90%E9%AB%98spark-jdbc%E6%93%8D%E4%BD%9C%E5%B9%B6%E5%8F%91%E5%BA%A6/" target="_blank" rel="noopener">spark jdbc(mysql) 操作并发度优化</a></p>
+<h3 id="一、不指定查询条件"><a href="#一、不指定查询条件" class="headerlink" title="一、不指定查询条件"></a>一、不指定查询条件</h3><p>　　这个方式链接MySql的函数原型是：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(url: <span class="type">String</span>, table: <span class="type">String</span>, properties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure></p>
+<p>我们只需要提供Driver的url，需要查询的表名，以及连接表相关属性properties。下面是具体例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, prop )</span><br><span class="line">println(df.count())</span><br><span class="line">println(df.rdd.partitions.size)</span><br></pre></td></tr></table></figure></p>
+<p>我们运行上面的程序，可以看到df.rdd.partitions.size输出结果是1，这个结果的含义是iteblog表的所有数据都是由RDD的一个分区处理的，所以说，如果你这个表很大，很可能会出现OOM<br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSetManager: Lost task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">1.0</span> (TID <span class="number">14</span>, spark047219):</span><br><span class="line"> java.lang.OutOfMemoryError: GC overhead limit exceeded at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:<span class="number">3380</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这种方式在数据量大的时候不建议使用。</p>
+<h3 id="二、指定数据库字段的范围"><a href="#二、指定数据库字段的范围" class="headerlink" title="二、指定数据库字段的范围"></a>二、指定数据库字段的范围</h3><p>　　这种方式就是通过指定数据库中某个字段的范围，但是遗憾的是，这个字段必须是数字，来看看这个函数的函数原型：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    columnName: <span class="type">String</span>,</span><br><span class="line">    lowerBound: <span class="type">Long</span>,</span><br><span class="line">    upperBound: <span class="type">Long</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span>,</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>　　前两个字段的含义和方法一类似。columnName就是需要分区的字段，这个字段在数据库中的类型必须是数字；lowerBound就是分区的下界；upperBound就是分区的上界；numPartitions是分区的个数。同样，我们也来看看如何使用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lowerBound = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> upperBound = <span class="number">100000</span></span><br><span class="line"><span class="keyword">val</span> numPartitions = <span class="number">5</span></span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, <span class="string">"id"</span>, lowerBound, upperBound, numPartitions, prop)</span><br></pre></td></tr></table></figure>
+<p>这个方法可以将iteblog表的数据分布到RDD的几个分区中，分区的数量由numPartitions参数决定，在理想情况下，每个分区处理相同数量的数据，我们在使用的时候不建议将这个值设置的比较大，因为这可能导致数据库挂掉！但是根据前面介绍，这个函数的缺点就是只能使用整形数据字段作为分区关键字。</p>
+<p>　　这个函数在极端情况下，也就是设置将numPartitions设置为1，其含义和第一种方式一致。</p>
+<h3 id="三、根据任意字段进行分区"><a href="#三、根据任意字段进行分区" class="headerlink" title="三、根据任意字段进行分区"></a>三、根据任意字段进行分区</h3><p>　　基于前面两种方法的限制，Spark还提供了根据任意字段进行分区的方法，函数原型如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jdbc</span></span>(</span><br><span class="line">    url: <span class="type">String</span>,</span><br><span class="line">    table: <span class="type">String</span>,</span><br><span class="line">    predicates: <span class="type">Array</span>[<span class="type">String</span>],</span><br><span class="line">    connectionProperties: <span class="type">Properties</span>): <span class="type">DataFrame</span></span><br></pre></td></tr></table></figure>
+<p>这个函数相比第一种方式多了predicates参数，我们可以通过这个参数设置分区的依据，来看看例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> predicates = <span class="type">Array</span>[<span class="type">String</span>](<span class="string">"reportDate &lt;= '2014-12-31'"</span>, </span><br><span class="line">	<span class="string">"reportDate &gt; '2014-12-31' and reportDate &lt;= '2015-12-31'"</span>)</span><br><span class="line"><span class="keyword">val</span> url = <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read.jdbc(url, <span class="string">"iteblog"</span>, predicates, prop)</span><br></pre></td></tr></table></figure>
+<p>最后rdd的分区数量就等于predicates.length。</p>
+<h3 id="四、通过load获取"><a href="#四、通过load获取" class="headerlink" title="四、通过load获取"></a>四、通过load获取</h3><p>Spark还提供通过load的方式来读取数据。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sqlContext.read.format(<span class="string">"jdbc"</span>).options(</span><br><span class="line">  <span class="type">Map</span>(<span class="string">"url"</span> -&gt; <span class="string">"jdbc:mysql://www.iteblog.com:3306/iteblog?user=iteblog&amp;password=iteblog"</span>,</span><br><span class="line">    <span class="string">"dbtable"</span> -&gt; <span class="string">"iteblog"</span>)).load()</span><br></pre></td></tr></table></figure>
+<p>options函数支持url、driver、dbtable、partitionColumn、lowerBound、upperBound以及numPartitions选项，细心的同学肯定发现这个和方法二的参数一致。是的，其内部实现原理部分和方法二大体一致。同时load方法还支持json、orc等数据源的读取。</p>
+<h2 id="Spark-写入MySQL"><a href="#Spark-写入MySQL" class="headerlink" title="Spark 写入MySQL"></a>Spark 写入MySQL</h2><p><a href="http://www.iteblog.com/archives/1275" target="_blank" rel="noopener">Spark将计算结果写入到Mysql中</a><br><a href="http://www.iteblog.com/archives/1290" target="_blank" rel="noopener">Spark RDD写入RMDB(Mysql)方法二</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/23/Spark-资料整理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/05/23/Spark-资料整理/" itemprop="url">Spark 资料整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-23T14:29:17+08:00">
+                2016-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/23/Spark-资料整理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/05/23/Spark-资料整理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="一-快速入门"><a href="#一-快速入门" class="headerlink" title="一 快速入门"></a>一 快速入门</h2><p><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="noopener">Apache Spark快速入门：基本概念和例子(1)</a><br><a href="http://www.iteblog.com/archives/1410" target="_blank" rel="noopener">Apache Spark快速入门：基本概念和例子(2)</a><br><a href="">Spark Streaming整体执行流程</a><a href="http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/" target="_blank" rel="noopener">http://flykobe.com/index.php/2016/03/22/spark-streaming-execution/</a></p>
+<h2 id="二-应用调试"><a href="#二-应用调试" class="headerlink" title="二 应用调试"></a>二 应用调试</h2><h3 id="2-1-Spark应用程序运行的日志存在哪里"><a href="#2-1-Spark应用程序运行的日志存在哪里" class="headerlink" title="2.1 Spark应用程序运行的日志存在哪里"></a>2.1 Spark应用程序运行的日志存在哪里</h3><p><a href="http://www.iteblog.com/archives/1353" target="_blank" rel="noopener">Spark应用程序运行的日志存在哪里</a><br>Spark日志确切的存放路径和部署模式相关：</p>
+<ol>
+<li>如果是Spark Standalone模式，我们可以直接在Master UI界面查看应用程序的日志，在默认情况下这些日志是存储在worker节点的work目录下，这个目录可以通过SPARK_WORKER_DIR参数进行配置。</li>
+<li>如果是Mesos模式，我们同样可以通过Mesos的Master UI界面上看到相关应用程序的日志，这些日志是存储在Mesos slave的work目录下。</li>
+<li>如果是YARN模式，最简单地收集日志的方式是使用YARN的日志收集工具（<figure class="highlight plain"><figcaption><span>logs -applicationId``` ），这个工具可以收集你应用程序相关的运行日志，但是这个工具是有限制的：**应用程序必须运行完**，因为YARN必须首先聚合这些日志；而且你必须开启日志聚合功能（yarn.log-aggregation-enable，在默认情况下，这个参数是false）。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">``` powershell</span><br><span class="line">./bin/yarn logs -applicationId application_1452073024926_19404</span><br><span class="line">or</span><br><span class="line">Tracking UI --&gt; ApplicationMaster --&gt; Executors菜单 --&gt; Logs</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-2-通过可视化途径理解你的Spark应用程序"><a href="#2-2-通过可视化途径理解你的Spark应用程序" class="headerlink" title="2.2 通过可视化途径理解你的Spark应用程序"></a>2.2 通过可视化途径理解你的Spark应用程序</h3><p><a href="http://www.iteblog.com/archives/1405" target="_blank" rel="noopener">通过可视化途径理解你的Spark应用程序</a><br><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Tracking UI --&gt; ApplicationMaster --&gt;Jobs菜单/Stages菜单</span><br><span class="line">分析shuffle的时间</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-3-Spark作业代码-源码-IDE远程调试"><a href="#2-3-Spark作业代码-源码-IDE远程调试" class="headerlink" title="2.3 Spark作业代码(源码)IDE远程调试"></a>2.3 Spark作业代码(源码)IDE远程调试</h3><p><a href="tp://www.iteblog.com/archives/1192" target="_blank" rel="noopener">Spark作业代码(源码)IDE远程调试</a></p>
+<h3 id="2-4-不要直接继承scala-App来提交代码"><a href="#2-4-不要直接继承scala-App来提交代码" class="headerlink" title="2.4 不要直接继承scala.App来提交代码"></a>2.4 不要直接继承scala.App来提交代码</h3><p>如果你继承了App trait，那么里面的变量被当作了单例类的field了；而如果是main方法，则当作是局部变量了。而且trait App是继承了DelayedInit，所以里面的变量只有用到了main方法的时候才会被初始化。<br><a href="http://www.iteblog.com/archives/1543" target="_blank" rel="noopener">Spark程序编写：继承App的问题</a> </p>
+<h2 id="三-REST-API"><a href="#三-REST-API" class="headerlink" title="三 REST API"></a>三 REST API</h2><p><a href="http://www.iteblog.com/archives/1386" target="_blank" rel="noopener">Spark 1.4中REST API介绍</a><br>目前这个API支持正在运行的应用程序，也支持历史服务器。在请求URL都有/api/v1。比如，对于历史服务器来说，我们可以通过http://:18080/api/v1来获取一些信息；对于正在运行的Spark应用程序，我们可以通过<a href="http://www.iteblog.com:4040/api/v1来获取一些信息。" target="_blank" rel="noopener">http://www.iteblog.com:4040/api/v1来获取一些信息。</a></p>
+<h2 id="四-文件操作"><a href="#四-文件操作" class="headerlink" title="四 文件操作"></a>四 文件操作</h2><h3 id="4-1-Spark多文件输出-MultipleOutputFormat"><a href="#4-1-Spark多文件输出-MultipleOutputFormat" class="headerlink" title="4.1 Spark多文件输出(MultipleOutputFormat)"></a>4.1 Spark多文件输出(MultipleOutputFormat)</h3><p><a href="http://www.iteblog.com/archives/1281" target="_blank" rel="noopener">Spark多文件输出(MultipleOutputFormat)</a></p>
+<h3 id="4-2-Json"><a href="#4-2-Json" class="headerlink" title="4.2 Json"></a>4.2 Json</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> org.apache.spark.sql.<span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> people = sqlContext.jsonFile(<span class="string">"[the path to file people]"</span>)</span><br><span class="line">people.registerTempTable(<span class="string">"people"</span>)</span><br><span class="line">people.printSchema()</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLE</span> people</span><br><span class="line"><span class="keyword">USING</span> org.apache.spark.sql.json</span><br><span class="line">OPTIONS (<span class="keyword">path</span> <span class="string">'[the path to the JSON dataset]'</span>)</span><br></pre></td></tr></table></figure>
+<p><a href="http://www.iteblog.com/archives/1260" target="_blank" rel="noopener">Spark SQL中对Json支持的详细介绍</a></p>
+<h2 id="五-shuffle"><a href="#五-shuffle" class="headerlink" title="五 shuffle"></a>五 shuffle</h2><p><a href="http://www.iteblog.com/archives/1138" target="_blank" rel="noopener">Spark shuffle：hash和sort性能对比</a><br>随着mapper数量或者Reduce数量的增加，基于hash的shuffle实现的表现比基于sort的shuffle实现的表现越来越糟糕。基于这个事实，在Spark 1.2版本，默认的shuffle将选用基于sort的。在MLlib下，基于sort的Shuffle并不一定比基于hash的Shuffle表现好，所以程序选择哪个Shuffle实现是需要考虑到具体的场景，如果内置的Shuffle实现不能满足自己的需求，我们完全可以自己实现一个Shuffle。用户自定义的Shuffle必须继承ShuffleManager类，重写里面的一些方法。</p>
+<h2 id="六-partition"><a href="#六-partition" class="headerlink" title="六 partition"></a>六 partition</h2><p><a href="http://www.iteblog.com/archives/1522" target="_blank" rel="noopener">Spark分区器HashPartitioner和RangePartitioner代码详解</a><br><a href="http://www.iteblog.com/archives/1368" target="_blank" rel="noopener">Spark自定义分区(Partitioner)</a><br>Spark提供了相应的接口，我们只需要扩展Partitioner抽象类，然后实现里面的三个方法：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.spark</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * An object that defines how the elements in a key-value pair RDD are partitioned by key.</span></span><br><span class="line"><span class="comment"> * Maps each key to a partition ID, from 0 to `numPartitions - 1`.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Partitioner</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">numPartitions</span></span>: <span class="type">Int</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getPartition</span></span>(key: <span class="type">Any</span>): <span class="type">Int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>def numPartitions: Int：这个方法需要返回你想要创建分区的个数；</li>
+<li>def getPartition(key: Any): Int：这个函数需要对输入的key做计算，然后返回该key的分区ID，范围一定是0到numPartitions-1；</li>
+<li>equals()：这个是Java标准的判断相等的函数，之所以要求用户实现这个函数是因为Spark内部会比较两个RDD的分区是否一样。</li>
+</ul>
+<h2 id="七-序列化"><a href="#七-序列化" class="headerlink" title="七 序列化"></a>七 序列化</h2><p><a href="http://www.iteblog.com/archives/1531" target="_blank" rel="noopener">Spark Task序列化代码分析</a><br><a href="http://www.iteblog.com/archives/1328" target="_blank" rel="noopener">在Spark中自定义Kryo序列化输入输出API</a><br><a href="http://stackoverflow.com/questions/31394140/require-kryo-serialization-in-spark-scala" target="_blank" rel="noopener">require-kryo-serialization-in-spark-scala</a></p>
+<p>解决序列化问题:</p>
+<ol>
+<li>使用lazy引用（Lazy Reference）来实现<br>lazy val pool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, redisTimeout)</li>
+<li>把对需要序列化对象的管理放在操作DStream的Output操作范围之内，因为我们知道它是在特定的Executor中进行初始化的，使用一个单例的对象来管理</li>
+</ol>
+<h2 id="八-RDD"><a href="#八-RDD" class="headerlink" title="八 RDD"></a>八 RDD</h2><p><a href="http://www.iteblog.com/archives/1298" target="_blank" rel="noopener">Spark RDD API扩展开发(1): 自定义函数</a><br><a href="http://www.iteblog.com/archives/1299" target="_blank" rel="noopener">Spark RDD API扩展开发(2):自定义RDD</a></p>
+<h2 id="九-kafka"><a href="#九-kafka" class="headerlink" title="九 kafka"></a>九 kafka</h2><p><a href="http://www.iteblog.com/archives/1322" target="_blank" rel="noopener">Spark Streaming和Kafka整合开发指南(一)</a><br><a href="http://www.iteblog.com/archives/1326" target="_blank" rel="noopener">Spark Streaming和Kafka整合开发指南(二)</a><br><a href="http://www.iteblog.com/archives/1381" target="_blank" rel="noopener">Spark+Kafka的Direct方式将偏移量发送到Zookeeper实现</a><br><a href="http://www.iteblog.com/archives/1591" target="_blank" rel="noopener">Spark Streaming和Kafka整合是如何保证数据零丢失</a><br><a href="http://www.iteblog.com/archives/1378" target="_blank" rel="noopener">Kafka+Spark Streaming+Redis实时系统实践</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/18/Spark函数讲解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/05/18/Spark函数讲解/" itemprop="url">Spark函数讲解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-18T13:48:55+08:00">
+                2016-05-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/18/Spark函数讲解/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/05/18/Spark函数讲解/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="cogroup"><a href="#cogroup" class="headerlink" title="cogroup"></a>cogroup</h2><p>将多个RDD中同一个Key对应的Value组合到一起。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)], numPartitions: <span class="type">Int</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>, <span class="type">W3</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], </span><br><span class="line">      other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], other3: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W3</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>], <span class="type">Iterable</span>[<span class="type">W3</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)],</span><br><span class="line">       partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)], </span><br><span class="line">      numPartitions: <span class="type">Int</span>)</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W1</span>, <span class="type">W2</span>](other1: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W1</span>)], other2: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W2</span>)])</span><br><span class="line">      : <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W1</span>], <span class="type">Iterable</span>[<span class="type">W2</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], partitioner: <span class="type">Partitioner</span>) : </span><br><span class="line">      <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)], numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cogroup</span></span>[<span class="type">W</span>](other: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">W</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, (<span class="type">Iterable</span>[<span class="type">V</span>], <span class="type">Iterable</span>[<span class="type">W</span>]))]</span><br></pre></td></tr></table></figure></p>
+<p>cogroup函数原型一共有九个（真多）！最多可以组合四个RDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data1 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>)))</span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">3</span>, <span class="string">"very"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> data3 = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data1.cogroup(data2, data3)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">------------------------------------</span><br><span class="line">(<span class="number">2</span>,(<span class="type">CompactBuffer</span>(bbs),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">1</span>,(<span class="type">CompactBuffer</span>(www),<span class="type">CompactBuffer</span>(iteblog),<span class="type">CompactBuffer</span>(com)))</span><br><span class="line">(<span class="number">3</span>,(<span class="type">CompactBuffer</span>(),<span class="type">CompactBuffer</span>(very, good),<span class="type">CompactBuffer</span>(good)))</span><br></pre></td></tr></table></figure></p>
+<h2 id="combineByKey"><a href="#combineByKey" class="headerlink" title="combineByKey"></a>combineByKey</h2><p>使用用户设置好的聚合函数对每个Key中的Value进行组合(combine)。可以将输入类型为RDD[(K, V)]转成成RDD[(K, C)]。</p>
+<h3 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>) : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, numPartitions: <span class="type">Int</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">combineByKey</span></span>[<span class="type">C</span>](createCombiner: <span class="type">V</span> =&gt; <span class="type">C</span>, mergeValue: (<span class="type">C</span>, <span class="type">V</span>) =&gt; <span class="type">C</span>, </span><br><span class="line">    mergeCombiners: (<span class="type">C</span>, <span class="type">C</span>) =&gt; <span class="type">C</span>, partitioner: <span class="type">Partitioner</span>, mapSideCombine: </span><br><span class="line">    <span class="type">Boolean</span> = <span class="literal">true</span>, serializer: <span class="type">Serializer</span> = <span class="literal">null</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">C</span>)]</span><br></pre></td></tr></table></figure>
+<p>　　第一个和第二个函数都是基于第三个函数实现的，使用的是HashPartitioner，Serializer为null。而第三个函数我们可以指定分区，如果需要使用Serializer的话也可以指定。combineByKey函数比较重要，我们熟悉地诸如aggregateByKey、foldByKey、reduceByKey等函数都是基于该函数实现的。<strong>默认情况会在Map端进行组合操作</strong>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>),(<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line"><span class="keyword">val</span> result = data.combineByKey(<span class="type">List</span>(_), (x: <span class="type">List</span> [<span class="type">String</span>], y: <span class="type">String</span>) =&gt; y :: x, (x: <span class="type">List</span>[<span class="type">String</span>],y:<span class="type">List</span>[<span class="type">String</span>]) =&gt; x ::: y)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>,<span class="type">List</span>(com, iteblog, bbs))</span><br><span class="line">(<span class="number">1</span>,<span class="type">List</span>(com, iteblog, www))</span><br><span class="line">(<span class="number">3</span>,<span class="type">List</span>(good))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> data2 = sc.parallelize(<span class="type">List</span>((<span class="string">"iteblog"</span>, <span class="number">1</span>), (<span class="string">"bbs"</span>, <span class="number">1</span>), (<span class="string">"iteblog"</span>, <span class="number">3</span>)))</span><br><span class="line"><span class="keyword">val</span> result2 = data2.combineByKey(x =&gt; x,(x: <span class="type">Int</span>, y:<span class="type">Int</span>) =&gt; x + y, (x:<span class="type">Int</span>, y: <span class="type">Int</span>) =&gt; x + y)</span><br><span class="line">result2.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(iteblog,<span class="number">4</span>)</span><br><span class="line">(bbs,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="coalesce"><a href="#coalesce" class="headerlink" title="coalesce"></a>coalesce</h2><p>对RDD中的分区重新进行合并。</p>
+<h3 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coalesce</span></span>(numPartitions: <span class="type">Int</span>, shuffle: <span class="type">Boolean</span> = <span class="literal">false</span>)</span><br><span class="line">　　　　(<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">T</span>] = <span class="literal">null</span>): <span class="type">RDD</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+<p>返回一个新的RDD，且该RDD的分区个数等于numPartitions个数。如果shuffle设置为true，则会进行shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>))</span><br><span class="line"><span class="keyword">val</span> result = data.coalesce(<span class="number">2</span>, <span class="literal">false</span>)</span><br><span class="line">println(result.partitions.length)</span><br><span class="line">println(result.toDebugString)</span><br><span class="line"><span class="keyword">val</span> result1 = data.coalesce(<span class="number">2</span>, <span class="literal">true</span>)</span><br><span class="line">println(result1.toDebugString)</span><br><span class="line"></span><br><span class="line"><span class="number">2</span></span><br><span class="line">(<span class="number">2</span>) <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">16</span> []</span><br><span class="line"> |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br><span class="line"> </span><br><span class="line">(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">5</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">CoalescedRDD</span>[<span class="number">4</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> |  <span class="type">ShuffledRDD</span>[<span class="number">3</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line"> +-(<span class="number">2</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at coalesce at <span class="type">CoalesceSuite</span>.scala:<span class="number">19</span> []</span><br><span class="line">    |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at <span class="type">CoalesceSuite</span>.scala:<span class="number">15</span> []</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看出shuffle为false的时候并不进行shuffle操作；而为true的时候会进行shuffle操作。RDD.partitions.length可以获取相关RDD的分区数。</p>
+<h2 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h2><p>为当前RDD设置检查点。该函数将会创建一个二进制的文件，并存储到checkpoint目录中，该目录是用SparkContext.setCheckpointDir()设置的。在checkpoint的过程中，该RDD的所有依赖于父RDD中的信息将全部被移出。<strong>对RDD进行checkpoint操作并不会马上被执行，必须执行Action操作才能触发</strong>。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checkpoint</span></span>()</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt;val data = sc.parallelize(1 to 100000 , 15)<br>scala&gt; sc.setCheckpointDir(“/app/ecom/cm/ods/tmp/sunke/spark/checkpoint”)<br>scala&gt; data.checkpoint<br>scala&gt; data.count<br>res3: Long = 100000</p>
+</blockquote>
+<p>结果：</p>
+<blockquote>
+<p>[<a href="mailto:work@yq01-cm-m32-201502nova228.yq01.baidu.com" target="_blank" rel="noopener">work@yq01-cm-m32-201502nova228.yq01.baidu.com</a> ~]$ hadoop fs -ls /app/ecom/cm/ods/tmp/sunke/spark/checkpoint<br>16/05/18 11:27:20 INFO common.UpdateService: ZkstatusUpdater to yq01-wutai-hdfs.dmop.baidu.com:54310 started<br>Found 1 items<br>drwxr-xr-x   3 ods ods          0 2016-05-18 11:26 /app/ecom/cm/ods/tmp/sunke/spark/checkpoint/590a5e9b-26de-416f-aecb-22ea5e29d893<br>执行完count之后，会在checkpoint目录下产生出多个（数量和你分区个数有关）二进制的文件。</p>
+</blockquote>
+<h2 id="cartesian"><a href="#cartesian" class="headerlink" title="cartesian"></a>cartesian</h2><p>从名字就可以看出这是笛卡儿的意思，就是对给的两个RDD进行笛卡儿计算。官方文档说明：Return the Cartesian product of this RDD and another one, that is, the RDD of all pairs of elements (a, b) where a is in <code>this</code> and b is in <code>other</code>.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cartesian</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](other: <span class="type">RDD</span>[<span class="type">U</span>]): <span class="type">RDD</span>[(<span class="type">T</span>, <span class="type">U</span>)]</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的是Pair类型的RDD，计算结果是当前RDD和other RDD中每个元素进行笛卡儿计算的结果。最后返回的是CartesianRDD。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line"><span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>))</span><br><span class="line"><span class="keyword">val</span> result = a.cartesian(b)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line"></span><br><span class="line">(<span class="number">1</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">2</span>,<span class="number">6</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">5</span>)</span><br><span class="line">(<span class="number">3</span>,<span class="number">6</span>)</span><br></pre></td></tr></table></figure></p>
+<p>笛卡儿计算是很恐怖的，它会迅速消耗大量的内存，所以在使用这个函数的时候请小心。</p>
+<h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2><p>使用MEMORY_ONLY储存级别对RDD进行缓存，其内部实现是调用persist()函数的。官方文档定义：Persist this RDD with the default storage level (<code>MEMORY_ONLY</code>).<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cache</span></span>() : <span class="keyword">this</span>.<span class="keyword">type</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>scala&gt; var data = sc.parallelize(List(1,2,3,4))<br>data: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res65: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, false, false, false, 1)<br>scala&gt; data.cache<br>res66: org.apache.spark.rdd.RDD[Int] =<br>　　ParallelCollectionRDD[44] at parallelize at <console>:12<br>scala&gt; data.getStorageLevel<br>res67: org.apache.spark.storage.StorageLevel =<br>　　StorageLevel(false, true, false, true, 1)<br>我们先是定义了一个RDD，然后通过getStorageLevel函数得到该RDD的默认存储级别，这里是NONE。然后我们调用cache函数，将RDD的存储级别改成了MEMORY_ONLY(看StorageLevel的第二个参数)。关于StorageLevel的其他的几种存储级别介绍请参照StorageLevel类进行了解。</console></console></p>
+</blockquote>
+<h2 id="aggregate"><a href="#aggregate" class="headerlink" title="aggregate"></a>aggregate</h2><p>Aggregate the elements of each partition, and then the results for all the partitions, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of this RDD, T. Thus, we need one operation for merging a T into an U and one operation for merging two U’s, as in scala.TraversableOnce. Both of these functions are allowed to modify and return their first argument instead of creating a new U to avoid memory allocation.<br>　　aggregate函数将每个分区里面的元素进行聚合，然后用combine函数将每个分区的结果和初始值(zeroValue)进行combine操作。这个函数最终返回的类型不需要和RDD中元素类型一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregate</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)(seqOp: (<span class="type">U</span>, <span class="type">T</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">U</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seqOP</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"seqOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">combOp</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">      println(<span class="string">"combOp: "</span> + a + <span class="string">"\t"</span> + b)</span><br><span class="line">      a + b</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> z1 = sc.parallelize(<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>), <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">val</span> result1 = z1.aggregate(<span class="number">3</span>)(seqOP, combOp)</span><br><span class="line">    println(<span class="string">"result1: "</span>+result1)</span><br><span class="line"></span><br><span class="line">计算过程为:  </span><br><span class="line">partition内部聚合：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">1</span>+<span class="number">2</span>+<span class="number">3</span>=<span class="number">9</span></span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">4</span>+<span class="number">5</span>+<span class="number">6</span>=<span class="number">18</span></span><br><span class="line">combine：</span><br><span class="line"><span class="number">3</span>(初始值)+<span class="number">9</span>+<span class="number">18</span></span><br><span class="line"></span><br><span class="line">result1: <span class="number">30</span></span><br></pre></td></tr></table></figure>
+<p>1、reduce函数和combine函数必须满足<strong>交换律(commutative)和结合律(associative)</strong><br>2、从aggregate 函数的定义可知，combine函数的输出类型必须和输入的类型一致</p>
+<h2 id="aggregateByKey"><a href="#aggregateByKey" class="headerlink" title="aggregateByKey"></a>aggregateByKey</h2><p>该函数和aggregate类似，但操作的RDD是Pair类型的。<br>Aggregate the values of each key, using given combine functions and a neutral “zero value”. This function can return a different result type, U, than the type of the values in this RDD, V. Thus, we need one operation for merging a V into a U and one operation for merging two U’s, as in scala.TraversableOnce. The former operation is used for merging values within a partition, and the latter is used for merging values between partitions. To avoid memory allocation, both of these functions are allowed to modify and return their first argument instead of creating a new U.<br>aggregateByKey函数对PairRDD中相同Key的值进行聚合操作，在聚合过程中同样使用了一个中立的初始值。和aggregate函数类似，aggregateByKey返回值的类型不需要和RDD中value的类型一致。因为aggregateByKey是对相同Key中的值进行聚合操作，所以aggregateByKey函数最终返回的类型还是Pair RDD，对应的结果是Key和聚合好的值；而aggregate函数直接是返回非RDD的结果，这点需要注意。在实现过程中，定义了三个aggregateByKey函数原型，但最终调用的aggregateByKey函数都一致。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, partitioner: <span class="type">Partitioner</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第一个aggregateByKey函数我们可以自定义<span class="type">Partitioner</span>。除了这个参数之外，其函数声明和aggregate很类似；其他的aggregateByKey函数实现最终都是调用这个。</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>, numPartitions: <span class="type">Int</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">第二个aggregateByKey函数可以设置分区的个数(numPartitions)，最终用的是<span class="type">HashPartitioner</span>。</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aggregateByKey</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](zeroValue: <span class="type">U</span>)</span><br><span class="line">　　　　(seqOp: (<span class="type">U</span>, <span class="type">V</span>) =&gt; <span class="type">U</span>, combOp: (<span class="type">U</span>, <span class="type">U</span>) =&gt; <span class="type">U</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">U</span>)]</span><br><span class="line">最后一个aggregateByKey实现先会判断当前<span class="type">RDD</span>是否定义了分区函数，如果定义了则用当前<span class="type">RDD</span>的分区；如果当前<span class="type">RDD</span>并未定义分区 ，则使用<span class="type">HashPartitioner</span>。</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>,<span class="number">3</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>, <span class="number">4</span>),(<span class="number">2</span>,<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seq</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"seq: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">comb</span></span>(a:<span class="type">Int</span>, b:<span class="type">Int</span>) : <span class="type">Int</span> =&#123;</span><br><span class="line">    println(<span class="string">"comb: "</span> + a + <span class="string">"\t "</span> + b)</span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = data.aggregateByKey(<span class="number">1</span>)(seq, comb)</span><br><span class="line">result.collect.foreach(println)</span><br><span class="line">计算过程:</span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span>+<span class="number">2</span> <span class="number">1</span>(初始值)+<span class="number">4</span></span><br><span class="line"><span class="number">1</span>(初始值)+<span class="number">3</span> </span><br><span class="line">(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line">(<span class="number">1</span>,<span class="number">11</span>)</span><br></pre></td></tr></table></figure>
+<p>aggregateByKey和aggregate结果有点不一样。如果用aggregate函数对含有3、2、4三个元素的RDD进行计算，初始值为1的时候，计算的结果应该是10，而这里是9，这是因为aggregate函数中的初始值需要和reduce函数以及combine函数结合计算，而aggregateByKey中的初始值只需要和reduce函数计算，不需要和combine函数结合计算，所以导致结果有点不一样。</p>
+<h2 id="sortBy和sortByKey"><a href="#sortBy和sortByKey" class="headerlink" title="sortBy和sortByKey"></a>sortBy和sortByKey</h2><p>在很多应用场景都需要对结果数据进行排序，Spark中有时也不例外。在Spark中存在两种对RDD进行排序的函数，分别是 sortBy和sortByKey函数。sortBy是对标准的RDD进行排序，它是从Spark 0.9.0之后才引入的（可以参见SPARK-1063）。而sortByKey函数是对PairRDD进行排序，也就是有Key和Value的RDD。下面将分别对这两个函数的实现以及使用进行说明。</p>
+<h3 id="sortBy"><a href="#sortBy" class="headerlink" title="sortBy"></a>sortBy</h3><p>sortBy函数是在org.apache.spark.rdd.RDD类中实现的，它的实现如下：<br>该函数最多可以传三个参数：<br>　　第一个参数是一个函数，该函数的也有一个带T泛型的参数，返回类型和RDD中元素的类型是一致的；<br>　　第二个参数是ascending，从字面的意思大家应该可以猜到，是的，这参数决定排序后RDD中的元素是升序还是降序，默认是true，也就是升序；<br>　　第三个参数是numPartitions，该参数决定排序后的RDD的分区个数，默认排序后的分区个数和排序之前的个数相等，即为this.partitions.size。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Return this RDD sorted by the given key function.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortBy</span></span>[<span class="type">K</span>](</span><br><span class="line">    f: (<span class="type">T</span>) =&gt; <span class="type">K</span>,</span><br><span class="line">    ascending: <span class="type">Boolean</span> = <span class="literal">true</span>,</span><br><span class="line">    numPartitions: <span class="type">Int</span> = <span class="keyword">this</span>.partitions.size)</span><br><span class="line">    (<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">K</span>], ctag: <span class="type">ClassTag</span>[<span class="type">K</span>]): <span class="type">RDD</span>[<span class="type">T</span>] =</span><br><span class="line">  <span class="keyword">this</span>.keyBy[<span class="type">K</span>](f)</span><br><span class="line">      .sortByKey(ascending, numPartitions)</span><br><span class="line">      .values</span><br></pre></td></tr></table></figure></p>
+<p>从sortBy函数的实现可以看出，第一个参数是必须传入的，而后面的两个参数可以不传入。而且sortBy函数函数的实现依赖于sortByKey函数，关于sortByKey函数后面会进行说明。keyBy函数也是RDD类中进行实现的，它的主要作用就是将将传进来的每个元素作用于f(x)中，并返回tuples类型的元素，也就变成了Key-Value类型的RDD了，它的实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Creates tuples of the elements in this RDD by applying `f`.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">keyBy</span></span>[<span class="type">K</span>](f: <span class="type">T</span> =&gt; <span class="type">K</span>): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">T</span>)] = &#123;</span><br><span class="line">    map(x =&gt; (f(x), x))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Demo:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = <span class="type">List</span>(<span class="number">3</span>,<span class="number">1</span>,<span class="number">90</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">12</span>)</span><br><span class="line"><span class="keyword">val</span> rdd = sc.parallelize(data)</span><br><span class="line"><span class="keyword">val</span> result = rdd.sortBy(x =&gt; x, <span class="literal">false</span>)</span><br><span class="line">result.collect.foreach(println)</span><br></pre></td></tr></table></figure></p>
+<h3 id="sortByKey函数"><a href="#sortByKey函数" class="headerlink" title="sortByKey函数"></a>sortByKey函数</h3><p>sortByKey函数作用于Key-Value形式的RDD，并对Key进行排序。它是在org.apache.spark.rdd.OrderedRDDFunctions中实现的，实现如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortByKey</span></span>(ascending: <span class="type">Boolean</span> = <span class="literal">true</span>, numPartitions: <span class="type">Int</span> = self.partitions.size)</span><br><span class="line">    : <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">val</span> part = <span class="keyword">new</span> <span class="type">RangePartitioner</span>(numPartitions, self, ascending)</span><br><span class="line">  <span class="keyword">new</span> <span class="type">ShuffledRDD</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">V</span>](self, part)</span><br><span class="line">    .setKeyOrdering(<span class="keyword">if</span> (ascending) ordering <span class="keyword">else</span> ordering.reverse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数返回的RDD一定是ShuffledRDD类型的，因为对源RDD进行排序，必须进行Shuffle操作，而Shuffle操作的结果RDD就是ShuffledRDD。其实这个函数的实现很优雅，里面用到了<strong>RangePartitioner，它可以使得相应的范围Key数据分到同一个partition中，然后内部用到了mapPartitions对每个partition中的数据进行排序</strong>，而每个partition中数据的排序用到了标准的sort机制，避免了大量数据的shuffle。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = sc.parallelize(<span class="type">List</span>(<span class="string">"wyp"</span>, <span class="string">"iteblog"</span>, <span class="string">"com"</span>, <span class="string">"397090770"</span>, <span class="string">"test"</span>), <span class="number">2</span>)</span><br><span class="line">   <span class="keyword">val</span> b = sc.parallelize(<span class="type">List</span>(<span class="number">3</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">12</span>, <span class="number">4</span>))</span><br><span class="line">   <span class="keyword">val</span> c = b.zip(a)</span><br><span class="line">   c.sortByKey().collect</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 修改默认的排序规则</span></span><br><span class="line">   <span class="keyword">implicit</span> <span class="keyword">val</span> sortIntegersByString = <span class="keyword">new</span> <span class="type">Ordering</span>[<span class="type">Int</span>] &#123;</span><br><span class="line">     <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">compare</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>) =</span><br><span class="line">       a.toString.compare(b.toString)</span><br><span class="line">   &#125;</span><br><span class="line">   c.sortByKey().collect</span><br></pre></td></tr></table></figure></p>
+<h2 id="collectAsMap"><a href="#collectAsMap" class="headerlink" title="collectAsMap"></a>collectAsMap</h2><p>功能和collect函数类似。该函数用于Pair RDD，最终返回Map类型的结果。官方文档说明：<br>Return the key-value pairs in this RDD to the master as a Map.<br>Warning: this doesn’t return a multimap (so if you have multiple values to the same key, <strong>only one value per key is preserved in the map returned</strong><br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">collectAsMap</span></span>(): <span class="type">Map</span>[<span class="type">K</span>, <span class="type">V</span>]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = sc.parallelize(<span class="type">List</span>((<span class="number">1</span>, <span class="string">"www"</span>), (<span class="number">1</span>, <span class="string">"iteblog"</span>), (<span class="number">1</span>, <span class="string">"com"</span>), (<span class="number">2</span>, <span class="string">"bbs"</span>), (<span class="number">2</span>, <span class="string">"iteblog"</span>), (<span class="number">2</span>, <span class="string">"com"</span>), (<span class="number">3</span>, <span class="string">"good"</span>)))</span><br><span class="line">    data.collectAsMap.foreach(print)</span><br><span class="line">(<span class="number">2</span>,com)(<span class="number">1</span>,com)(<span class="number">3</span>,good)</span><br></pre></td></tr></table></figure>
+<p>从结果我们可以看出，如果RDD中同一个Key中存在多个Value，那么后面的Value将会把前面的Value覆盖，最终得到的结果就是Key唯一，而且对应一个Value。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/05/05/常见Web容器的ClassLoader机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1236,631 +1978,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/04/24/Spring-Session学习笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/04/24/Spring-Session学习笔记/" itemprop="url">Spring Session学习笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-24T19:02:47+08:00">
-                2016-04-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/04/24/Spring-Session学习笔记/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/04/24/Spring-Session学习笔记/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="http://www.iflym.com/index.php/code/201503170001.html" target="_blank" rel="noopener">分布式cookie-session的实现(spring-session)</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/04/21/正确操作Java集合/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/04/21/正确操作Java集合/" itemprop="url">正确操作Java集合</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-21T17:01:23+08:00">
-                2016-04-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/04/21/正确操作Java集合/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/04/21/正确操作Java集合/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="java-对于collection操作"><a href="#java-对于collection操作" class="headerlink" title="java 对于collection操作"></a>java 对于collection操作</h1><h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>切记使用<strong>迭代器</strong></p>
-<p>正确的代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Iterator&lt;String&gt; it = famous.iterator(); it.hasNext();)&#123;</span><br><span class="line">    String s = it.next();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">"madehua"</span>))&#123;</span><br><span class="line">        it.remove();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>错误的代码:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Iterator&lt;String&gt; it = famous.iterator(); it.hasNext();)&#123;</span><br><span class="line">        String s = it.next();</span><br><span class="line">        <span class="keyword">if</span>(s.equals(<span class="string">"madehua"</span>))&#123;</span><br><span class="line">            famous.remove(s); <span class="comment">// 使用了错误的remove方法</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (String s : famous) &#123;</span><br><span class="line">    <span class="keyword">if</span> (s.equals(<span class="string">"madehua"</span>)) &#123;</span><br><span class="line">	    famous.remove(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/04/10/Tomcat系统架构和设计模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/04/10/Tomcat系统架构和设计模式/" itemprop="url">Tomcat系统架构和设计模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-10T22:02:09+08:00">
-                2016-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
-                    <span itemprop="name">Tomcat</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/04/10/Tomcat系统架构和设计模式/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/04/10/Tomcat系统架构和设计模式/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Tomcat-的总体结构"><a href="#Tomcat-的总体结构" class="headerlink" title="Tomcat 的总体结构"></a>Tomcat 的总体结构</h2><p><img src="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/image001.gif" alt="Tomcat 的总体结构"></p>
-<p>从上图中可以看出 Tomcat 的心脏是两个组件：Connector 和 Container，关于这两个组件将在后面详细介绍。Connector 组件是可以被替换，这样可以提供给服务器设计者更多的选择，因为这个组件是如此重要，不仅跟服务器的设计的本身，而且和不同的应用场景也十分相关，所以一个 Container 可以选择对应多个 Connector。多个 Connector 和一个 Container 就形成了一个 Service，Service 的概念大家都很熟悉了，有了 Service 就可以对外提供服务了，但是 Service 还要一个生存的环境，必须要有人能够给她生命、掌握其生死大权，那就非 Server 莫属了。所以整个 Tomcat 的生命周期由 Server 控制。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="noopener">Tomcat 系统架构与设计模式，第 1 部分: 工作原理</a></li>
-<li><a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="noopener">Tomcat 系统架构与设计模式，第 2 部分: 设计模式分析</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/04/07/Spring实现数据库读写分离/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/04/07/Spring实现数据库读写分离/" itemprop="url">Spring实现数据库读写分离</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-07T09:53:26+08:00">
-                2016-04-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/04/07/Spring实现数据库读写分离/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/04/07/Spring实现数据库读写分离/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://github.com/slamke/spring_read_write" target="_blank" rel="noopener">Github</a></p>
-<p>参考：<br><a href="http://wiki.xby1993.net/doku.php?id=spring:spring%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB" target="_blank" rel="noopener">spring实现数据库读写分离</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1906,7 +2028,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1917,7 +2039,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>

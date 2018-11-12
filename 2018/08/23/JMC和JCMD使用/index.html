@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
 <meta property="og:description" content="使用JCMD排查问题 另一份Java应用调优指南之－前菜 另一份Java应用调优指南之－工具篇 Java Mission Control之使用 123456789-Dcom.sun.management.jmxremote=true -Djava.rmi.server.hostname=** -Dcom.sun.management.jmxremote.port=6666 -Dcom.sun.ma">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-08-23T03:15:52.511Z">
+<meta property="og:updated_time" content="2018-09-07T06:07:06.679Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JMC和JCMD使用">
 <meta name="twitter:description" content="使用JCMD排查问题 另一份Java应用调优指南之－前菜 另一份Java应用调优指南之－工具篇 Java Mission Control之使用 123456789-Dcom.sun.management.jmxremote=true -Djava.rmi.server.hostname=** -Dcom.sun.management.jmxremote.port=6666 -Dcom.sun.ma">
@@ -362,7 +362,7 @@
 <ol>
 <li>ps ux 查看运行的进程</li>
 <li>top -c查看占用cpu的进程</li>
-<li>top -bn1 -H -p <pid> 查看占用cpu的线程  // 找出cpu高的线程tid ps -mp <pid> -o THREAD,tid,time | sort -rn</pid></pid></li>
+<li>top -bn1 -H -p <pid>  / top -Hp <pid>查看占用cpu的线程  // 找出cpu高的线程tid ps -mp <pid> -o THREAD,tid,time | sort -rn</pid></pid></pid></li>
 <li>jstack <pid>查看线程运行情况  // 转换线程tidprintf “%x\n” <tid></tid></pid></li>
 <li>jmap -heap <pid> 查看内存占用情况</pid></li>
 </ol>
@@ -407,6 +407,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/07/Minor-GC、Major-GC和Full-GC之间的区别/" rel="prev" title="Minor GC、Major GC和Full GC之间的区别">
+                Minor GC、Major GC和Full GC之间的区别 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -484,7 +488,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -495,7 +499,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>

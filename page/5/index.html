@@ -249,6 +249,668 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/28/Hadoop的安全机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/28/Hadoop的安全机制/" itemprop="url">Hadoop的安全机制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-28T17:31:00+08:00">
+                2017-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/28/Hadoop的安全机制/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/28/Hadoop的安全机制/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Hadoop Kerberos安全机制介绍</p>
+<p>参考: <a href="http://dongxicheng.org/mapreduce/hadoop-kerberos-introduction/" target="_blank" rel="noopener">http://dongxicheng.org/mapreduce/hadoop-kerberos-introduction/</a></p>
+<p>在Hadoop1.0.0或者CDH3版本后，加入了Kerberos认证机制。使得集群中的节点就是它们所宣称的，是信赖的。Kerberos可以将认证的密钥在集群部署时事先放到可靠的节点上。集群运行时，集群内的节点使用密钥得到认证。只有被认证过节点才能正常使用。企图冒充的节点由于没有事先得到的密钥信息，无法与集群内部的节点通信。防止了恶意的使用或篡改Hadoop集群的问题，确保了Hadoop集群的可靠安全。</p>
+<ul>
+<li>解决服务器到服务器的认证<br>由于kerberos对集群里的所有机器都分发了keytab，相互之间使用密钥进行通信，确保不会冒充服务器的情况。集群中的机器就是它们所宣称的，是可靠的。<br>防止了用户伪装成Datanode，Tasktracker，去接受JobTracker，Namenode的任务指派。</li>
+<li>解决client到服务器的认证<br>Kerberos对可信任的客户端提供认证，确保他们可以执行作业的相关操作。防止用户恶意冒充client提交作业的情况。<br>用户无法伪装成其他用户入侵到一个HDFS 或者MapReduce集群上<br>用户即使知道datanode的相关信息，也无法读取HDFS上的数据<br>用户无法发送对于作业的操作到JobTracker上</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/28/SparkSQL有必要坐下来聊聊Join/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/28/SparkSQL有必要坐下来聊聊Join/" itemprop="url">SparkSQL有必要坐下来聊聊Join</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-28T11:15:46+08:00">
+                2017-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/28/SparkSQL有必要坐下来聊聊Join/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/28/SparkSQL有必要坐下来聊聊Join/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转自 <a href="http://hbasefly.com/2017/03/19/sparksql-basic-join/" target="_blank" rel="noopener">http://hbasefly.com/2017/03/19/sparksql-basic-join/</a></p>
+<p>HashJoin</p>
+<p>Broadcast Hash Join</p>
+<p>Shuffle Hash Join</p>
+<p>Sort-Merge Join</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/19/Java的通用I-O-API设计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/19/Java的通用I-O-API设计/" itemprop="url">Java的通用I/O API设计</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-19T20:47:53+08:00">
+                2017-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/19/Java的通用I-O-API设计/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/19/Java的通用I-O-API设计/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://github.com/oldratlee/translations/blob/master/generic-io-api-in-java-and-api-design/README.md" target="_blank" rel="noopener">博客</a></p>
+<p><a href="https://github.com/oldratlee/io-api/wiki/java-api-design-exercise" target="_blank" rel="noopener">wiki说明</a></p>
+<p><a href="https://github.com/oldratlee/io-api" target="_blank" rel="noopener">代码库</a></p>
+<p><a href="http://lcsd05.cs.tamu.edu/slides/keynote.pdf" target="_blank" rel="noopener">How to Design a Good API and Why it Matters(by Joshua Bloch)</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/15/作为Scala语法糖的设计模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sun Ke">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/15/作为Scala语法糖的设计模式/" itemprop="url">作为Scala语法糖的设计模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-15T15:49:22+08:00">
+                2017-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Scala/" itemprop="url" rel="index">
+                    <span itemprop="name">Scala</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/15/作为Scala语法糖的设计模式/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/15/作为Scala语法糖的设计模式/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转载: <a href="http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar" target="_blank" rel="noopener">http://zhangyi.farbox.com/post/designthinking/design-patterns-with-scala-syntax-sugar</a></p>
+<p>Scala算是一门博采众家之长的语言，兼具OO与FP的特性，若使用恰当，可以更好地将OO与FP的各自优势发挥到极致；然而问题也随之而来，倘若过分地夸大OO特性，Scala就变成了一门精简版的Java，写出的是没有Scala Style的拙劣代码；倘若过分追求FP的不变性等特性，因为Scala在类型系统以及Monad实现的繁琐性，又可能导致代码变得复杂，不易阅读，反而得不偿失。</p>
+<p>看来，赋予程序员选择的自由，有时候未必是好事！</p>
+<p>在OO世界里，设计模式曾经风靡全世界，你不懂设计模式，都不好意思说自己是程序员。现在呢？说你懂设计模式，倒显得你逼格低了，心里鄙视：“这年头谁还用设计模式，早过时了！”程序员心中的鄙视链开始加成，直接失血二十格。</p>
+<p>其实什么事情都得辩证来看！设计模式对OO设计的推进作用不容忽视，更不容轻视。我只是反对那种为了“模式”而“模式”的僵化思想，如果没有明白设计模式的本质思想，了解根本的设计原理，设计模式无非就是花拳绣腿罢了。当然，在FP世界里，设计模式开始变味开始走形，但诸多模式的本质，例如封装、抽象，仍然贯穿其中，不过是表达形式迥然而已罢了。</p>
+<p>在混合了OO与FP的Scala语言中，我们来观察设计模式的实现，会非常有趣。Pavel Fatin有篇博客Design Patterns in Scala将Java设计模式与Scala进行了对比，值得一读。我这里想借用他的案例，然后从另一个角度来俯瞰设计模式。</p>
+<p>在Pavel Fatin比较的设计模式中，部分模式在Scala中不过是一种语法糖（Syntax Sugar），包括：</p>
+<ul>
+<li>Factory Method</li>
+<li>Lazy Initialization</li>
+<li>Singleton</li>
+<li>Adapter</li>
+<li>Value Object</li>
+<li>Factory Method</li>
+</ul>
+<p>文中给出的Factory Method模式，准确地说其实是静态工厂模式，它并不在GOF 23种模式之列，但作为对复杂创建逻辑的一种封装，常常被开发人员使用。站在OCP（开放封闭原则）的角度讲，该模式对扩展不是开放的，但对于修改而言，却是封闭的。如果创建逻辑发生了变化，可以保证仅修改该静态工厂方法一处。同时，该模式还可以极大地简化对象创建的API。</p>
+<p>在Scala中，通过引入伴生对象（Companion Object）来简化静态工厂方法，语法更加干净，体现了Scala精简的设计哲学。即使不是要使用静态工厂，我们也常常建议为Scala类定义伴生对象，尤其是在DSL上下文中，更是如此，因为这样可以减少new关键字对代码的干扰。</p>
+<h2 id="Lazy-Initialization"><a href="#Lazy-Initialization" class="headerlink" title="Lazy Initialization"></a>Lazy Initialization</h2><p>lazy修饰符在Scala中有更深远的涵义，例如牵涉到所谓严格（Strictness）函数与非严格（Non-strictness）函数。在Scala中，若未明确声明，所有函数都是严格求值的，即函数会立即对它的参数进行求值。而如果对val变量添加lazy修饰符，则Scala会延迟对该变量求值，直到它第一次被引用时。如果要定义非严格函数，可以将函数设置为by name参数。</p>
+<p>scala的lazy修饰符常常被用作定义一些消耗资源的变量。这些资源在初始化时并不需要，只有在调用某些方法时，才需要准备好这些资源。例如在Spark SQL的QeuryExecution类中，包括optimizedPlan、sparkPlan、executedPlan以及toRdd等，都被定义为lazy val：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QueryExecution</span>(<span class="params">val sparkSession: <span class="type">SparkSession</span>, val logical: <span class="type">LogicalPlan</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> analyzed: <span class="type">LogicalPlan</span> = &#123;</span><br><span class="line">    <span class="type">SparkSession</span>.setActiveSession(sparkSession)</span><br><span class="line">    sparkSession.sessionState.analyzer.execute(logical)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> withCachedData: <span class="type">LogicalPlan</span> = &#123;</span><br><span class="line">    assertAnalyzed()</span><br><span class="line">    assertSupported()</span><br><span class="line">    sparkSession.sharedState.cacheManager.useCachedData(analyzed)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> optimizedPlan: <span class="type">LogicalPlan</span> = sparkSession.sessionState.optimizer.execute(withCachedData)</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> sparkPlan: <span class="type">SparkPlan</span> = &#123;</span><br><span class="line">    <span class="type">SparkSession</span>.setActiveSession(sparkSession)</span><br><span class="line">    planner.plan(<span class="type">ReturnAnswer</span>(optimizedPlan)).next()</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> executedPlan: <span class="type">SparkPlan</span> = prepareForExecution(sparkPlan)</span><br><span class="line">  <span class="keyword">lazy</span> <span class="keyword">val</span> toRdd: <span class="type">RDD</span>[<span class="type">InternalRow</span>] = executedPlan.execute()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样设计有一个好处是，当程序在执行到这些步骤时，并不会被马上执行，从而使得初始化QueryExecution变得更快。只有在需要时，这些变量对应的代码才会执行。这也是延迟加载的涵义。</p>
+<h2 id="Singleton-Pattern"><a href="#Singleton-Pattern" class="headerlink" title="Singleton Pattern"></a>Singleton Pattern</h2><p>C#提供了静态类的概念，但Java没有，而Scala则通过引入Object弥补了Java的这一缺失，而且从语义上讲，似乎比静态类（Static Class）更容易让人理解。</p>
+<p>Object可以派生自多个trait。例如派生自App trait，就可直接享有main函数的福利。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">DelayedInit</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) = &#123;</span><br><span class="line">    <span class="keyword">this</span>._args = args</span><br><span class="line">    <span class="keyword">for</span> (proc &lt;- initCode) proc()</span><br><span class="line">    <span class="keyword">if</span> (util.<span class="type">Properties</span>.propIsSet(<span class="string">"scala.time"</span>)) &#123;</span><br><span class="line">      <span class="keyword">val</span> total = currentTime - executionStart</span><br><span class="line">      <span class="type">Console</span>.println(<span class="string">"[total "</span> + total + <span class="string">"ms]"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">App</span></span></span><br></pre></td></tr></table></figure>
+<p>继承多个trait的好处是代码复用。我们可以将许多小粒度方法的实现定义在多个trait中。这些方法如果被类继承，则成为实例方法，如果被Object继承，则变成了线程安全的静态方法（因为继承trait的实现就是一个mixin）。多么奇妙！所以很多时候，我们会尽量保证Obejct的短小精悍，然后将许多逻辑放到trait中。当你看到如下代码时，其实不必惊讶：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">App</span> </span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">InitHook</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ShutdownHook</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ActorSystemProvider</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">ScheduledTaskSupport</span></span></span><br></pre></td></tr></table></figure></p>
+<p>这种小粒度的trait既可以保证代码的复用，也有助于职责分离，还有利于测试。真是再好不过了！</p>
+<h2 id="Adapter-Pattern"><a href="#Adapter-Pattern" class="headerlink" title="Adapter Pattern"></a>Adapter Pattern</h2><p>隐式转换当然可以用作Adapter。在Scala中，之所以可以更好地调用Java库，隐式转换功不可没。从语法上看，隐式转换比C#提供的扩展方法更强大，适用范围更广。</p>
+<p>Pavel Fatin给出了日志转换的Adapter案例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Log</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">warning</span></span>(message: <span class="type">String</span>)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">error</span></span>(message: <span class="type">String</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Logger</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">log</span></span>(level: <span class="type">Level</span>, message: <span class="type">String</span>) &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="class"><span class="keyword">class</span> <span class="title">LoggerToLogAdapter</span>(<span class="params">logger: <span class="type">Logger</span></span>) <span class="keyword">extends</span> <span class="title">Log</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">warning</span></span>(message: <span class="type">String</span>) &#123; logger.log(<span class="type">WARNING</span>, message) &#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">error</span></span>(message: <span class="type">String</span>) &#123; logger.log(<span class="type">ERROR</span>, message) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> log: <span class="type">Log</span> = <span class="keyword">new</span> <span class="type">Logger</span>()</span><br></pre></td></tr></table></figure></p>
+<p>这里的隐式类LoggerToLogAdapter可以将Logger适配为Log。与Java实现Adapter模式不同的是，我们不需要去创建LoggerToLogAdapter的实例。如上代码中，创建的是Logger实例。Logger自身与Log无关，但在创建该对象的上下文中，由于我们定义了隐式类，当Scala编译器遇到该隐式类时，就会为Logger添加通过隐式类定义的代码，包括隐式类中定义的对Log的继承，以及额外增加的warning与error方法。</p>
+<p>在大多数场景，Adapter关注的是接口之间的适配。但是，当要适配的接口只有一个函数时，在支持高阶函数（甚至只要支持Lambda）的语言中，此时的Adapter模式就味如鸡肋了。假设Log与Logger接口只有一个log函数（不管它的函数名是什么），接收的参数为(Level, String)，那么从抽象的角度来看，它们其实属于相同的一个抽象：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f: (<span class="type">Level</span>, <span class="type">String</span>) =&gt; <span class="type">Unit</span></span><br></pre></td></tr></table></figure></p>
+<p>任何一个符合该定义的函数，都是完全适配的，没有类型与函数名的约束。</p>
+<p>如果再加上泛型，抽象会更加彻底。例如典型的Load Pattern实现：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span>](r : <span class="type">Resource</span>)(f : <span class="type">Resource</span> =&gt; <span class="type">A</span>) : <span class="type">A</span> =</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        f(r)</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        r.dispose()</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>泛型A可以是任何类型，包括Unit类型。这里的f扩大了抽象范围，只要满足从Resource转换到A的语义，都可以传递给using函数。更而甚者可以完全抛开对Resource类型的依赖，只需要定义了close()方法，都可以作为参数传入：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span> &lt;: <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>():<span class="type">Unit</span>, <span class="type">B</span>][resource: <span class="type">A</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">B</span> =</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        f(resource)</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        resource.close()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">using(io.<span class="type">Source</span>.fromFile(<span class="string">"example.txt"</span>)) &#123; source =&gt; &#123;</span><br><span class="line">    <span class="keyword">for</span> (line &lt;- source.getLines) &#123;</span><br><span class="line">        println(line)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为FileResource定义了close()函数，所以可以作为参数传给using()函数。</p>
+<h2 id="Value-Object"><a href="#Value-Object" class="headerlink" title="Value Object"></a>Value Object</h2><p>Value Object来自DDD中的概念，通常指的是没有唯一标识的不变对象。Java没有Value Object的语法，然而因其在多数业务领域中被频繁使用，Scala为其提供了快捷语法Case Class。在几乎所有的Scala项目中，都可以看到Case Class的身影。除了在业务中表现Value Object之外，还可以用于消息传递（例如AKKA在Actor之间传递的消息）、序列化等场景。此外，Case Class又可以很好地支持模式匹配，或者作为典型的代数数据类型（ADT）。例如Scala中的List，可以被定义为：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">List</span>[+<span class="type">T</span>]</span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">Nil</span> <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">Nothing</span>]</span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">class</span> <span class="title">Cons</span>[+<span class="type">T</span>](<span class="params">h: <span class="type">T</span>, t: <span class="type">List</span>[<span class="type">T</span>]</span>) <span class="keyword">extends</span> <span class="title">List</span>[<span class="type">T</span>]</span></span><br></pre></td></tr></table></figure>
+<p>这里，case object是一个单例的值对象。而Nil与Cons又都同时继承自一个sealed trait。在消息定义时，我们常常采用这样的ADT定义。例如List定义中，Nil与Cons就是List ADT的sum或者union，而Cons构造器则被称之为是参数h（代表List的head）与t（代表List的tail）的product。这也是ADT（algebraic data type）之所以得名。注意它与OO中的ADT（抽象数据类型）是风马牛不相及的两个概念。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/03/15/Spark的UDF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1239,672 +1901,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/01/05/HFTP文件系统解析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/05/HFTP文件系统解析/" itemprop="url">HFTP文件系统解析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T15:57:58+08:00">
-                2017-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/HDFS/" itemprop="url" rel="index">
-                    <span itemprop="name">HDFS</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/01/05/HFTP文件系统解析/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/01/05/HFTP文件系统解析/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h2><p>抽象类<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">|  文件系统  |  URI前缀  |  hadoop的具体实现类 |</span><br><span class="line">| --- | --- | --- |</span><br><span class="line">| Local | file | fs.LocalFileSystem |</span><br><span class="line">| HDFS  | hdfs | hdfs.DistributedFileSystem |</span><br><span class="line">| HFTP  | hftp | hdfs.HftpFileSystem |</span><br><span class="line">| HSFTP | hsftp | hdfs.HsftpFileSystem |</span><br><span class="line">| HAR  | har  | fs.HarFileSystem |</span><br><span class="line">| KFS  | kfs  | fs.kfs.KosmosFileSystem |</span><br><span class="line">| FTP  | ftp  | fs.ftp.FTPFileSystem |</span><br><span class="line">| S3 (native) | s3n | s.s3native.NativeS3FileSystem |</span><br><span class="line">| S3 (blockbased) | s3 | fs.s3.S3FileSystem |</span><br><span class="line"></span><br><span class="line">Hadoop提供了很多接口来访问这些文件系统，最常用的是通过URI前缀来访问正确的文件系统。比如:</span><br><span class="line">&gt; hadoop fs -ls  file:///.......</span><br><span class="line"> &gt; hadoop fs -ls  hdfs:///.......</span><br><span class="line"></span><br><span class="line">虽然理论上MapReduce可以使用上面这些系统，但是如果我们处理海量数据的话还是要选用一个分布式文件系统hdfs或者kfs。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配置</span><br><span class="line">hadoop-default.xml关于filesystem实现的配置```hadoop-default.xml```：</span><br><span class="line">``` xml</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.fms.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.FMSFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.apache.hadoop.hdfs.DistributedFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;description&gt;The FileSystem for hdfs: uris.&lt;/description&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
-<p>spark-client关于filesystem实现的配置<figure class="highlight plain"><figcaption><span>```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">``` xml</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.file.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.LocalFileSystem&lt;/value&gt;</span><br><span class="line">    &lt;description&gt;The FileSystem for file: uris.&lt;/description&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.hdfs.impl&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;org.apache.hadoop.fs.DFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line"></span><br><span class="line">  &lt;property&gt;</span><br><span class="line">   &lt;name&gt;fs.webhdfs.impl&lt;/name&gt;</span><br><span class="line">   &lt;value&gt;org.apache.hadoop.smw.hdfs.web.WebHdfsFileSystem&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
-<h2 id="HFTP介绍"><a href="#HFTP介绍" class="headerlink" title="HFTP介绍"></a>HFTP介绍</h2><p>HFTP 是hadoop文件系统用来让你从一个远程的hadoop HDFS集群中读取数据的组件。这个读取是通过HTTP，并且数据源是DataNodes。HFTP是一个只读的文件系统，当你试图用来写入数据或者修改文件系统状态时，会抛出异常。</p>
-<p>HFTP 主要的帮助在有多个HDFS集群，并存在多个版本时，将数据从一个集群迁移到另一个。HFTP 在不同版本的HDFS中是兼容写的。你可以操作例如：</p>
-<blockquote>
-<p>hadoop distcp -i h<a href="ftp://sourceFS:50070/src" target="_blank" rel="noopener">ftp://sourceFS:50070/src</a> hdfs://destFS:8020/dest</p>
-</blockquote>
-<p>注意HFTP是只读的，所以目标端必须是HDFS文件系统。（在这个例子中，distcp会使用新文件系统的配置运行。）</p>
-<p>另外，HSFTP，默认使用HTTPS。这意味着数据在传输的时候会被加密。<br><a href="https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html" target="_blank" rel="noopener">https://hadoop.apache.org/docs/r2.6.3/hadoop-project-dist/hadoop-hdfs/Hftp.html</a></p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>HFTP的代码在java 类<code>org.apache.hadoop.hdfs.HftpFileSystem</code> 中。同样的，HSFTP也在<code>org.apache.hadoop.hdfs.HsftpFileSystem</code>中实现.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2017/01/02/SparkListener机制详解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/02/SparkListener机制详解/" itemprop="url">SparkListener机制详解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-02T18:35:49+08:00">
-                2017-01-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/01/02/SparkListener机制详解/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/01/02/SparkListener机制详解/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Spark源码注释中有下面一句话:</p>
-<blockquote>
-<p>Asynchronously passes SparkListenerEvents to registered SparkListeners</p>
-</blockquote>
-<p>即所有spark消息SparkListenerEvents 被异步的发送给已经注册过的SparkListeners.<br>在SparkContext中, 首先会创建LiveListenerBus实例,这个类主要功能如下:</p>
-<ul>
-<li>保存所有消息队列,负责消息的缓存</li>
-<li>保存所有注册过的listener,负责消息的分发<br><img src="http://img.blog.csdn.net/20150806141900394" alt=""></li>
-</ul>
-<p>listener链表保存在ListenerBus类中,为了保证并发访问的安全性,此处采用Java的CopyOnWriteArrayList类来存储listener. 当需要对listener链表进行更改时,CopyOnWriteArrayList的特性使得会先复制整个链表,然后在复制的链表上面进行修改.当一旦获得链表的迭代器,在迭代器的生命周期中,可以保证数据的一致性.</p>
-<p>消息队列实际上是保存在类AsynchronousListenerBus中的:</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> <span class="type">EVENT_QUEUE_CAPACITY</span> = <span class="number">10000</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> eventQueue = <span class="keyword">new</span> <span class="type">LinkedBlockingQueue</span>[<span class="type">E</span>](<span class="type">EVENT_QUEUE_CAPACITY</span>)</span><br></pre></td></tr></table></figure>
-<p>事件队列的长度为10000,当缓存事件数量达到上限后,新来的事件会被丢弃,</p>
-<p>在SparkContext中,会</p>
-<ul>
-<li>创建LiveListenerBus类类型的成员变量listenerBus</li>
-<li>创建各种listener,并加入到listenerBus中</li>
-<li>post一些事件到listenerBus中</li>
-<li>调用listenerBus.start() 来启动事件处理程序</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20150806141223019" alt=""></p>
-<p>这里有一点需要注意的是, 在listenerBus.start() 调用之前, 可以向其中post消息, 这些消息会被缓存起来,等start函数调用之后, 消费者线程会分发这些缓存的消息.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/12/23/使用RCU技术实现读写线程无锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/12/23/使用RCU技术实现读写线程无锁/" itemprop="url">使用RCU技术实现读写线程无锁</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-23T14:56:16+08:00">
-                2016-12-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/23/使用RCU技术实现读写线程无锁/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/12/23/使用RCU技术实现读写线程无锁/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在一个系统中有一个写线程和若干个读线程，读写线程通过一个指针共用了一个数据结构，写线程改写这个结构，读线程读取该结构。在写线程改写这个数据结构的过程中，加锁情况下读线程由于等待锁耗时会增加。</p>
-<p>可以利用RCU (Read Copy Update What is rcu)的思想来去除这个锁。</p>
-<h2 id="RCU"><a href="#RCU" class="headerlink" title="RCU"></a>RCU</h2><p>RCU可以说是一种替代读写锁的方法。其基于一个事实：当写线程在改变一个指针时，读线程获取这个指针，要么获取到老的值，要么获取到新的值。RCU的基本思想其实很简单，参考<a href="http://www.rdrop.com/~paulmck/RCU/whatisRCU.html" target="_blank" rel="noopener">What is RCU</a>中Toy implementation可以很容易理解。一种简单的RCU流程可以描述为：</p>
-<p>写线程：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">old_ptr = _ptr</span><br><span class="line">tmp_ptr = copy(_ptr)     <span class="comment">// copy</span></span><br><span class="line">change(tmp_ptr)          <span class="comment">// change </span></span><br><span class="line">_ptr = tmp_ptr           <span class="comment">// update</span></span><br><span class="line">synchroize(tmp_ptr)</span><br></pre></td></tr></table></figure></p>
-<p>写线程要更新_ptr指向的内容时，先复制一份新的，基于新的进行改变，更新_ptr指针，最后同步释放老的内存。</p>
-<p>读线程：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tmp_ptr = _ptr</span><br><span class="line">use(tmp_ptr)</span><br><span class="line">dereference(tmp_ptr)</span><br></pre></td></tr></table></figure></p>
-<p>读线程直接使用_ptr，使用完后需要告诉写线程自己不再使用_ptr。读线程获取_ptr时，可能会获取到老的也可能获取到新的，无论哪种RCU都需要保证这块内存是有效的。重点在synchroize和dereference。synchroize会等待所有使用老的_ptr的线程dereference，对于新的_ptr使用者其不需要等待。这个问题说白了就是写线程如何知道old_ptr没有任何读线程在使用，可以安全地释放。</p>
-<p>这个问题实际上在wait-free的各种实现中有好些解法，<a href="http://stackoverflow.com/questions/22263874/how-when-to-release-memory-in-wait-free-algorithms" target="_blank" rel="noopener">how-when-to-release-memory-in-wait-free-algorithms</a>这里有人总结了几种方法，例如Hazard pointers、Quiescence period based reclamation。</p>
-<p>简单地使用引用计数智能指针是无法解决这个问题的，因为智能指针自己不是线程安全的，例如：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tmp_ptr = _ptr      <span class="comment">// 1</span></span><br><span class="line">tmp_ptr-&gt;addRef()   <span class="comment">// 2</span></span><br><span class="line">use</span><br><span class="line">tmp_ptr-&gt;release()</span><br></pre></td></tr></table></figure></p>
-<p>代码1/2行不是原子的，所以当取得tmp_ptr准备addRef时，tmp_ptr可能刚好被释放了。</p>
-<p>Quiescence period based reclamation方法指的是读线程需要声明自己处于Quiescence period，也就是不使用_ptr的时候，当其使用_ptr的时候实际是进入了一个逻辑上的临界区，当所有读线程都不再使用_ptr的时候，写线程就可以对内存进行安全地释放。</p>
-<p>本文正是描述了一种Quiescence period based reclamation实现。这个实现可以用于有一个写线程和多个读线程共用若干个数据的场景。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/12/23/大数据下的DistinctCount/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sun Ke">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="雁渡寒潭 风吹疏竹">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/12/23/大数据下的DistinctCount/" itemprop="url">大数据下的DistinctCount</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-23T11:53:53+08:00">
-                2016-12-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/23/大数据下的DistinctCount/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/12/23/大数据下的DistinctCount/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在数据库中，常常会有Distinct Count的操作，比如，查看每一选修课程的人数：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> course, <span class="keyword">count</span>(<span class="keyword">distinct</span> <span class="keyword">sid</span>)</span><br><span class="line"><span class="keyword">from</span> stu_table</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> course;</span><br></pre></td></tr></table></figure></p>
-<h2 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h2><p>在大数据场景下，报表很重要一项是UV（Unique Visitor）统计，即某时间段内用户人数。例如，查看一周内app的用户分布情况，Hive中写HiveQL实现：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> app, <span class="keyword">count</span>(<span class="keyword">distinct</span> uid) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span> log_table</span><br><span class="line"><span class="keyword">where</span> week_cal = <span class="string">'2016-03-27'</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> uv <span class="keyword">desc</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">20</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="Pig"><a href="#Pig" class="headerlink" title="Pig"></a>Pig</h2><p>大部分情况下，Hive的执行效率偏低，我更为偏爱Pig：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- all users define DISTINCT_COUNT(A, a) returns dist &#123;</span></span><br><span class="line">    B = foreach $A generate $a;</span><br><span class="line">    unique_B = distinct B;</span><br><span class="line">    C = group unique_B all;</span><br><span class="line">    $dist = foreach C generate SIZE(unique_B);</span><br><span class="line">&#125;</span><br><span class="line">A = <span class="keyword">load</span> <span class="string">'/path/to/data'</span> <span class="keyword">using</span> PigStorage() <span class="keyword">as</span> (app, uid);</span><br><span class="line">B = DISTINCT_COUNT(A, uid);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- &lt;app, users&gt;</span></span><br><span class="line">A = <span class="keyword">load</span> <span class="string">'/path/to/data'</span> <span class="keyword">using</span> PigStorage() <span class="keyword">as</span> (app, uid);</span><br><span class="line">B = distinct A;</span><br><span class="line">C = group B by app;</span><br><span class="line">D = foreach C generate group as app, COUNT($1) as uv;</span><br><span class="line"><span class="comment">-- or</span></span><br><span class="line">D = foreach C generate group as app, SIZE($1) as uv;</span><br></pre></td></tr></table></figure></p>
-<p>DataFu 为pig提供基数估计的UDF <figure class="highlight plain"><figcaption><span>Count：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">```sql</span><br><span class="line">define HyperLogLogPlusPlus datafu.pig.stats.HyperLogLogPlusPlus();</span><br><span class="line">A = load &apos;/path/to/data&apos; using PigStorage() as (app, uid);</span><br><span class="line">B = group A by app;</span><br><span class="line">C = foreach B generate group as app, HyperLogLogPlusPlus($1) as uv;</span><br></pre></td></tr></table></figure></p>
-<h2 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h2><p>在Spark中，Load数据后通过RDD一系列的转换——map、distinct、reduceByKey进行Distinct Count：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map &#123; line =&gt; (line._1, <span class="number">1</span>) &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .mapValues&#123; _ =&gt; <span class="number">1</span> &#125;</span><br><span class="line">  .reduceByKey(_ + _)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or </span></span><br><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">  .distinct()</span><br><span class="line">  .map(_._1)</span><br><span class="line">  .countByValue()</span><br></pre></td></tr></table></figure></p>
-<p>同时，Spark提供近似Distinct Count的API：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.map &#123; row =&gt; (row.app, row.uid) &#125;</span><br><span class="line">    .countApproxDistinctByKey(<span class="number">0.001</span>)</span><br></pre></td></tr></table></figure></p>
-<p>实现是基于HyperLogLog算法：</p>
-<blockquote>
-<p>The algorithm used is based on streamlib’s implementation of “HyperLogLog in Practice: Algorithmic Engineering of a State of The Art Cardinality Estimation Algorithm”, available here.</p>
-</blockquote>
-<p>或者，将Schema化的RDD转成DataFrame后，registerTempTable然后执行sql命令亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"><span class="keyword">val</span> df = rdd.toDF()</span><br><span class="line">df.registerTempTable(<span class="string">"app_table"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> appUsers = sqlContext.sql(<span class="string">"select app, count(distinct uid) as uv from app_table group by app"</span>)</span><br></pre></td></tr></table></figure></p>
-<h2 id="Bitmap"><a href="#Bitmap" class="headerlink" title="Bitmap"></a>Bitmap</h2><h3 id="Bitmap介绍"><a href="#Bitmap介绍" class="headerlink" title="Bitmap介绍"></a>Bitmap介绍</h3><p>《编程珠玑》上是这样介绍bitmap的：</p>
-<blockquote>
-<p>Bitmap是一个十分有用的数据结构。所谓的Bitmap就是用一个bit位来标记某个元素对应的Value，而Key即是该元素。由于采用了Bit为单位来存储数据，因此在内存占用方面，可以大大节省。</p>
-</blockquote>
-<p>简而言之——用一个bit（0或1）表示某元素是否出现过，其在bitmap的位置对应于其index。《编程珠玑》给出了一个用bitmap做排序的例子：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1999 Lucent Technologies */</span></span><br><span class="line"><span class="comment">/* From 'Programming Pearls' by Jon Bentley */</span></span><br><span class="line"><span class="comment">/* bitsort.c -- bitmap sort from Column 1 * Sort distinct integers in the range [0..N-1] */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BITSPERWORD 32</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SHIFT 5</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MASK 0x1F</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> N 10000000</span></span><br><span class="line"><span class="keyword">int</span> a[<span class="number">1</span> + N / BITSPERWORD];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] |= (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clr</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; a[i &gt;&gt; SHIFT] &amp;= ~(<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123; <span class="keyword">return</span> a[i &gt;&gt; SHIFT] &amp; (<span class="number">1</span> &lt;&lt; (i &amp; MASK)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        clr(i);</span><br><span class="line">    <span class="comment">/* Replace above 2 lines with below 3 for word-parallel init  int top = 1 + N/BITSPERWORD;  for (i = 0; i &lt; top; i++)  a[i] = 0;  */</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;i) != EOF)</span><br><span class="line">        <span class="built_in">set</span>(i);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        <span class="keyword">if</span> (test(i))</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, i);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面代码中，用int的数组存储bitmap，对于每一个待排序的int数，其对应的index为其int值。</p>
-<h3 id="Distinct-Count优化"><a href="#Distinct-Count优化" class="headerlink" title="Distinct Count优化"></a>Distinct Count优化</h3><ol>
-<li>index生成</li>
-</ol>
-<p>为了使用bitmap做Distinct Count，首先需得到每个用户（uid）对应（在bitmap中）的index。有两种办法可以得到从1开始编号index表（与uid一一对应）：</p>
-<ul>
-<li>hash，但是要找到无碰撞且hash值均匀分布[1, +∞)区间的hash函数是非常困难的；<br>维护一张uid与index之间的映射表，并增量更新</li>
-<li>比较两种方法，第二种方法更为简单可行。</li>
-</ul>
-<ol start="2">
-<li>UV计算</li>
-</ol>
-<p>在index生成完成后，RDD[(uid, V)]与RDD[(uid, index)]join得到index化的RDD。bitmap的开源实现有EWAH，采用RLE（Run Length Encoding）压缩，很好地解决了存储空间的浪费。Distinct Count计算转变成了求bitmap中1的个数：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// distinct count for rdd(not pair) and the rdd must be sorted in each partition</span></span><br><span class="line"><span class="comment">// 计算独立值的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">distinctCount</span></span>(rdd: <span class="type">RDD</span>[<span class="type">Int</span>]): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> bitmap = rdd.aggregate[<span class="type">EWAHCompressedBitmap</span>](<span class="keyword">new</span> <span class="type">EWAHCompressedBitmap</span>())(</span><br><span class="line">      (u: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        u.set(v)</span><br><span class="line">        u</span><br><span class="line">      &#125;,</span><br><span class="line">      (u1: <span class="type">EWAHCompressedBitmap</span>, u2: <span class="type">EWAHCompressedBitmap</span>) =&gt; u1.or(u2)</span><br><span class="line">    )</span><br><span class="line">    bitmap.cardinality()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// the tuple_2 is the index</span></span><br><span class="line"><span class="comment">// 计算每个值对应的count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">groupCount</span></span>[<span class="type">K</span>: <span class="type">ClassTag</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    <span class="keyword">val</span> grouped: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">EWAHCompressedBitmap</span>)] = rdd.combineByKey[<span class="type">EWAHCompressedBitmap</span>](</span><br><span class="line">      (v: <span class="type">Int</span>) =&gt; <span class="type">EWAHCompressedBitmap</span>.bitmapOf(v),</span><br><span class="line">      (c: <span class="type">EWAHCompressedBitmap</span>, v: <span class="type">Int</span>) =&gt; &#123;</span><br><span class="line">        c.set(v)</span><br><span class="line">        c</span><br><span class="line">      &#125;,</span><br><span class="line">      (c1: <span class="type">EWAHCompressedBitmap</span>, c2: <span class="type">EWAHCompressedBitmap</span>) =&gt; c1.or(c2))</span><br><span class="line">    grouped.map(t =&gt; (t._1, t._2.cardinality()))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>但是，在上述计算中，由于EWAHCompressedBitmap的set方法要求int值是升序的，也就是说RDD的每一个partition的index应是升序排列：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sort pair RDD by value</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sortPairRDD</span></span>[<span class="type">K</span>](rdd: <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)]): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">Int</span>)] = &#123;</span><br><span class="line">    rdd.mapPartitions(iter =&gt; &#123;</span><br><span class="line">      iter.toArray.sortWith((x, y) =&gt; x._2.compare(y._2) &lt; <span class="number">0</span>).iterator</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>为了避免排序，可以为每一个uid生成一个bitmap，然后在Distinct Count时将bitmap进行or运算亦可：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rdd.reduceByKey(_ or _)</span><br><span class="line">    .mapValues(_._2.cardinality())</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1950,7 +1951,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1961,7 +1962,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>

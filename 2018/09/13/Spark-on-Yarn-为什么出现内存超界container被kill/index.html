@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Scala,类型转换," />
+  <meta name="keywords" content="Spark,Yarn," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
-<meta name="keywords" content="Scala,类型转换">
+<meta name="description" content="一个Executor对应一个JVM进程。 从Spark的角度看，Executor占用的内存分为两部分：Memory）等。1234567891011121314```spark.driver.memory``` 和```spark.executor.memory``` 分别设置Spark的Driver和Executor的```ExecutorMemory```.```spark.yarn.execu">
+<meta name="keywords" content="Spark,Yarn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Scala mutable和immutable类型转换">
-<meta property="og:url" content="http://slamke.github.io/2016/08/10/Scala-mutable和immutable类型转换/index.html">
+<meta property="og:title" content="Spark on Yarn 为什么出现内存超界container被kill">
+<meta property="og:url" content="http://slamke.github.io/2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/index.html">
 <meta property="og:site_name" content="雁渡寒潭 风吹疏竹">
-<meta property="og:description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
+<meta property="og:description" content="一个Executor对应一个JVM进程。 从Spark的角度看，Executor占用的内存分为两部分：Memory）等。1234567891011121314```spark.driver.memory``` 和```spark.executor.memory``` 分别设置Spark的Driver和Executor的```ExecutorMemory```.```spark.yarn.execu">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-02-03T08:34:17.048Z">
+<meta property="og:updated_time" content="2018-09-13T07:55:04.854Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Scala mutable和immutable类型转换">
-<meta name="twitter:description" content="一般而言，from mutable to immutable, 使用 to 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _">
+<meta name="twitter:title" content="Spark on Yarn 为什么出现内存超界container被kill">
+<meta name="twitter:description" content="一个Executor对应一个JVM进程。 从Spark的角度看，Executor占用的内存分为两部分：Memory）等。1234567891011121314```spark.driver.memory``` 和```spark.executor.memory``` 分别设置Spark的Driver和Executor的```ExecutorMemory```.```spark.yarn.execu">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://slamke.github.io/2016/08/10/Scala-mutable和immutable类型转换/"/>
+  <link rel="canonical" href="http://slamke.github.io/2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/"/>
 
 
 
 
 
-  <title>Scala mutable和immutable类型转换 | 雁渡寒潭 风吹疏竹</title>
+  <title>Spark on Yarn 为什么出现内存超界container被kill | 雁渡寒潭 风吹疏竹</title>
   
 
 
@@ -253,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2016/08/10/Scala-mutable和immutable类型转换/">
+    <link itemprop="mainEntityOfPage" href="http://slamke.github.io/2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Sun Ke">
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Scala mutable和immutable类型转换</h1>
+          <h1 class="post-title" itemprop="name headline">Spark on Yarn 为什么出现内存超界container被kill</h1>
         
 
         <div class="post-meta">
@@ -282,8 +282,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-10T09:46:12+08:00">
-                2016-08-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-13T14:36:24+08:00">
+                2018-09-13
               </time>
             
 
@@ -305,8 +305,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Scala/" itemprop="url" rel="index">
-                    <span itemprop="name">Scala</span>
+                  <a href="/categories/Spark/" itemprop="url" rel="index">
+                    <span itemprop="name">Spark</span>
                   </a>
                 </span>
 
@@ -323,9 +323,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/08/10/Scala-mutable和immutable类型转换/#comments" itemprop="discussionUrl">
+                <a href="/2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/08/10/Scala-mutable和immutable类型转换/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -353,13 +353,16 @@
       
 
       
-        <p>一般而言，from mutable to immutable, 使用 to<em> 系列方法in mutable collections, like MutableList and ListBuffer’s toList method.<br>from immutable to mutable, 使用构造函数: scala.collection.mutable.ListBuffer(immtableList: _</em>).</p>
+        <p>一个Executor对应一个JVM进程。 从Spark的角度看，Executor占用的内存分为两部分：<figure class="highlight plain"><figcaption><span>Memory）等。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">```spark.driver.memory``` 和```spark.executor.memory``` 分别设置Spark的Driver和Executor的```ExecutorMemory```.</span><br><span class="line"></span><br><span class="line">```spark.yarn.executor.memoryOverhead```和```spark.yarn.driver.memoryOverhead```分别设置Spark的Driver和Executor的```MemoryOverhead```.</span><br><span class="line"></span><br><span class="line">另外，Spark会大量分配堆外内存，堆外内存默认最大可以和```ExecutorMemory```一样，可以通过javaOptions使用```MaxDirectMemorySize```配置最大值。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">堆外内存最大可以和```ExecutorMemory```一样，但是堆外内存又受```MemoryOverhead```限制，所以当```MaxDirectMemorySize```,```ExecutorMemory```和```MemoryOverhead```设置不合理时，会出现container内存超限，被Yarn kill的情况。 </span><br><span class="line"></span><br><span class="line">比如，```ExecutorMemory``` 为8G，```MemoryOverhead```为4G，```MaxDirectMemorySize```没有设置，此时yarn认为一个container最大可以使用12G内存，但是堆外内存最大可以使用8G，导致container最大可以使用超过16G内存(堆内内存+ 堆外内存)，比12G大， 最终被Yarn kill掉。</span><br><span class="line"></span><br><span class="line">合理的设置规则为:    ```ExecutorMemory``` + ```MemoryOverhead``` &gt;  ```ExecutorMemory``` + ```MaxDirectMemorySize</span><br></pre></td></tr></table></figure></p>
+<p>所以，Spark应用占用集群内存的总大小为: </p>
 <blockquote>
-<p>Note that the to* methods like toList, toMap are is performed in constant time.</p>
+<p>(executor个数) * (SPARK_EXECUTOR_MEMORY+ spark.yarn.executor.memoryOverhead)+(SPARK_DRIVER_MEMORY+spark.yarn.driver.memoryOverhead)</p>
 </blockquote>
-<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> mutableMap1 = immutableMap.toMap() <span class="comment">// after 2.8</span></span><br><span class="line"><span class="keyword">val</span> mutbaleMap2 = collection.immutable.<span class="type">Map</span>(x.toList: _*) <span class="comment">// before 2.8</span></span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableMap = scala.collection.immutable.<span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="string">"1"</span>, <span class="number">2</span> -&gt; <span class="string">"2"</span>)</span><br><span class="line"><span class="keyword">val</span> mutableMap = scala.collection.mutable.<span class="type">Map</span>(immutableMap: _*)</span><br></pre></td></tr></table></figure>
-<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from mutable to immutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = mutableListBuffer.toList</span><br><span class="line"><span class="comment">// from immutable to mutable</span></span><br><span class="line"><span class="keyword">val</span> immutableList = scala.collection.immutable.<span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> mutableListBuffer = scala.collection.mutable.<span class="type">ListBuffer</span>(immutableList: _*)</span><br></pre></td></tr></table></figure>
-<p><a href="http://qiita.com/visualskyrim/items/1e92fc99fc3eaf004778" target="_blank" rel="noopener">参考链接</a></p>
+<p>参数调优建议：</p>
+<p>每个Executor进程的内存设置4G~8G较为合适。</p>
+<p>每个Executor的CPU core数量设置为2~4个较为合适。</p>
+<p>以下是部分建议的参数设置:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">--conf "spark.driver.extraJavaOptions=-XX:MaxDirectMemorySize=1024m -Xmn4g -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/tmp/log/run/gc-%t.log" \</span><br><span class="line"></span><br><span class="line">--conf "spark.speculation=true" \</span><br><span class="line">--conf "spark.speculation.quantile=0.95" \</span><br><span class="line"></span><br><span class="line">--conf "spark.kryoserializer.buffer.max=1024m" \</span><br><span class="line"></span><br><span class="line">--conf "spark.sql.hive.metastorePartitionPruning=true" \</span><br><span class="line">--conf "spark.sql.optimizer.metadataOnly=true" \</span><br><span class="line">--conf "spark.sql.parquet.filterPushdown=true" \</span><br><span class="line">--conf "spark.sql.hive.caseSensitiveInferenceMode=NEVER_INFER" \</span><br><span class="line">--conf "spark.sql.hive.convertMetastoreParquet=false" \</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -377,9 +380,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Scala/" rel="tag"># Scala</a>
+            <a href="/tags/Spark/" rel="tag"># Spark</a>
           
-            <a href="/tags/类型转换/" rel="tag"># 类型转换</a>
+            <a href="/tags/Yarn/" rel="tag"># Yarn</a>
           
         </div>
       
@@ -392,8 +395,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/04/Spark性能优化/" rel="next" title="Spark性能优化">
-                <i class="fa fa-chevron-left"></i> Spark性能优化
+              <a href="/2018/09/07/redis系列：通过文章点赞排名案例学习sortedset命令/" rel="next" title="redis系列：通过文章点赞排名案例学习sortedset命令">
+                <i class="fa fa-chevron-left"></i> redis系列：通过文章点赞排名案例学习sortedset命令
               </a>
             
           </div>
@@ -401,10 +404,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/11/Dropwizard--非常棒的Java-REST服务器栈/" rel="prev" title="Dropwizard--非常棒的Java REST服务器栈">
-                Dropwizard--非常棒的Java REST服务器栈 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -466,17 +465,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -491,7 +481,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-count">104</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -502,7 +492,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -536,22 +526,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Map"><span class="nav-number">1.</span> <span class="nav-text">Map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#List"><span class="nav-number">2.</span> <span class="nav-text">List</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -716,9 +690,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://slamke.github.io/2016/08/10/Scala-mutable和immutable类型转换/';
-          this.page.identifier = '2016/08/10/Scala-mutable和immutable类型转换/';
-          this.page.title = 'Scala mutable和immutable类型转换';
+          this.page.url = 'http://slamke.github.io/2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/';
+          this.page.identifier = '2018/09/13/Spark-on-Yarn-为什么出现内存超界container被kill/';
+          this.page.title = 'Spark on Yarn 为什么出现内存超界container被kill';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://Sunke.disqus.com/embed.js';
